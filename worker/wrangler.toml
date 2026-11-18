@@ -1,0 +1,11 @@
+name = "city-leads"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# Сайты, с которых разрешено отправлять заявки (через запятую, без слэша в конце).
+# Когда подключите свой домен, добавьте его сюда, например: "https://dzaffry13-oss.github.io,https://city-bynaksk.ru"
+ALLOWED_ORIGINS = "https://dzaffry13-oss.github.io"
+
+# Секреты BOT_TOKEN и CHAT_ID в этот файл не пишутся.
+# Их задают командой: npx wrangler secret put BOT_TOKEN
