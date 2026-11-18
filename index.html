@@ -27,7 +27,7 @@ document.getElementById('search').addEventListener('submit',e=>{e.preventDefault
 function openModal(t){document.getElementById('mt').textContent=t;document.getElementById('modal').classList.add('open')}function closeModal(){document.getElementById('modal').classList.remove('open')}document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};document.onkeydown=e=>{if(e.key==='Escape')closeModal()};document.getElementById('year').textContent=new Date().getFullYear();
 
 // Адрес Cloudflare Worker, который пересылает заявки в Telegram (см. README.md)
-const LEAD_URL="";
+const LEAD_URL="https://city-leads.dzaffry13.workers.dev";
 document.getElementById("lead").addEventListener("submit",async e=>{e.preventDefault();
 const f=e.target,st=document.getElementById("status"),btn=document.getElementById("send"),d=Object.fromEntries(new FormData(f));
 d.topic=document.getElementById("mt").textContent;d.page=location.href;
