@@ -428,7 +428,7 @@ function showDetails(id){
   $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>';
   $("details-modal").classList.add("open");
 }
-$("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
+document.querySelector("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
 $("details-modal").addEventListener("click",e=>{if(e.target.id==="details-modal")$("details-modal").classList.remove("open")});
 $("details-request").addEventListener("click",()=>{if(activeDetails){$("details-modal").classList.remove("open");openModal("Заявка: "+activeDetails.title+" — "+cityName(activeDetails))}});
 ["rooms","area","budget","sort"].forEach(id=>$(id).addEventListener("input",render));
