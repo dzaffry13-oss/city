@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101D36">
-<meta name="description" content="CITY, агентство недвижимости в Буйнакске: квартиры, комнаты, дома, земельные участки, гаражи и коммерческая недвижимость. Продажа и аренда.">
-<title>CITY, агентство недвижимости в Буйнакске</title>
+<meta name="description" content="CITY — агентство недвижимости в Дагестане. Подбор, продажа и аренда квартир, домов, участков и коммерческих помещений.">
+<title>CITY — агентство недвижимости в Дагестане</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='9' fill='%2313262F'/%3E%3Cpath d='M4 25l7-9 5 6 6-11 8 14z' fill='%23F0C579'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -215,8 +215,8 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
     <g class="l l5"><path d="M0 335L220 318 460 336 720 320 980 338 1220 322 1440 334V360H0z" fill="#13262F"/></g>
   </svg>
   <div class="wrap hero-in">
-    <h1>Недвижимость<br>в Буйнакске</h1>
-    <p class="lead">Квартиры, дома, участки и коммерческие помещения. Подбираем объект, организуем просмотр и сопровождаем сделку.</p>
+    <h1>Недвижимость<br>в Дагестане</h1>
+    <p class="lead">Квартиры, дома, участки и коммерческие помещения в городах Дагестана. Подбираем объект, организуем просмотр и сопровождаем сделку.</p>
     <div class="hero-cta">
       <a class="btn acc" href="#catalog">Смотреть объекты</a>
       <button class="btn line" type="button" data-open="Продать или сдать недвижимость">Продать или сдать</button>
@@ -227,7 +227,7 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
 <div class="wrap finder-wrap">
   <form class="finder" id="search">
     <div class="cats" id="cats" aria-label="Категория недвижимости"></div>
-    <div class="frow">
+    <div class="frow">\n      <div class="field city-field"><label for="city">Город</label><select id="city"><option value="">Все города</option></select></div>
       <div class="seg" id="deals" aria-label="Тип сделки"></div>
       <div class="field" id="f-rooms" hidden>
         <label for="rooms">Комнаты</label>
@@ -268,7 +268,7 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
     <h2>Доверие дороже денег</h2>
     <div>
       <p>CITY помогает собственникам находить покупателей и арендаторов, а тем, кто ищет жильё или помещение, подбирать подходящий объект и спокойно доходить до сделки.</p>
-      <p>Мы работаем в Буйнакске и знаем местный рынок.</p>
+      <p>Мы развиваем подбор недвижимости по городам Республики Дагестан.</p>
       <div class="vals">
         <div><b>Понятный процесс</b><span>Объясняем каждый следующий шаг.</span></div>
         <div><b>Личный подход</b><span>Учитываем задачу и бюджет.</span></div>
@@ -305,7 +305,7 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
         <a class="btn ghost" data-tg target="_blank" rel="noopener" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Telegram</a>
       </div>
     </div>
-    <div class="fine"><span>CITY, агентство недвижимости. Буйнакск, Республика Дагестан</span><span>&copy; <span id="year"></span> CITY</span></div>
+    <div class="fine"><span>CITY, агентство недвижимости. Республика Дагестан</span><span>&copy; <span id="year"></span> CITY</span></div>
   </div>
 </footer>
 
@@ -359,7 +359,7 @@ const GLYPH={
 };
 const ICON_CHAT='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
 let L=[];const S={cat:"",deal:""};
-const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("ru-RU").format(n);
+const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("ru-RU").format(n);\nfunction cityName(i){return String(i.city||"").trim()}\nfunction populateCities(){const el=$("city"),selected=el.value;const cities=[...new Set(L.map(cityName).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ru"));el.innerHTML='<option value="">Все города</option>'+cities.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");el.value=cities.includes(selected)?selected:""}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function tabs(){
@@ -376,7 +376,7 @@ function fields(){
 }
 function list(){
   const r=$("rooms").value,a=+$("area").value||0,b=+$("budget").value||Infinity,roomsOn=!$("f-rooms").hidden;
-  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!roomsOn||!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&i.area>=a&&i.price<=b);
+  const selectedCity=$("city").value;\n  const x=L.filter(i=>(!selectedCity||cityName(i)===selectedCity)&&(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!roomsOn||!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&i.area>=a&&i.price<=b);
   const so=$("sort").value;
   if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);
   return x;
@@ -405,7 +405,7 @@ $("cards").addEventListener("click",e=>{const b=e.target.closest(".ask");if(b)op
 ["rooms","area","budget","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
 tabs();fields();
-fetch("listings.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{L=d;render()}).catch(()=>{$("empty").textContent="Не удалось загрузить объявления. Позвоните нам: "+PHONE_TEXT;$("empty").style.display="block"});
+fetch("listings.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{L=d;populateCities();render()}).catch(()=>{$("empty").textContent="Не удалось загрузить объявления. Позвоните нам: "+PHONE_TEXT;$("empty").style.display="block"});
 
 /* ---- окно заявки ---- */
 function openModal(t){$("mt").textContent=t;$("modal").classList.add("open")}
