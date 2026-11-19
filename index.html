@@ -103,6 +103,7 @@ h2{font-family:var(--display);font-weight:500;font-size:clamp(25px,3.6vw,40px);l
 .specs{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .specs li{background:var(--tint);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:600;color:var(--ink2)}
 .loc{font-size:13.5px;color:var(--mut)}
+.detail-list{margin:14px 0 0}.detail-list div{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--line)}.detail-list dt{color:var(--mut)}.detail-list dd{margin:0;text-align:right;font-weight:600}
 .acts{display:flex;gap:8px;margin-top:auto;padding-top:8px}
 .acts .wa{flex:1}
 .acts .ask{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:0 16px;font-weight:700;font-size:14px;cursor:pointer}
@@ -332,6 +333,16 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
   </div>
 </div>
 
+
+<div class="modal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-title">
+  <div class="dialog">
+    <button class="close" type="button" data-close-details aria-label="Закрыть">&times;</button>
+    <h3 id="details-title">Информация об объекте</h3>
+    <div id="details-content"></div>
+    <button class="btn acc" type="button" id="details-request" style="width:100%;margin-top:14px">Оставить заявку</button>
+  </div>
+</div>
+
 <script>
 // Один номер для звонков, WhatsApp и Telegram
 const PHONE_DIGITS="79094833939",PHONE_TEXT="+7 909 483-39-39";
@@ -384,13 +395,14 @@ function list(){
 function card(i){
   const land=i.category==="uchastki",u=land?"сот.":"м²";
   const per=i.deal==="arenda"?"в месяц":i.deal==="posutochno"?"в сутки":"";
-  const msg="Здравствуйте! Интересует объект: "+i.title+", "+fmt(i.price)+" ₽"+(per?" "+per:"")+". Он ещё актуален?";
+  const city=cityName(i)||"Город не указан";
+  const msg="Здравствуйте! Интересует объект: "+i.title+", город: "+city+", "+fmt(i.price)+" ₽"+(per?" "+per:"")+". Он ещё актуален?";
   const wa="https://wa.me/"+PHONE_DIGITS+"?text="+encodeURIComponent(msg);
   const specs=[i.rooms?i.rooms+" комн.":"",fmt(i.area)+" "+u,i.extra||""].filter(Boolean).map(t=>"<li>"+esc(t)+"</li>").join("");
   const vis=i.image?'<img src="'+esc(i.image)+'" alt="'+esc(i.title)+'" loading="lazy">':'<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">'+(GLYPH[i.category]||GLYPH.doma)+'</svg>';
   return '<article class="card"><div class="visual">'+vis+'<div class="chips"><span class="chip">'+DEALLBL[i.deal]+'</span>'+(i.demo?'<span class="chip o">пример</span>':'')+'</div></div>'
-    +'<div class="cbody"><div class="price">'+fmt(i.price)+' ₽'+(per?'<small>'+per+'</small>':'')+'</div><h3>'+esc(i.title)+'</h3><ul class="specs">'+specs+'</ul><div class="loc">'+esc(i.location||"Буйнакск")+'</div>'
-    +'<div class="acts"><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'Написать в WhatsApp</a><button type="button" class="ask" data-t="'+esc(i.title)+'">Заявка</button></div></div></article>';
+    +'<div class="cbody"><div class="price">'+fmt(i.price)+' ₽'+(per?'<small>'+per+'</small>':'')+'</div><h3>'+esc(i.title)+'</h3><div class="loc"><strong>Город:</strong> '+esc(city)+'</div><ul class="specs">'+specs+'</ul><div class="loc">'+esc(i.location||"Район не указан")+'</div>'
+    +'<div class="acts"><button type="button" class="ask" data-details="'+i.id+'">Подробнее</button><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'WhatsApp</a></div></div></article>';
 }
 function render(){
   tabs();fields();
@@ -401,7 +413,24 @@ function render(){
 }
 $("cats").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(b){S.cat=b.dataset.cat;render()}});
 $("deals").addEventListener("click",e=>{const b=e.target.closest("[data-deal]");if(b){S.deal=b.dataset.deal;render()}});
-$("cards").addEventListener("click",e=>{const b=e.target.closest(".ask");if(b)openModal("Заявка: "+b.dataset.t)});
+$("cards").addEventListener("click",e=>{
+  const b=e.target.closest("[data-details]");
+  if(b)showDetails(b.dataset.details);
+});
+let activeDetails=null;
+function showDetails(id){
+  const item=L.find(x=>String(x.id)===String(id));if(!item)return;
+  activeDetails=item;
+  const city=cityName(item)||"Город не указан";
+  const per=item.deal==="arenda"?"в месяц":item.deal==="posutochno"?"в сутки":"";
+  const rows=[["Город",city],["Адрес / район",item.location||"Не указан"],["Тип сделки",DEALLBL[item.deal]||"Не указан"],["Площадь",(item.area??"—")+(item.category==="uchastki"?" сот.":" м²")],["Комнаты",item.rooms?item.rooms:"—"],["Дополнительно",item.extra||"—"]];
+  $("details-title").textContent=item.title;
+  $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>';
+  $("details-modal").classList.add("open");
+}
+$("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
+$("details-modal").addEventListener("click",e=>{if(e.target.id==="details-modal")$("details-modal").classList.remove("open")});
+$("details-request").addEventListener("click",()=>{if(activeDetails){$("details-modal").classList.remove("open");openModal("Заявка: "+activeDetails.title+" — "+cityName(activeDetails))}});
 ["rooms","area","budget","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
 tabs();fields();
