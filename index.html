@@ -511,6 +511,13 @@ footer{background:#06172b}
   .steps-btns{width:100%}
   .steps-btns .btn{flex:1 1 100%}
 }
+
+/* Цифры шагов: ровные цифры одной высоты, содержимое колонок по центру */
+.step i{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1;line-height:1}
+@media(min-width:641px){
+  .step,.step + .step,.step:nth-child(even),.step:nth-child(n+3){padding:28px 22px 14px;text-align:center}
+  .step p{margin-inline:auto;max-width:24em}
+}
 </style>
 </head>
 <body>
