@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101D36">
-<meta name="description" content="CITY — агентство недвижимости в Дагестане. Подбор, продажа и аренда квартир, домов, участков и коммерческих помещений.">
-<title>CITY — агентство недвижимости в Дагестане</title>
+<meta name="description" content="CITY — агентство недвижимости в Буйнакске. Покупка, продажа и аренда недвижимости. Почти 6 лет работы, личная проверка объектов и сопровождение сделок.">
+<title>CITY — агентство недвижимости в Буйнакске</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='9' fill='%2313262F'/%3E%3Cpath d='M4 25l7-9 5 6 6-11 8 14z' fill='%23F0C579'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,9 +78,13 @@ h1{font-family:var(--display);font-weight:500;font-size:clamp(31px,6.2vw,74px);l
 .seg .tab:hover{background:rgba(255,255,255,.6)}
 .seg .tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(19,38,47,.18)}
 .field label{display:block;font-size:13px;font-weight:600;color:var(--mut);margin:0 0 6px 2px}
-.field input,.field select{width:100%;height:48px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;background:#fff}
+.field input,.field select,.city-fixed{width:100%;height:48px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;background:#fff}.city-fixed{display:flex;align-items:center;color:var(--ink);font-weight:600}
 .field input:focus,.field select:focus{border-color:var(--acc);outline:0}
 .frow .btn{height:48px;padding-block:0}
+
+
+.advanced-filters{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:18px}.advanced-filters[hidden]{display:none}.filter-section{display:grid;gap:10px}.filter-section>strong{font-size:14px}.filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.filter-footer{display:flex;justify-content:flex-end;gap:10px}.finder-actions .field{max-width:260px}.finder-actions .btn{height:48px}.finder-actions .btn.line{color:var(--ink);border-color:var(--line);background:#fff}.finder-actions .btn.line:hover{background:var(--ink);color:#fff}
+@media(max-width:760px){.filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.finder-actions .field{flex:1 1 100%;max-width:none}.finder-actions .btn{flex:1 1 100%}}
 
 /* каталог */
 .block{padding:clamp(56px,8vw,96px) 0}
@@ -234,13 +238,253 @@ footer{background:#06172b}
  h1{font-size:clamp(34px,9vw,46px);max-width:12em}
 }
 
+
+/* Компактная поисковая панель CITY */
+.finder-wrap{margin-top:-66px}
+.finder{padding:18px 20px 20px;gap:14px;border-radius:22px}
+.deal-tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.deal-tab{border:1px solid transparent;background:#f2f4f7;color:#26364b;border-radius:15px;padding:12px 22px;font-weight:600;cursor:pointer;transition:.18s}
+.deal-tab:hover{background:#e9edf2}
+.deal-tab.active{background:#fff;border:1.5px solid var(--ink);box-shadow:0 2px 8px rgba(7,27,49,.07)}
+.finder-bar{display:grid;grid-template-columns:minmax(145px,1.1fr) minmax(140px,1fr) minmax(130px,.8fr) auto auto;align-items:center;gap:0;background:#f2f4f7;border-radius:18px;padding:8px}
+.finder-bar .field{min-width:0;padding:0 16px}
+.finder-bar .field+ .field{border-left:1px solid #d6dce4}
+.finder-bar label{font-size:12px;margin-bottom:2px;color:#687589}
+.finder-bar select,.finder-bar input{height:32px;border:0;background:transparent;border-radius:0;padding:0;font-size:15px;font-weight:600;box-shadow:none}
+.finder-bar select:focus,.finder-bar input:focus{outline:0}
+.finder-bar input::placeholder{color:#26364b;opacity:.7}
+.finder-bar .filter-link, .finder-bar .show-listings{height:54px;border:0;cursor:pointer;font-weight:700;white-space:nowrap}
+.finder-bar .filter-link{background:transparent;padding:0 16px;color:var(--ink)}
+.finder-bar .show-listings{background:var(--ink);color:#fff;border-radius:14px;padding:0 22px}
+.finder-bar .show-listings:hover{background:#17385c}
+.advanced-filters{padding:18px 8px 4px}
+.finder-actions{display:none}
+@media(max-width:900px){
+ .finder-bar{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .finder-bar .field{padding:8px 10px}
+ .finder-bar .field+.field{border-left:0}
+ .finder-bar .filter-link,.finder-bar .show-listings{grid-column:span 1}
+}
+@media(max-width:600px){
+ .finder-wrap{margin-top:-82px}
+ .finder{padding:12px;border-radius:18px}
+ .deal-tabs{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:2px 0 4px}
+ .deal-tab{padding:10px 16px;font-size:14px}
+ .finder-bar{grid-template-columns:1fr 1fr;padding:8px}
+ .finder-bar .field{grid-column:span 1;padding:7px 8px}
+ .finder-bar .price-quick{border-left:1px solid #d6dce4}
+ .finder-bar .filter-link,.finder-bar .show-listings{height:46px;padding:0 8px;font-size:13px}
+ .finder-bar .show-listings{grid-column:span 2}
+}
+
+#quick-land[hidden],#f-land-type[hidden]{display:none}
+
+/* CITY — signature property search */
+.finder-wrap{position:relative;z-index:3;max-width:1280px;margin:-54px auto 0}
+.finder{background:transparent;border:0;box-shadow:none;padding:0;gap:12px}
+.deal-tabs{display:flex;justify-content:center;gap:7px;margin:0 auto 12px}
+.deal-tab{position:relative;background:rgba(255,255,255,.94);border:1px solid #e6e9ee;color:#536174;border-radius:12px;padding:10px 22px;font-size:14px;font-weight:600;letter-spacing:.01em;box-shadow:0 3px 14px rgba(9,29,53,.045);transition:background .2s,border-color .2s,color .2s,transform .2s}
+.deal-tab:hover{background:#fff;border-color:#c8d0da;color:var(--ink);transform:translateY(-1px)}
+.deal-tab.active{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 5px 16px rgba(9,29,53,.16)}
+.deal-tab.active:after{content:"";position:absolute;left:22px;right:22px;bottom:5px;height:2px;border-radius:2px;background:#d7b45f;opacity:.95}
+.finder-bar{display:grid;grid-template-columns:minmax(190px,1.2fr) minmax(170px,1fr) minmax(145px,.85fr) auto auto;align-items:stretch;gap:0;padding:8px;background:#fff;border:1px solid #e6eaf0;border-radius:17px;box-shadow:0 12px 34px rgba(11,31,55,.09)}
+.finder-bar .field{min-width:0;display:flex;flex-direction:column;justify-content:center;padding:7px 18px}
+.finder-bar .field+.field{border-left:1px solid #e8ebef}
+.finder-bar label{font-size:11px;font-weight:600;letter-spacing:.035em;text-transform:uppercase;color:#8a94a3;margin:0 0 3px}
+.finder-bar select,.finder-bar input{width:100%;height:30px;min-width:0;border:0!important;background-color:transparent!important;border-radius:0!important;padding:0 20px 0 0!important;font-size:15px;font-weight:600;color:var(--ink);box-shadow:none!important}
+.finder-bar select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 9 9'%3E%3Cpath d='M1 2.5 4.5 6 8 2.5' fill='none' stroke='%2324364d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 4px center!important;background-size:9px 9px!important}
+.finder-bar select:focus,.finder-bar input:focus{outline:0}
+.finder-bar input::placeholder{color:#929ba8;opacity:1;font-weight:500}
+.finder-bar .filter-link,.finder-bar .show-listings{align-self:center;height:48px;border:0;cursor:pointer;font-size:14px;font-weight:650;white-space:nowrap;transition:all .2s}
+.finder-bar .filter-link{position:relative;background:#f7f8fa;color:var(--ink);border:1px solid #edf0f3;border-radius:11px;padding:0 17px;margin:0 8px}
+.finder-bar .filter-link:before{content:none;display:none}
+.finder-bar .filter-link:hover,.finder-bar .filter-link[aria-expanded="true"]{background:#fbf8ef;border-color:#d7b45f}
+.finder-bar .show-listings{background:var(--ink);color:#fff;border-radius:11px;padding:0 22px}
+.finder-bar .show-listings:hover{background:#17385c;box-shadow:0 5px 14px rgba(9,29,53,.16);transform:translateY(-1px)}
+.advanced-filters{margin-top:10px;padding:20px 22px;background:#fff;border:1px solid #e7ebf0;border-radius:16px;box-shadow:0 10px 28px rgba(11,31,55,.06)}
+.filter-grid{gap:14px}
+.filter-grid .field{padding:11px 13px;background:#f8f9fb;border:1px solid #edf0f3;border-radius:10px}
+.filter-grid .field label{color:#7d8999;font-size:11px;font-weight:600}
+.filter-grid input,.filter-grid select{background:transparent;border:0;padding:2px 0;color:var(--ink);font-weight:550}
+.filter-footer{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:16px}
+@media(max-width:900px){
+ .finder-wrap{margin-top:-38px;padding:0 18px}
+ .finder-bar{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+ .finder-bar .field{padding:10px 13px}
+ .finder-bar .field+.field{border-left:0}
+ .finder-bar .field:nth-child(2n){border-left:1px solid #e8ebef}
+ .finder-bar .filter-link,.finder-bar .show-listings{margin:6px;height:46px}
+ .finder-bar .filter-link{grid-column:1}
+ .finder-bar .show-listings{grid-column:2}
+}
+@media(max-width:600px){
+ .finder-wrap{margin-top:-28px;padding:0 14px}
+ .finder{gap:8px}
+ .deal-tabs{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:2px 1px 6px;margin-bottom:4px}
+ .deal-tab{padding:10px 16px;font-size:13px;flex:0 0 auto}
+ .finder-bar{grid-template-columns:1fr 1fr;padding:6px;border-radius:14px}
+ .finder-bar .field{padding:9px 10px}
+ .finder-bar .field:nth-child(2n){border-left:1px solid #e8ebef}
+ .finder-bar label{font-size:10px}
+ .finder-bar select,.finder-bar input{font-size:13px}
+ .finder-bar .filter-link,.finder-bar .show-listings{height:43px;margin:5px 3px;padding:0 8px;font-size:12px}
+ .finder-bar .filter-link{grid-column:1}
+ .finder-bar .show-listings{grid-column:2}
+ .advanced-filters{padding:14px;border-radius:13px}
+ .filter-footer{justify-content:stretch}
+ .filter-footer>*{flex:1}
+}
+
+/* Price range popover */
+.finder-bar{grid-template-columns:minmax(190px,1.15fr) minmax(165px,1fr) minmax(155px,.9fr) auto auto}
+.price-control{position:relative;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:7px 18px;border-left:1px solid #e8ebef}
+.price-caption{font-size:11px;font-weight:600;letter-spacing:.035em;text-transform:uppercase;color:#8a94a3;margin:0 0 3px}
+.price-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;height:30px;padding:0;border:0;background:transparent;color:var(--ink);font-size:15px;font-weight:600;text-align:left;cursor:pointer}
+.price-chevron{width:9px;height:9px;flex:0 0 9px;border-right:2px solid #24364d;border-bottom:2px solid #24364d;transform:rotate(45deg) translateY(-2px);transform-origin:center;transition:transform .18s}
+.price-trigger[aria-expanded="true"] .price-chevron{transform:rotate(225deg) translateY(-2px)}
+.price-popover{position:absolute;z-index:20;top:calc(100% + 15px);left:0;width:330px;padding:17px;background:#fff;border:1px solid #e8ebf0;border-radius:15px;box-shadow:0 16px 38px rgba(11,31,55,.16)}
+.price-popover[hidden]{display:none}
+.price-range{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.price-range label{display:flex;flex-direction:column;gap:7px;color:#7d8999;font-size:12px;font-weight:600}
+.price-range input{width:100%;height:44px;padding:0 12px!important;border:1px solid #e6eaf0!important;border-radius:9px!important;background:#f8f9fb!important;color:var(--ink);font-size:15px;font-weight:500}
+.price-range input:focus{outline:2px solid rgba(215,180,95,.55)}
+.price-done{display:block;width:100%;height:40px;margin-top:12px;border:0;border-radius:9px;background:var(--ink);color:#fff;font-weight:650;cursor:pointer}
+.price-done:hover{background:#17385c}
+@media(max-width:900px){
+ .price-control{grid-column:1/-1;border-left:0;border-top:1px solid #e8ebef;padding:10px 13px}
+ .price-popover{top:calc(100% + 6px);left:8px;width:min(330px,calc(100vw - 60px))}
+}
+@media(max-width:600px){
+ .price-control{grid-column:1/-1;border-left:0;padding:9px 10px}
+ .price-trigger{font-size:13px}
+}
+
+/* Mobile-first finishing pass */
+.mobile-menu-toggle,.mobile-menu{display:none}
+@media(max-width:600px){
+  html{scroll-padding-top:76px}
+  body{font-size:15px;overflow-x:hidden}
+  .wrap{width:calc(100% - 28px)}
+  header.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px)}
+  .nav{height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{gap:8px;min-width:0}
+  .brand .brand-mark{width:36px;height:40px}
+  .brand b{font-size:25px}
+  .brand span{font-size:8px;letter-spacing:.025em;margin-top:3px}
+  .nav .btn{display:none}
+  .mobile-menu-toggle{display:flex;width:42px;height:42px;flex:0 0 42px;flex-direction:column;justify-content:center;align-items:center;gap:5px;border:1px solid rgba(215,174,93,.55);border-radius:11px;background:rgba(255,255,255,.08);cursor:pointer}
+  .mobile-menu-toggle span{width:18px;height:2px;border-radius:2px;background:#f1d18b;transition:transform .18s,opacity .18s}
+  .mobile-menu-toggle[aria-expanded="true"] span:first-child{transform:translateY(7px) rotate(45deg)}
+  .mobile-menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .mobile-menu-toggle[aria-expanded="true"] span:last-child{transform:translateY(-7px) rotate(-45deg)}
+  .mobile-menu:not([hidden]){display:grid;gap:2px;padding:8px 14px 14px;background:#071b31;border-top:1px solid rgba(215,174,93,.25);box-shadow:0 12px 24px rgba(0,0,0,.16)}
+  .mobile-menu a,.mobile-menu button{display:block;padding:13px 10px;color:#fff;text-decoration:none;font-size:15px;font-weight:600;text-align:left;border:0;border-bottom:1px solid rgba(255,255,255,.09);background:transparent}
+  .mobile-menu button{margin-top:7px;text-align:center;background:linear-gradient(135deg,#f2d38e,#d9aa4e);color:#12233a;border-radius:10px;border:0}
+  .hero{min-height:0;padding:62px 0 112px;background-position:58% center}
+  .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,18,35,.82),rgba(7,27,49,.34))}
+  .hero-in{position:relative}
+  h1{font-size:clamp(33px,9.4vw,42px);line-height:1.07;max-width:11em;margin-bottom:14px}
+  .lead{font-size:14px;line-height:1.55;margin-bottom:20px;max-width:29em}
+  .hero-cta{display:grid;grid-template-columns:1fr;gap:9px}
+  .hero-cta .btn{width:100%;min-height:46px;justify-content:center}
+  .finder-wrap{width:calc(100% - 24px);margin:-48px auto 0;padding:0}
+  .finder{padding:11px;background:#fff;border:1px solid #e8ebf0;border-radius:16px;box-shadow:0 12px 28px rgba(7,27,49,.13);gap:9px}
+  .deal-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:0}
+  .deal-tab{min-width:0;padding:10px 3px;border-radius:9px;font-size:11.5px;white-space:nowrap;box-shadow:none}
+  .deal-tab.active:after{left:30%;right:30%;bottom:4px}
+  .finder-bar{grid-template-columns:1fr 1fr;gap:0;padding:5px;border-radius:12px;box-shadow:none;background:#f6f7f9}
+  .finder-bar .field,.price-control{min-width:0;padding:10px 9px}
+  .finder-bar .category-field,.finder-bar .rooms-quick,.finder-bar .land-quick,.finder-bar .price-control{grid-column:span 2;border:0;border-bottom:1px solid #e2e6ec}
+  .finder-bar .field:nth-child(2n){border-left:0}
+  .finder-bar label,.price-caption{font-size:9.5px;letter-spacing:.045em;margin-bottom:4px}
+  .finder-bar select,.finder-bar input,.price-trigger{height:29px;font-size:14px}
+  .finder-bar select{background-position:right 7px center!important}
+  .price-control{grid-column:span 2;border-top:0;border-left:0;padding:9px}
+  .price-popover{position:fixed;top:auto;left:12px;right:12px;bottom:calc(82px + env(safe-area-inset-bottom,0px));width:auto;padding:15px;border-radius:15px;box-shadow:0 14px 42px rgba(5,18,35,.22)}
+  .price-range input{height:44px;font-size:16px}
+  .finder-bar .filter-link,.finder-bar .show-listings{height:44px;margin:5px 3px;padding:0 6px;font-size:11.5px;border-radius:9px}
+  .finder-bar .filter-link{grid-column:1}
+  .finder-bar .show-listings{grid-column:2}
+  .advanced-filters{margin-top:8px;padding:13px 10px;border-radius:12px}
+  .filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .filter-grid .field{min-width:0;padding:9px;border-radius:9px}
+  .filter-grid label{font-size:10px}
+  .filter-grid input,.filter-grid select{width:100%;min-width:0;font-size:13px}
+  .filter-footer{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .filter-footer .btn{min-width:0;padding:10px 6px;font-size:12px}
+  #catalog{padding-top:38px}
+  #catalog .head{align-items:flex-start;gap:12px;margin-bottom:17px}
+  #catalog h2{font-size:29px}
+  .tools{width:100%;justify-content:space-between;gap:8px;font-size:12px}
+  .tools select{height:38px;max-width:170px;font-size:12px}
+  .cards{grid-template-columns:1fr;gap:14px}
+  .card{border-radius:14px}
+  .visual{height:clamp(190px,58vw,250px)}
+  .card .body{padding:15px}
+  .card h3{font-size:18px;line-height:1.3}
+  .card .price{font-size:21px}
+  .block{padding:48px 0}
+  h2{font-size:29px}
+  .steps{gap:0}
+  .step{padding:17px 0}
+  .about-g{gap:18px}
+  .vals{grid-template-columns:1fr 1fr;gap:10px}
+  .vals>div{padding:13px;border-radius:10px}
+  .sell{padding:24px 18px;border-radius:16px}
+  .sell .btn{width:100%;justify-content:center}
+  footer{padding:34px 0 calc(88px + env(safe-area-inset-bottom,0px))}
+  .mbar{display:flex;gap:7px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+  .mbar a{min-height:43px;padding:10px 4px;font-size:12px;border-radius:10px}
+  .dialog{width:calc(100% - 24px);max-height:calc(100dvh - 32px);overflow:auto;padding:22px 17px;border-radius:16px}
+  .dialog input,.dialog textarea{font-size:16px;min-height:46px}
+  .dialog textarea{min-height:90px}
+}
+@media(min-width:390px) and (max-width:600px){
+ .deal-tab{font-size:12px}
+ .finder-bar .filter-link,.finder-bar .show-listings{font-size:12px}
+}
+@media(max-width:360px){
+ .wrap{width:calc(100% - 24px)}
+ .deal-tab{font-size:10px;padding:9px 1px}
+ .finder-bar .filter-link,.finder-bar .show-listings{font-size:10.5px}
+ .vals{grid-template-columns:1fr}
+}
+
+/* Реальные отзывы клиентов */
+.review-note{color:var(--mut);font-size:14px}
+.review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.review-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 22px rgba(7,27,49,.045)}
+.review-stars{color:#d9a441;letter-spacing:3px;font-size:19px;line-height:1.2}
+.review-card p{margin:13px 0 16px;font-size:15px;line-height:1.55}
+.review-card span{color:var(--mut);font-size:12.5px}
+@media(max-width:900px){.review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.review-grid{grid-template-columns:1fr}.review-card{padding:17px}}
+
+/* Категории и сделка внутри карточки поиска; отзывы; блок «О нас» */
+[hidden]{display:none!important}
+.cats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 1px 4px}
+.cats::-webkit-scrollbar{display:none}
+.cat-chip{flex:none;white-space:nowrap;border:1.5px solid #e1e6ec;background:#fff;color:#2b3b50;border-radius:999px;padding:9px 17px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.cat-chip:hover{border-color:#9aa8b8}
+.cat-chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+@media(min-width:601px){
+  .finder{background:#fff;border:1px solid #e6eaf0;border-radius:20px;box-shadow:0 14px 40px rgba(11,31,55,.13);padding:14px;gap:12px}
+  .finder-bar{box-shadow:none;border:0;background:#f4f6f8}
+}
+@media(max-width:600px){
+  .cat-chip{padding:9px 14px;font-size:13px}
+}
+.review-grid{align-items:stretch}
+.about-l{display:flex;flex-direction:column;gap:6px}
+.about-l .vals{margin-top:18px}
+.about-r p:first-child{margin-top:0}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap nav">
     <a class="brand" href="#top" aria-label="CITY, агентство недвижимости">
-      <img class="brand-mark" src="assets/city-logo-mark.png" onerror="this.onerror=null;this.src=\'assets/city-logo-mark.webp\'" alt="" aria-hidden="true">
+      <img class="brand-mark" src="assets/city-logo-mark.png" onerror="this.onerror=null;this.src='assets/city-logo-mark.webp'" alt="" aria-hidden="true">
       <div><b>CITY</b><span>Доверие дороже денег</span></div>
     </a>
     <nav class="links" aria-label="Разделы сайта">
@@ -248,7 +492,12 @@ footer{background:#06172b}
     </nav>
     <a class="tel" data-call href="#"><span data-phone-text></span></a>
     <button class="btn acc sm" type="button" data-open="Оставить заявку">Оставить заявку</button>
+    <button class="mobile-menu-toggle" type="button" id="mobile-menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Открыть меню"><span></span><span></span><span></span></button>
   </div>
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Мобильное меню" hidden>
+    <a href="#catalog">Объекты</a><a href="#steps">Как мы работаем</a><a href="#about">О нас</a><a href="#contacts">Контакты</a>
+    <button type="button" data-open="Оставить заявку">Оставить заявку</button>
+  </nav>
 </header>
 
 <main id="top">
@@ -256,7 +505,7 @@ footer{background:#06172b}
   
   <div class="wrap hero-in">
     <h1>Купить, снять или продать<br>недвижимость</h1>
-    <p class="lead">Квартиры, дома, участки и коммерческие объекты в городах Республики Дагестан.</p>
+    <p class="lead">Помогаем покупать, продавать и снимать недвижимость в Буйнакске. Почти 6 лет рядом с городом и его жителями.</p>
     <div class="hero-cta">
       <a class="btn acc" href="#catalog">Смотреть объекты</a>
       <button class="btn line" type="button" data-open="Продать или сдать недвижимость">Продать или сдать</button>
@@ -266,17 +515,35 @@ footer{background:#06172b}
 
 <div class="wrap finder-wrap">
   <form class="finder" id="search">
-    <div class="cats" id="cats" aria-label="Категория недвижимости"></div>
-    <div class="frow">
-      <div class="field city-field"><label for="city">Город</label><select id="city"><option value="">Все города</option></select></div>
-      <div class="seg" id="deals" aria-label="Тип сделки"></div>
-      <div class="field" id="f-rooms" hidden>
-        <label for="rooms">Комнаты</label>
-        <select id="rooms"><option value="">Любое количество</option><option value="1">1 комната</option><option value="2">2 комнаты</option><option value="3">3 комнаты</option><option value="4">4 и больше</option></select>
+    <div class="cats" id="cats" role="group" aria-label="Категория недвижимости"></div>
+    <div class="finder-bar">
+      <div class="field category-field"><label for="deal-select">Сделка</label><select id="deal-select" aria-label="Тип сделки"></select></div>
+      <div class="field rooms-quick" id="quick-rooms"><label for="rooms">Комнаты</label><select id="rooms"><option value="">Любое количество</option><option value="1">1 комната</option><option value="2">2 комнаты</option><option value="3">3 комнаты</option><option value="4">4 и больше</option></select></div>
+      <div class="field land-quick" id="quick-land" hidden><label for="land-type">Категория земли</label><select id="land-type"><option value="">Любая категория</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческая</option></select></div>
+      <div class="price-control" id="price-control">
+        <span class="price-caption">Цена</span>
+        <button class="price-trigger" type="button" id="price-trigger" aria-expanded="false"><span id="price-summary">Любая цена</span><span class="price-chevron" aria-hidden="true"></span></button>
+        <div class="price-popover" id="price-popover" hidden>
+          <div class="price-range">
+            <label>От, ₽<input id="price-min" type="number" min="0" inputmode="numeric" placeholder="Не важно"></label>
+            <label>До, ₽<input id="price-max" type="number" min="0" inputmode="numeric" placeholder="Не важно"></label>
+          </div>
+          <button class="price-done" type="button" id="price-done">Готово</button>
+        </div>
       </div>
-      <div class="field"><label for="area" id="area-l">Площадь от, м²</label><input id="area" type="number" min="0" inputmode="numeric" placeholder="Например, 40"></div>
-      <div class="field"><label for="budget">Цена до, ₽</label><input id="budget" type="number" min="0" inputmode="numeric" placeholder="5 000 000"></div>
-      <button class="btn acc" type="submit">Показать</button>
+      <button class="filter-link" type="button" id="toggle-filters" aria-expanded="false">☷ Все фильтры</button>
+      <button class="show-listings" type="submit">Показать объявления</button>
+    </div>
+    <div class="advanced-filters" id="advanced-filters" hidden>
+      <div class="filter-grid">
+        <div class="field" id="f-area-min"><label for="area-min">Площадь от</label><input id="area-min" type="number" min="0" inputmode="numeric" placeholder="От"></div>
+        <div class="field" id="f-area-max"><label for="area-max">Площадь до</label><input id="area-max" type="number" min="0" inputmode="numeric" placeholder="До"></div>
+        <div class="field" id="f-rooms" hidden><label for="rooms-advanced">Комнаты</label><select id="rooms-advanced"><option value="">Любое количество</option><option value="1">1 комната</option><option value="2">2 комнаты</option><option value="3">3 комнаты</option><option value="4">4 и больше</option></select></div>
+        <div class="field" id="f-land-type" hidden><label for="land-type-advanced">Категория земли</label><select id="land-type-advanced"><option value="">Любая категория</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческая</option></select></div>
+        <div class="field" id="f-floor" hidden><label for="floor">Этаж</label><input id="floor" type="number" min="1" inputmode="numeric" placeholder="Например, 3"></div>
+        <div class="field" id="f-floors" hidden><label for="floors">Этажей в доме</label><input id="floors" type="number" min="1" inputmode="numeric" placeholder="Например, 5"></div>
+      </div>
+      <div class="filter-footer"><button class="btn line sm" type="button" id="reset-filters">Сбросить</button><button class="btn acc" type="submit">Показать объекты</button></div>
     </div>
   </form>
 </div>
@@ -306,16 +573,29 @@ footer{background:#06172b}
 
 <section class="block about" id="about">
   <div class="wrap about-g">
-    <h2>Доверие дороже денег</h2>
-    <div>
-      <p>CITY помогает собственникам находить покупателей и арендаторов, а тем, кто ищет жильё или помещение, подбирать подходящий объект и спокойно доходить до сделки.</p>
-      <p>Мы развиваем подбор недвижимости по городам Республики Дагестан.</p>
+    <div class="about-l">
+      <h2>Доверие дороже денег</h2>
       <div class="vals">
-        <div><b>Понятный процесс</b><span>Объясняем каждый следующий шаг.</span></div>
-        <div><b>Личный подход</b><span>Учитываем задачу и бюджет.</span></div>
-        <div><b>Всегда на связи</b><span>Отвечаем в WhatsApp и по телефону.</span></div>
-        <div><b>Честность</b><span>Не обещаем того, чего не можем.</span></div>
+        <div><b>Почти 6 лет в Буйнакске</b><span>Знаем местный рынок и его особенности.</span></div>
+        <div><b>Личная проверка</b><span>Внимательно проверяем детали объекта и сделки.</span></div>
+        <div><b>Честный разговор</b><span>Говорим открыто и не обещаем невозможного.</span></div>
+        <div><b>Сопровождение</b><span>Остаёмся рядом от первого обращения до результата.</span></div>
       </div>
+    </div>
+    <div class="about-r">
+      <p>CITY работает в Буйнакске почти 6 лет. За это время название CITY стало частью нашей ежедневной работы и отношений с людьми, которые обращаются к нам за помощью с недвижимостью.</p>
+      <p>Каждый объект и каждую сделку я проверяю лично и досконально. Для меня важно не просто свести стороны, а разобраться в деталях, честно рассказать о ситуации и провести клиента через весь процесс.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block testimonials" id="reviews">
+  <div class="wrap">
+    <div class="head"><h2>Нам доверяют</h2><span class="review-note">Реальные отзывы клиентов на Авито</span></div>
+    <div class="review-grid">
+      <article class="review-card"><div class="review-stars">★★★★★</div><p>«Всё хорошо прошло, агент ответил сразу, всё показал, рассказал. Сделка благополучно состоялась».</p><span>Сабина · арендатор</span></article>
+      <article class="review-card"><div class="review-stars">★★★★★</div><p>«Дождались меня, хотя опоздала. Всё показали и объяснили».</p><span>Нурия · покупатель</span></article>
+      <article class="review-card"><div class="review-stars">★★★★★</div><p>«Вошёл в положение и помог со всем. Рекомендую».</p><span>Алексей · арендатор</span></article>
     </div>
   </div>
 </section>
@@ -346,7 +626,7 @@ footer{background:#06172b}
         <a class="btn ghost" data-tg target="_blank" rel="noopener" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Telegram</a>
       </div>
     </div>
-    <div class="fine"><span>CITY, агентство недвижимости. Республика Дагестан</span><span>&copy; <span id="year"></span> CITY</span></div>
+    <div class="fine"><span>CITY — агентство недвижимости в Буйнакске</span><span>&copy; <span id="year"></span> CITY</span></div>
   </div>
 </footer>
 
@@ -396,10 +676,10 @@ document.querySelectorAll("[data-tg]").forEach(e=>e.href="https://t.me/+"+PHONE_
 document.getElementById("year").textContent=new Date().getFullYear();
 
 /* ---- каталог ---- */
-const CATS=[["","Все"],["kvartiry","Квартиры"],["komnaty","Комнаты"],["doma","Дома, дачи, коттеджи"],["uchastki","Земельные участки"],["garazhi","Гаражи и машиноместа"],["kommerciya","Коммерческая недвижимость"]];
+const CATS=[["","Все"],["kvartiry","Квартиры"],["doma","Дома"],["uchastki","Земельные участки"],["kommerciya","Коммерческая недвижимость"]];
 const DEALS=[["","Все"],["prodazha","Купить"],["arenda","Снять"],["posutochno","Посуточно"]];
 const DEALLBL={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
-const DAILY=["kvartiry","komnaty","doma"],ROOMS=["kvartiry","doma"];
+const DAILY=["kvartiry","doma"],ROOMS=["kvartiry","doma"];
 const GLYPH={
   kvartiry:'<path d="M18 62V14h28v48M10 62h44M25 24h4M35 24h4M25 34h4M35 34h4M25 44h4M35 44h4M28 62V54h8v8"/>',
   komnaty:'<path d="M10 14h44v40H10zM10 38h44M22 14v-4h20v4M26 54v-8h12v8"/>',
@@ -412,25 +692,32 @@ const ICON_CHAT='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d=
 let L=[];const S={cat:"",deal:""};
 const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("ru-RU").format(n);
 function cityName(i){return String(i.city||"").trim()}
-function populateCities(){const el=$("city"),selected=el.value;const cities=[...new Set(L.map(cityName).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ru"));el.innerHTML='<option value="">Все города</option>'+cities.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");el.value=cities.includes(selected)?selected:""}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function tabs(){
   const dealOk=!S.cat||DAILY.includes(S.cat);
   if(!dealOk&&S.deal==="posutochno")S.deal="";
-  $("cats").innerHTML=CATS.map(([v,t])=>'<button type="button" class="tab'+(S.cat===v?" active":"")+'" data-cat="'+v+'">'+t+'</button>').join("");
-  $("deals").innerHTML=DEALS.filter(([v])=>v!=="posutochno"||dealOk).map(([v,t])=>'<button type="button" class="tab'+(S.deal===v?" active":"")+'" data-deal="'+v+'">'+t+'</button>').join("");
+  $("cats").innerHTML=CATS.map(([v,t])=>'<button type="button" class="cat-chip'+(S.cat===v?" active":"")+'" data-cat="'+v+'" aria-pressed="'+(S.cat===v)+'">'+t+'</button>').join("");
+  $("deal-select").innerHTML=DEALS.filter(([v])=>v!=="posutochno"||dealOk).map(([v,t])=>'<option value="'+v+'"'+(S.deal===v?" selected":"")+'>'+(v===""?"Купить или снять":t)+'</option>').join("");
 }
 function fields(){
-  const land=S.cat==="uchastki";
-  $("area-l").textContent=land?"Площадь от, сот.":"Площадь от, м²";
-  $("area").placeholder=land?"Например, 6":"Например, 40";
-  $("f-rooms").hidden=!ROOMS.includes(S.cat);
+  const isFlat=S.cat==="kvartiry",isHome=S.cat==="doma",isRoom=ROOMS.includes(S.cat),land=S.cat==="uchastki";
+  $("f-rooms").hidden=!isRoom;
+  $("quick-rooms").hidden=!isRoom;
+  $("quick-land").hidden=!land;
+  $("f-land-type").hidden=!land;
+  $("f-floor").hidden=!isFlat;
+  $("f-floors").hidden=!(isFlat||isHome);
+  $("f-area-min").querySelector("label").textContent=land?"Площадь от, сот.":"Площадь от, м²";
+  $("f-area-max").querySelector("label").textContent=land?"Площадь до, сот.":"Площадь до, м²";
 }
 function list(){
-  const r=$("rooms").value,a=+$("area").value||0,b=+$("budget").value||Infinity,roomsOn=!$("f-rooms").hidden;
-  const selectedCity=$("city").value;
-  const x=L.filter(i=>(!selectedCity||cityName(i)===selectedCity)&&(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!roomsOn||!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&i.area>=a&&i.price<=b);
+  const r=$("rooms").value||$("rooms-advanced").value,min=+$("price-min").value||0,max=+$("price-max").value||Infinity;
+  const amin=+$("area-min").value||0,amax=+$("area-max").value||Infinity;
+  const floor=+$("floor").value||0,floors=+$("floors").value||0;
+  const landType=$("land-type").value||$("land-type-advanced").value;
+  const landText=i=>String(i.landType||i.purpose||i.extra||"").toLocaleLowerCase("ru");
+  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||landText(i).includes(landType.toLocaleLowerCase("ru")))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
   const so=$("sort").value;
   if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);
   return x;
@@ -455,7 +742,7 @@ function render(){
   $("count").textContent=x.length?"Найдено: "+x.length:"";
 }
 $("cats").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(b){S.cat=b.dataset.cat;render()}});
-$("deals").addEventListener("click",e=>{const b=e.target.closest("[data-deal]");if(b){S.deal=b.dataset.deal;render()}});
+$("deal-select").addEventListener("change",e=>{S.deal=e.target.value;render()});
 $("cards").addEventListener("click",e=>{
   const b=e.target.closest("[data-details]");
   if(b)showDetails(b.dataset.details);
@@ -474,10 +761,38 @@ function showDetails(id){
 document.querySelector("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
 $("details-modal").addEventListener("click",e=>{if(e.target.id==="details-modal")$("details-modal").classList.remove("open")});
 $("details-request").addEventListener("click",()=>{if(activeDetails){$("details-modal").classList.remove("open");openModal("Заявка: "+activeDetails.title+" — "+cityName(activeDetails))}});
-["rooms","area","budget","sort"].forEach(id=>$(id).addEventListener("input",render));
+["rooms","rooms-advanced","land-type","land-type-advanced","price-min","price-max","area-min","area-max","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
+const mobileMenu=$("mobile-menu"),menuToggle=$("mobile-menu-toggle");
+menuToggle.addEventListener("click",()=>{
+  const opening=mobileMenu.hidden;
+  mobileMenu.hidden=!opening;
+  menuToggle.setAttribute("aria-expanded",String(opening));
+  menuToggle.setAttribute("aria-label",opening?"Закрыть меню":"Открыть меню");
+});
+mobileMenu.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
+  mobileMenu.hidden=true;menuToggle.setAttribute("aria-expanded","false");
+  menuToggle.setAttribute("aria-label","Открыть меню");
+}));
+
 tabs();fields();
-fetch("listings.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{L=d;populateCities();render()}).catch(()=>{$("empty").textContent="Не удалось загрузить объявления. Позвоните нам: "+PHONE_TEXT;$("empty").style.display="block"});
+$("toggle-filters").addEventListener("click",()=>{const panel=$("advanced-filters"),open=panel.hidden;panel.hidden=!open;$("toggle-filters").setAttribute("aria-expanded",String(open));$("toggle-filters").textContent=open?"Скрыть фильтры":"Все фильтры"});
+$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","rooms-advanced","land-type","land-type-advanced","floor","floors"].forEach(id=>$(id).value="");S.deal="";$("sort").value="";updatePriceSummary();render()});
+function updatePriceSummary(){
+  const min=$("price-min").value,max=$("price-max").value;
+  $("price-summary").textContent=min||max?(min?fmt(+min):"0")+" — "+(max?fmt(+max):"∞")+" ₽":"Любая цена";
+}
+function closePrice(){ $("price-popover").hidden=true; $("price-trigger").setAttribute("aria-expanded","false"); }
+$("price-trigger").addEventListener("click",()=>{
+  const open=$("price-popover").hidden;
+  $("price-popover").hidden=!open;
+  $("price-trigger").setAttribute("aria-expanded",String(open));
+});
+$("price-done").addEventListener("click",()=>{updatePriceSummary();closePrice();render()});
+["price-min","price-max"].forEach(id=>$(id).addEventListener("input",updatePriceSummary));
+document.addEventListener("click",e=>{if(!$("price-control").contains(e.target))closePrice()});
+
+fetch("listings.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{L=d.filter(i=>cityName(i)==="Буйнакск");render()}).catch(()=>{$("empty").textContent="Не удалось загрузить объявления. Позвоните нам: "+PHONE_TEXT;$("empty").style.display="block"});
 
 /* ---- окно заявки ---- */
 function openModal(t){$("mt").textContent=t;$("modal").classList.add("open")}
