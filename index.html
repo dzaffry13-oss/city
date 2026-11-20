@@ -481,6 +481,36 @@ footer{background:#06172b}
 .about-l{display:flex;flex-direction:column;gap:6px}
 .about-l .vals{margin-top:18px}
 .about-r p:first-child{margin-top:0}
+
+/* Раздел «Как мы работаем» */
+.steps-head{display:grid;grid-template-columns:1fr 1fr;gap:14px 48px;align-items:end}
+.steps-head p{margin:0;color:var(--mut);font-size:16px;line-height:1.6;max-width:32em}
+.steps{grid-template-columns:repeat(4,minmax(0,1fr));border-top:1.5px solid var(--ink)}
+.step{padding:26px 24px 8px 0}
+.step + .step{padding-left:24px}
+.step h3{font-size:19px;line-height:1.3;margin:0 0 10px}
+.step p{font-size:15px;line-height:1.6;max-width:none}
+.steps-cta{display:flex;align-items:center;justify-content:space-between;gap:18px 28px;flex-wrap:wrap;margin-top:34px;padding:22px 26px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.steps-cta b{display:block;font-size:18px;margin-bottom:2px}
+.steps-cta span{color:var(--mut);font-size:15px}
+.steps-btns{display:flex;gap:10px;flex-wrap:wrap}
+.steps-btns .btn.line{background:#fff;color:var(--ink);border:1.5px solid var(--ink);box-shadow:none}
+.steps-btns .btn.line:hover{background:var(--ink);color:#fff}
+@media(max-width:1000px){
+  .steps-head{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr));border-top:1.5px solid var(--ink)}
+  .step,.step + .step{padding:22px 20px 14px 0;border-left:0}
+  .step:nth-child(even){padding-left:20px;border-left:1px solid var(--line)}
+  .step:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media(max-width:640px){
+  .steps{grid-template-columns:1fr;border-top:0}
+  .step,.step + .step,.step:nth-child(even),.step:nth-child(n+3){padding:20px 0 14px;border-left:0;border-top:1px solid var(--line)}
+  .step:first-child{border-top:1.5px solid var(--ink)}
+  .steps-cta{padding:18px}
+  .steps-btns{width:100%}
+  .steps-btns .btn{flex:1 1 100%}
+}
 </style>
 </head>
 <body>
@@ -565,11 +595,22 @@ footer{background:#06172b}
 
 <section class="block" id="steps" style="padding-top:0">
   <div class="wrap">
-    <h2>Как мы работаем</h2>
+    <div class="steps-head">
+      <h2>Как мы работаем</h2>
+      <p>Четыре шага от первого сообщения до сделки. На каждом из них вы знаете, что происходит и что будет дальше.</p>
+    </div>
     <div class="steps">
-      <div class="step"><i>1</i><h3>Обсуждаем задачу</h3><p>Узнаём, что вы ищете или хотите продать или сдать, в какие сроки и с каким бюджетом.</p></div>
-      <div class="step"><i>2</i><h3>Подбираем и показываем</h3><p>Предлагаем подходящие объекты и организуем просмотры в удобное для вас время.</p></div>
-      <div class="step"><i>3</i><h3>Ведём к сделке</h3><p>Помогаем согласовать условия и пройти все этапы оформления.</p></div>
+      <div class="step"><i>1</i><h3>Узнаём, что вам нужно</h3><p>Вы звоните или пишете в WhatsApp. Мы уточняем задачу: бюджет, район и сроки. Если вы продаёте или сдаёте, то параметры объекта и желаемую цену.</p></div>
+      <div class="step"><i>2</i><h3>Подбираем и проверяем</h3><p>Подбираем подходящие варианты и проверяем объект: состояние, документы и условия. Показываем только то, что действительно соответствует вашему запросу.</p></div>
+      <div class="step"><i>3</i><h3>Показываем объекты</h3><p>Договариваемся о просмотре на удобное для вас время. Вы осматриваете объект вместе с агентом и задаёте любые вопросы.</p></div>
+      <div class="step"><i>4</i><h3>Доводим до сделки</h3><p>Помогаем согласовать цену и условия, подготовить документы и пройти оформление. Остаёмся на связи до результата.</p></div>
+    </div>
+    <div class="steps-cta">
+      <div><b>Готовы начать?</b><span>Напишите нам в WhatsApp или оставьте заявку. Мы ответим в ближайшее время.</span></div>
+      <div class="steps-btns">
+        <a class="btn acc" data-wa target="_blank" rel="noopener" href="#">Написать в WhatsApp</a>
+        <button class="btn line" type="button" data-open="Оставить заявку">Оставить заявку</button>
+      </div>
     </div>
   </div>
 </section>
