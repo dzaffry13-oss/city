@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='9' fill='%2313262F'/%3E%3Cpath d='M4 25l7-9 5 6 6-11 8 14z' fill='%23F0C579'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Идея: горный хребет в утреннем свете как главный образ, остальное спокойное и функциональное.
    Выравнивание по левому краю. Заголовки, цены и телефон: Unbounded. Текст: Manrope. */
@@ -188,14 +188,60 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
   .ridge .l{animation:none}
   *{transition:none!important}
 }
+
+/* CITY premium update */
+:root{
+ --ink:#0b1d35;--ink2:#213a55;--stone:#f5f6f8;--paper:#fff;
+ --line:#e4e8ee;--tint:#eff2f6;--mut:#657286;
+ --acc:#d7ae5d;--acc-h:#b88a37;--sun:#e8c476;
+ --display:"Playfair Display",Georgia,serif;
+}
+body{background:#f5f6f8;color:var(--ink)}
+header.top{background:rgba(7,27,49,.97);border-bottom:1px solid rgba(215,174,93,.42)}
+.nav{height:80px}
+.brand{gap:12px}
+.brand .brand-mark{width:46px;height:54px;object-fit:contain;display:block}
+.brand b{font:600 31px/1 var(--display);letter-spacing:.035em;color:#fff}
+.brand span{font-size:10.5px;letter-spacing:.09em;color:#e5c77e;margin-top:5px}
+.links{gap:24px;color:#eef2f7}
+.links a:hover{color:var(--sun)}
+.tel{color:#fff}
+.btn.acc{background:linear-gradient(135deg,#f2d38e,#d9aa4e);color:#12233a;box-shadow:0 7px 22px rgba(0,0,0,.12)}
+.btn.acc:hover{background:#f3d994}
+.btn.line{border:1.5px solid rgba(242,211,142,.9);color:#fff;background:rgba(7,27,49,.38)}
+.hero{
+ min-height:500px;
+ background:linear-gradient(90deg,rgba(5,18,35,.92) 0%,rgba(7,27,49,.70) 42%,rgba(7,27,49,.12) 100%),url("assets/city-hero-winter.jpg") center 58%/cover no-repeat;
+ padding:clamp(72px,8vw,104px) 0 clamp(168px,19vw,220px);
+}
+h1{font-family:var(--display);font-weight:600;max-width:14em;font-size:clamp(34px,5.2vw,66px);line-height:1.08;letter-spacing:-.025em}
+.lead{color:#e5eaf1;max-width:36em}
+.hero-cta{gap:14px}
+.hero-cta .btn{min-height:50px}
+.finder{border:1px solid #eadfca;box-shadow:0 20px 55px rgba(7,27,49,.14)}
+.tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.card{border-color:#e4e8ed;box-shadow:0 8px 26px rgba(7,27,49,.07)}
+.card:hover{box-shadow:0 14px 36px rgba(7,27,49,.12)}
+.chip{background:var(--ink)}
+.step i{color:#b88a37}
+.sell{background:linear-gradient(125deg,#071b31,#173a5b);border-color:rgba(215,174,93,.55)}
+footer{background:#06172b}
+@media(max-width:900px){.nav{height:72px}}
+@media(max-width:600px){
+ .brand .brand-mark{width:38px;height:45px}
+ .brand span{font-size:9px;letter-spacing:.03em}
+ .hero{min-height:510px;background-position:58% center;padding-top:74px;padding-bottom:190px}
+ h1{font-size:clamp(34px,9vw,46px);max-width:12em}
+}
+
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap nav">
     <a class="brand" href="#top" aria-label="CITY, агентство недвижимости">
-      <svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#13262F"/><path d="M4 25l7-9 5 6 6-11 8 14z" fill="#F0C579"/></svg>
-      <div><b>CITY</b><span>Агентство недвижимости</span></div>
+      <img class="brand-mark" src="assets/city-logo-mark.webp" alt="" aria-hidden="true">
+      <div><b>CITY</b><span>Доверие дороже денег</span></div>
     </a>
     <nav class="links" aria-label="Разделы сайта">
       <a href="#catalog">Объекты</a><a href="#steps">Как мы работаем</a><a href="#about">О нас</a><a href="#contacts">Контакты</a>
@@ -207,17 +253,10 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
 
 <main id="top">
 <section class="hero">
-  <svg class="ridge" viewBox="0 0 1440 360" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-    <circle cx="1030" cy="118" r="54" fill="#F0C579" opacity=".92"/>
-    <g class="l l1"><path d="M0 170L90 120 170 150 280 70 360 130 450 95 560 160 660 110 760 150 880 60 980 135 1080 100 1190 160 1290 115 1440 150V360H0z" fill="#C9D5DA"/></g>
-    <g class="l l2"><path d="M0 220L120 170 220 205 340 140 450 200 580 150 700 215 820 160 940 210 1060 145 1180 205 1300 165 1440 200V360H0z" fill="#A7B9C3"/></g>
-    <g class="l l3"><path d="M0 265L140 225 260 255 400 205 540 260 690 215 820 262 980 220 1120 265 1260 228 1440 255V360H0z" fill="#7E96A4"/></g>
-    <g class="l l4"><path d="M0 305L180 270 330 300 500 262 680 302 860 270 1040 306 1220 274 1440 298V360H0z" fill="#4A6573"/></g>
-    <g class="l l5"><path d="M0 335L220 318 460 336 720 320 980 338 1220 322 1440 334V360H0z" fill="#13262F"/></g>
-  </svg>
+  
   <div class="wrap hero-in">
-    <h1>Недвижимость<br>в Дагестане</h1>
-    <p class="lead">Квартиры, дома, участки и коммерческие помещения в городах Дагестана. Подбираем объект, организуем просмотр и сопровождаем сделку.</p>
+    <h1>Купить, снять или продать<br>недвижимость</h1>
+    <p class="lead">Квартиры, дома, участки и коммерческие объекты в городах Республики Дагестан.</p>
     <div class="hero-cta">
       <a class="btn acc" href="#catalog">Смотреть объекты</a>
       <button class="btn line" type="button" data-open="Продать или сдать недвижимость">Продать или сдать</button>
@@ -228,7 +267,8 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
 <div class="wrap finder-wrap">
   <form class="finder" id="search">
     <div class="cats" id="cats" aria-label="Категория недвижимости"></div>
-    <div class="frow">\n      <div class="field city-field"><label for="city">Город</label><select id="city"><option value="">Все города</option></select></div>
+    <div class="frow">
+      <div class="field city-field"><label for="city">Город</label><select id="city"><option value="">Все города</option></select></div>
       <div class="seg" id="deals" aria-label="Тип сделки"></div>
       <div class="field" id="f-rooms" hidden>
         <label for="rooms">Комнаты</label>
@@ -370,7 +410,9 @@ const GLYPH={
 };
 const ICON_CHAT='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
 let L=[];const S={cat:"",deal:""};
-const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("ru-RU").format(n);\nfunction cityName(i){return String(i.city||"").trim()}\nfunction populateCities(){const el=$("city"),selected=el.value;const cities=[...new Set(L.map(cityName).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ru"));el.innerHTML='<option value="">Все города</option>'+cities.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");el.value=cities.includes(selected)?selected:""}
+const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("ru-RU").format(n);
+function cityName(i){return String(i.city||"").trim()}
+function populateCities(){const el=$("city"),selected=el.value;const cities=[...new Set(L.map(cityName).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ru"));el.innerHTML='<option value="">Все города</option>'+cities.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");el.value=cities.includes(selected)?selected:""}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function tabs(){
@@ -387,7 +429,8 @@ function fields(){
 }
 function list(){
   const r=$("rooms").value,a=+$("area").value||0,b=+$("budget").value||Infinity,roomsOn=!$("f-rooms").hidden;
-  const selectedCity=$("city").value;\n  const x=L.filter(i=>(!selectedCity||cityName(i)===selectedCity)&&(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!roomsOn||!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&i.area>=a&&i.price<=b);
+  const selectedCity=$("city").value;
+  const x=L.filter(i=>(!selectedCity||cityName(i)===selectedCity)&&(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!roomsOn||!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&i.area>=a&&i.price<=b);
   const so=$("sort").value;
   if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);
   return x;
