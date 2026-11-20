@@ -543,9 +543,12 @@ footer{background:#06172b}
   .about-c .vals>div:first-child{border-top:0}
 }
 
-/* CITY — вертикальный формат фотографий объектов, снимки целиком без обрезки */
-.visual{height:auto;aspect-ratio:4/5;min-height:0;background-color:#edf1f5}
+/* CITY — компактные фотографии объектов, вертикальные снимки целиком без обрезки */
+.visual{height:320px;aspect-ratio:auto;min-height:0;background-color:#edf1f5}
 .visual img{object-fit:contain}
+@media(max-width:600px){
+  .visual{height:clamp(300px,82vw,340px)}
+}
 </style>
 </head>
 <body>
