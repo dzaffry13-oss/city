@@ -494,19 +494,24 @@ footer{background:#06172b}
   padding:clamp(150px,27%,230px) 22px 22px;
   color:#fff;
   background:linear-gradient(180deg,
-    rgba(5,17,32,0) 0%,
-    rgba(5,17,32,.14) 6%,
+    rgba(5,17,32,.18) 0%,
     rgba(5,17,32,.42) 16%,
-    rgba(5,17,32,.68) 29%,
-    rgba(5,17,32,.84) 45%,
-    rgba(5,17,32,.94) 68%,
+    rgba(5,17,32,.68) 36%,
+    rgba(5,17,32,.88) 62%,
     rgba(5,17,32,.97) 100%);
+  background-size:100% calc(100% - clamp(150px,27%,230px));
+  background-position:bottom;
+  background-repeat:no-repeat;
 }
 .card.photo-card .price,
 .card.photo-card .cbody h3,
 .card.photo-card .loc{color:#fff}
 @media(max-width:600px){
-  .card.photo-card .cbody{padding:clamp(150px,34%,220px) 17px 18px;gap:10px}
+  .card.photo-card .cbody{
+    padding:clamp(150px,34%,220px) 17px 18px;
+    gap:10px;
+    background-size:100% calc(100% - clamp(150px,34%,220px));
+  }
 }
 
 /* Реальные отзывы клиентов */
