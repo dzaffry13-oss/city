@@ -336,7 +336,7 @@ $("photos").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.
 
 /* Обработка фото: уменьшение, исправление поворота и логотип */
 let logoImg=null;
-function loadLogo(){return logoImg||(logoImg=new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="assets/city-logo-mark.png"}))}
+function loadLogo(){return logoImg||(logoImg=new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="assets/city-logo-mark.svg"}))}
 async function processPhoto(file,wm){
   const bmp=await createImageBitmap(file,{imageOrientation:"from-image"});
   const k=Math.min(1,1600/Math.max(bmp.width,bmp.height)),w=Math.round(bmp.width*k),h=Math.round(bmp.height*k);
