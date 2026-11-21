@@ -100,13 +100,13 @@
   },
   {
     "id": 9,
-    "category": "uchastki",
+    "category": "kommerciya",
     "deal": "prodazha",
     "title": "Участок под строительство",
     "price": 3200000,
     "area": 25,
     "location": "Буйнакск · район уточняется",
-    "demo": true,
+    "demo": false,
     "extra": "ИЖС",
     "city": "Буйнакск"
   },
