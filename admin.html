@@ -256,14 +256,19 @@ function renderList(){
     const per=i.deal==="arenda"?" / мес":i.deal==="posutochno"?" / сутки":"";
     return '<div class="item'+(i.hidden?' off':'')+'"><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
      +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
-     +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
+     +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-link="'+i.id+'">Скопировать ссылку</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
   }).join(""):'<div class="empty">'+(LIST.length?"Ничего не найдено.":"Объектов пока нет. Нажмите «Добавить объект».")+'</div>';
 }
 $("q").addEventListener("input",renderList);
 $("items").addEventListener("click",async e=>{
   const b=e.target.closest("button");if(!b)return;
-  const id=+(b.dataset.edit||b.dataset.vis||b.dataset.del);const it=LIST.find(x=>x.id===id);if(!it)return;
+  const id=+(b.dataset.edit||b.dataset.vis||b.dataset.del||b.dataset.link);const it=LIST.find(x=>x.id===id);if(!it)return;
   if(b.dataset.edit){openForm(it);return}
+  if(b.dataset.link){
+    const link=location.origin+"/o/"+id;
+    try{await navigator.clipboard.writeText(link);toast("Ссылка скопирована: "+link)}catch(err){prompt("Скопируйте ссылку:",link)}
+    return;
+  }
   if(b.dataset.vis){
     busy(it.hidden?"Показываем на сайте…":"Скрываем с сайта…");
     try{await commitList(l=>l.map(x=>{if(x.id!==id)return x;const y={...x};if(y.hidden)delete y.hidden;else y.hidden=true;return y}),(it.hidden?"Показан объект: ":"Скрыт объект: ")+it.title);renderList();toast(it.hidden?"Объект скрыт. Сайт обновится через 1–2 минуты.":"Объект снова виден. Сайт обновится через 1–2 минуты.")}
