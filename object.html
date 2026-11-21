@@ -50,8 +50,8 @@ footer{background:var(--navy);color:#d4dce8;padding:26px 0;font-size:12px}.foot{
 <div class="gallery" id="gallery"></div>
 <div class="content">
 <div class="main-col">
+<section class="panel description-panel"><h2>Описание квартиры</h2><p class="description" id="description"></p></section>
 <section class="panel"><h2>Основные характеристики</h2><div class="specs" id="specs"></div></section>
-<section class="panel"><h2>Об объекте</h2><p class="description" id="description"></p></section>
 <section class="panel"><h2>Подробные характеристики</h2><div class="detail-groups" id="details"></div></section>
 </div>
 <aside class="side"><div class="contact"><h2>Заинтересовал объект?</h2><p>Оставьте заявку — мы ответим на вопросы и поможем договориться о просмотре.</p><button class="btn" id="request-open">Оставить заявку</button><a class="phone-link" id="phone-link" href="tel:+79094833939">+7 909 483-39-39</a><p class="note">Связь напрямую с агентством CITY</p></div></aside>
@@ -78,8 +78,8 @@ function render(item){
  document.querySelector('meta[name="description"]').content=item.title+" в "+(item.city||"Буйнакске")+". "+item.area+" м². Подробности и связь с агентством CITY.";
  $("crumb-title").textContent=item.title;$("deal").textContent=(dealLabels[item.deal]||"Недвижимость")+" · "+(item.city||"Буйнакск");
  $("title").textContent=item.title;$("price").innerHTML=esc(fmt(item.price)+" ₽")+ '<small>'+esc(per.trim())+'</small>';
- $("specs").innerHTML=[spec((item.area||"—")+(item.category==="uchastki"?" сот.":" м²"),"Общая площадь"),item.rooms?spec(item.rooms,"Комнат"): "",spec(item.floor?(item.floor+(item.floors?" из "+item.floors:"")+" этаж"):(item.extra||"—"),"Этаж")].filter(Boolean).join("");
- $("description").textContent=item.description||"Подробности об объекте можно уточнить у агентства CITY.";
+ $("specs").innerHTML=[spec((item.area||"—")+(item.category==="uchastki"?" сот.":" м²"),"Общая площадь"),item.rooms?spec(item.rooms,"Комнат"): "",(item.floor||item.floors)?spec(item.floor?(item.floor+(item.floors?" из "+item.floors:"")):item.floors,"Этаж"): (item.extra?spec(item.extra,"Дополнительно"):"")].filter(Boolean).join("");
+ $("description").textContent=item.description||(item.category==="kvartiry"?"Квартира площадью "+(item.area||"—")+" м². Подробности об объекте можно уточнить у агентства CITY.":"Подробности об объекте можно уточнить у агентства CITY.");
  const labels={kitchenArea:"Площадь кухни",livingArea:"Жилая площадь",ceilingHeight:"Высота потолков",heating:"Отопление",bathroom:"Санузел",windows:"Окна",furniture:"Мебель",appliances:"Техника",condition:"Состояние",documents:"Документы",payment:"Ипотека / рассрочка",bargaining:"Торг",parking:"Парковка",utilities:"Коммуникации"};
  const d=item.details||{},space=["kitchenArea","livingArea","ceilingHeight"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
  const comfort=["heating","bathroom","windows","furniture","appliances"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
