@@ -450,6 +450,35 @@ footer{background:#06172b}
  .vals{grid-template-columns:1fr}
 }
 
+/* CITY — карточка целиком на фотографии: текст поверх снимка */
+.card.photo-card{position:relative;isolation:isolate;min-height:590px;background:#10233a;border:1px solid rgba(255,255,255,.22);border-radius:20px;overflow:hidden}
+.card.photo-card .visual{position:absolute;inset:0;height:auto;min-height:0;z-index:0;background:#10233a}
+.card.photo-card .photo-open{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
+.card.photo-card .photo-open img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.card.photo-card .chips{top:16px;left:16px;z-index:2}
+.card.photo-card .cbody{position:relative;z-index:1;margin-top:auto;padding:170px 22px 22px;gap:11px;color:#fff;background:linear-gradient(180deg,rgba(5,17,32,0) 0%,rgba(5,17,32,.70) 23%,rgba(5,17,32,.94) 100%)}
+.card.photo-card .price,.card.photo-card .cbody h3,.card.photo-card .loc{color:#fff}
+.card.photo-card .price{font-size:clamp(22px,2vw,27px);text-shadow:0 1px 8px rgba(0,0,0,.2)}
+.card.photo-card .cbody h3{font-size:19px;line-height:1.35}
+.card.photo-card .loc{color:rgba(255,255,255,.88)}
+.card.photo-card .specs li{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.card.photo-card .acts{padding-top:6px}
+.card.photo-card .acts .ask{background:rgba(255,255,255,.96);color:#10233a;border-color:#fff}
+.card.photo-card .acts .wa{color:#10233a}
+.card.photo-card .photo-open:focus-visible{outline:3px solid var(--sun);outline-offset:-5px}
+@media(max-width:600px){
+ .card.photo-card{min-height:610px;border-radius:18px}
+ .card.photo-card .cbody{padding:190px 17px 18px;gap:10px}
+ .card.photo-card .cbody h3{font-size:18px}
+ .card.photo-card .chips{top:13px;left:13px}
+ .card.photo-card .acts{gap:7px}
+ .card.photo-card .acts .ask{padding-inline:13px}
+}
+@media(min-width:601px){
+ .card.photo-card{min-height:620px}
+ .card.photo-card .cbody{padding-top:210px}
+}
+
 /* Реальные отзывы клиентов */
 .review-note{color:var(--mut);font-size:14px}
 .review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -828,7 +857,7 @@ function card(i){
   const wa="https://wa.me/"+PHONE_DIGITS+"?text="+encodeURIComponent(msg);
   const specs=[i.rooms?i.rooms+" комн.":"",fmt(i.area)+" "+u,i.extra||""].filter(Boolean).map(t=>"<li>"+esc(t)+"</li>").join("");
   const vis=i.image?'<button type="button" class="photo-open" data-photo="'+esc(i.image)+'" data-photo-alt="'+esc(i.title)+'" aria-label="Увеличить фотографию: '+esc(i.title)+'"><img src="'+esc(i.image)+'" alt="'+esc(i.title)+'" loading="lazy"></button>':'<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">'+(GLYPH[i.category]||GLYPH.doma)+'</svg>';
-  return '<article class="card"><div class="visual">'+vis+'<div class="chips"><span class="chip">'+DEALLBL[i.deal]+'</span>'+(i.demo?'<span class="chip o">пример</span>':'')+'</div></div>'
+  return '<article class="card'+(i.image?' photo-card':'')+'"><div class="visual">'+vis+'<div class="chips"><span class="chip">'+DEALLBL[i.deal]+'</span>'+(i.demo?'<span class="chip o">пример</span>':'')+'</div></div>'
     +'<div class="cbody"><div class="price">'+fmt(i.price)+' ₽'+(per?'<small>'+per+'</small>':'')+'</div><h3>'+esc(i.title)+'</h3><div class="loc"><strong>Город:</strong> '+esc(city)+'</div><ul class="specs">'+specs+'</ul><div class="loc">'+esc(i.location||"Район не указан")+'</div>'
     +'<div class="acts"><button type="button" class="ask" data-details="'+i.id+'">Подробнее</button><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'WhatsApp</a></div></div></article>';
 }
