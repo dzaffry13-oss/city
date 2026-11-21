@@ -69,7 +69,12 @@ export default {
         disable_web_page_preview: true,
       }),
     });
-    if (!tg.ok) return reply(502, { ok: false, error: 'telegram' });
+    let tgResult;
+    try { tgResult = await tg.json(); } catch { tgResult = null; }
+    if (!tg.ok || !tgResult?.ok) {
+      console.error('Telegram delivery failed', tg.status, tgResult?.description || 'unknown');
+      return reply(502, { ok: false, error: 'telegram' });
+    }
     return reply(200, { ok: true });
   },
 };
