@@ -176,6 +176,10 @@
       "bargaining": "Небольшой торг возможен",
       "parking": "Открытая парковка во дворе",
       "utilities": "Все коммуникации подключены"
-    }
+    },
+    "images": [
+      "assets/ataeva-25-2.jpg",
+      "assets/ataeva-25-2.1.jpg"
+    ]
   }
 ]
