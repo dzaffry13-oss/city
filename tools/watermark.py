@@ -15,7 +15,8 @@ from PIL import Image, ImageFilter, ImageOps
 LOGO = Path(__file__).resolve().parent.parent / "assets" / "city-logo-mark.png"
 WIDTH_SHARE = 0.22   # ширина знака относительно ширины фото
 OPACITY = 0.50       # прозрачность знака (1 = непрозрачный)
-MARGIN_SHARE = 0.035  # отступ от правого и нижнего края относительно ширины фото
+MARGIN_SHARE = 0.05   # отступ от правого края относительно ширины фото
+BOTTOM_SHARE = 0.085  # отступ снизу: запас, чтобы знак не обрезался при показе фото в формате 4:5
 
 
 def add_watermark(src: Path, dst: Path) -> None:
@@ -36,7 +37,7 @@ def add_watermark(src: Path, dst: Path) -> None:
     logo.putalpha(alpha.point(lambda v: int(v * OPACITY)))
 
     margin = int(w * MARGIN_SHARE)
-    pos = (w - lw - margin, h - lh - margin)
+    pos = (w - lw - margin, h - lh - int(w * BOTTOM_SHARE))
 
     canvas = photo.convert("RGBA")
     canvas.alpha_composite(shadow, (pos[0] + 2, pos[1] + 3))

@@ -896,14 +896,6 @@ footer{background:#06172b}
   <span class="photo-counter" id="photo-counter"></span>
 </div>
 
-<div class="modal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-title">
-  <div class="dialog details-dialog">
-    <button class="close" type="button" data-close-details aria-label="Закрыть">&times;</button>
-    <h3 id="details-title">Информация об объекте</h3>
-    <div id="details-content"></div>
-    <button class="btn acc" type="button" id="details-request" style="width:100%;margin-top:14px">Оставить заявку</button>
-  </div>
-</div>
 
 <script>
 // Один номер для звонков, WhatsApp и Telegram
@@ -1004,22 +996,7 @@ $("cards").addEventListener("click",e=>{
   }
   const photo=e.target.closest("[data-photo]");
   if(photo){const card=photo.closest(".card");const id=card.querySelector("[data-gallery-next]")?.dataset.galleryNext||card.querySelector("[data-gallery-prev]")?.dataset.galleryPrev;const item=L.find(x=>String(x.id)===String(id))||L.find(x=>(Array.isArray(x.images)&&x.images.includes(photo.dataset.photo))||x.image===photo.dataset.photo);const photos=item?(Array.isArray(item.images)&&item.images.length?item.images:(item.image?[item.image]:[])):[photo.dataset.photo];openPhoto(photos,Number(photo.dataset.photoIndex||0),photo.dataset.photoAlt||"Фото объекта");return;}
-  const b=e.target.closest("[data-details]");
-  if(b)showDetails(b.dataset.details);
 });
-let activeDetails=null;
-function showDetails(id){
-  const item=L.find(x=>String(x.id)===String(id));if(!item)return;
-  activeDetails=item;
-  const city=cityName(item)||"Город не указан";
-  const per=item.deal==="arenda"?"в месяц":item.deal==="posutochno"?"в сутки":"";
-  const rows=[["Город",city],["Адрес / район",item.location||"Не указан"],["Тип сделки",DEALLBL[item.deal]||"Не указан"],["Площадь", (item.area??"—")+(item.category==="uchastki"?" сот.":" м²")],["Комнаты",item.rooms||"—"],["Этаж",item.floor?(item.floor+(item.floors?" из "+item.floors:"")):(item.extra||"—")]];
-  const labels={kitchenArea:"Площадь кухни",livingArea:"Жилая площадь",ceilingHeight:"Высота потолков",heating:"Отопление",bathroom:"Санузел",windows:"Окна",furniture:"Мебель",appliances:"Техника",condition:"Состояние",documents:"Документы",payment:"Ипотека / рассрочка",bargaining:"Торг",parking:"Парковка",utilities:"Коммуникации"};
-  Object.entries(item.details||{}).forEach(([key,value])=>{if(value)rows.push([labels[key]||key,value])});
-  $("details-title").textContent=item.title;
-  $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>'+(item.description?'<p class="detail-desc">'+esc(item.description)+'</p>':'');
-  $("details-modal").classList.add("open");
-}
 let fullPhotos=[],fullPhotoIndex=0,fullPhotoAlt="Фото объекта",touchStartX=0;
 function showFullPhoto(){
   if(!fullPhotos.length)return;
@@ -1039,10 +1016,7 @@ document.querySelector("[data-full-next]").addEventListener("click",()=>moveFull
 $("photo-modal").addEventListener("click",e=>{if(e.target.id==="photo-modal")closePhoto();});
 $("photo-modal").addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
 $("photo-modal").addEventListener("touchend",e=>{const dx=e.changedTouches[0].screenX-touchStartX;if(Math.abs(dx)>45)moveFullPhoto(dx<0?1:-1);},{passive:true});
-document.addEventListener("keydown",e=>{if($("photo-modal").classList.contains("open")){if(e.key==="ArrowRight")moveFullPhoto(1);if(e.key==="ArrowLeft")moveFullPhoto(-1);}if(e.key==="Escape"){closePhoto();$("details-modal").classList.remove("open");}});
-document.querySelector("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
-$("details-modal").addEventListener("click",e=>{if(e.target.id==="details-modal")$("details-modal").classList.remove("open")});
-$("details-request").addEventListener("click",()=>{if(activeDetails){$("details-modal").classList.remove("open");openModal("Заявка: "+activeDetails.title+" — "+cityName(activeDetails))}});
+document.addEventListener("keydown",e=>{if($("photo-modal").classList.contains("open")){if(e.key==="ArrowRight")moveFullPhoto(1);if(e.key==="ArrowLeft")moveFullPhoto(-1);}if(e.key==="Escape")closePhoto();});
 ["rooms","rooms-advanced","land-type","land-type-advanced","price-min","price-max","area-min","area-max","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
 const mobileMenu=$("mobile-menu"),menuToggle=$("mobile-menu-toggle");
