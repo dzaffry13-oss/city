@@ -23,16 +23,20 @@ footer{background:var(--navy);color:#d4dce8;padding:26px 0;font-size:12px}.foot{
 @media(max-width:800px){.intro{grid-template-columns:1fr;gap:10px}.price{white-space:normal}.price small{text-align:left;display:inline;margin-left:6px}.gallery{height:56vw;min-height:250px;grid-template-columns:1fr 112px;gap:8px}.thumbs{gap:8px}.content{grid-template-columns:1fr}.side{position:static;grid-row:1}.specs{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{padding:21px}.contact{padding:22px}}
 @media(max-width:520px){.wrap{width:min(100% - 28px,1120px)}.nav{height:62px}.brand img{width:32px;height:32px}.back{font-size:12px}main{padding:25px 0 52px}.gallery{grid-template-columns:1fr;height:auto;min-height:0}.hero-photo{height:68vw;max-height:390px}.thumbs{grid-template-columns:1fr 1fr;grid-template-rows:92px}.specs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.spec{padding:11px}.detail-groups{grid-template-columns:1fr}.panel{padding:18px}.viewer{padding:54px 8px 64px}.viewer img{max-width:100%;max-height:calc(100dvh - 118px)}.viewer button{width:40px;height:40px}.viewer .prev{left:8px}.viewer .next{right:8px}}
 
-/* Gallery refinement: portrait photos with softly rounded corners */
+/* Gallery refinement: portrait photos, clipped rounded corners and on-page navigation */
 .gallery{display:flex!important;flex-direction:column;align-items:center;height:auto!important;min-height:0!important;gap:12px!important}
-.hero-photo{display:block;width:min(100%,520px);height:auto!important;aspect-ratio:4/5;border-radius:20px}
-.hero-photo img{width:100%;height:100%;aspect-ratio:4/5;object-fit:contain;border-radius:20px}
+.hero-photo{display:block;width:min(100%,520px);height:auto!important;aspect-ratio:4/5;border:0!important;padding:0!important;border-radius:22px!important;overflow:hidden!important;clip-path:inset(0 round 22px);background:#e9ece8}
+.hero-photo img{display:block;width:100%;height:100%;aspect-ratio:4/5;object-fit:contain;border-radius:22px!important;clip-path:inset(0 round 22px)}
+.gallery-nav{position:absolute;top:min(34%,300px);left:0;right:0;display:flex;justify-content:space-between;pointer-events:none;padding:0 max(12px,calc((100% - 520px)/2 + 12px));z-index:2}
+.gallery-nav button{pointer-events:auto;width:44px;height:44px;border:1px solid rgba(255,255,255,.65);border-radius:50%;background:rgba(16,29,54,.78);color:#fff;font-size:28px;line-height:1;display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 12px #0003}
+.gallery-nav button:hover{background:rgba(16,29,54,.96)}
 .thumbs{display:flex!important;justify-content:center;grid-template-rows:none!important;gap:10px!important;width:100%;min-height:0!important}
-.thumb{flex:0 0 86px;width:86px;height:108px;border-radius:14px}
-.thumb img{width:100%;height:100%;object-fit:contain;border-radius:14px}
+.thumb{flex:0 0 86px;width:86px;height:108px;border-radius:14px!important;overflow:hidden!important;clip-path:inset(0 round 14px);border:2px solid transparent}
+.thumb.active{border-color:var(--sun)}
+.thumb img{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px!important;clip-path:inset(0 round 12px)}
 .gallery-count{position:static!important;align-self:center;display:inline-block}
-.gallery-empty{width:min(100%,520px);aspect-ratio:4/5;min-height:0!important;border-radius:20px}
-@media(max-width:520px){.hero-photo{width:min(100%,420px)}.thumb{flex-basis:76px;width:76px;height:96px}}
+.gallery-empty{width:min(100%,520px);aspect-ratio:4/5;min-height:0!important;border-radius:22px;overflow:hidden}
+@media(max-width:520px){.hero-photo{width:min(100%,420px)}.gallery-nav{top:min(32%,230px);padding:0 10px}.gallery-nav button{width:40px;height:40px}.thumb{flex-basis:76px;width:76px;height:96px}}
 </style>
 </head>
 <body>
@@ -61,14 +65,14 @@ footer{background:var(--navy);color:#d4dce8;padding:26px 0;font-size:12px}.foot{
 const PHONE="79094833939",PHONE_TEXT="+7 909 483-39-39",LEAD_URL="https://city-leads.dzaffry13.workers.dev";
 const $=id=>document.getElementById(id),esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>new Intl.NumberFormat("ru-RU").format(Number(n)||0),dealLabels={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
-let photos=[],photoIndex=0,touchX=0,current=null;
+let photos=[],photoIndex=0,galleryIndex=0,touchX=0,current=null;
 $("year").textContent=new Date().getFullYear();
 $("phone-link").href="tel:+"+PHONE;$("phone-link").textContent=PHONE_TEXT;
 function showError(){ $("loading").hidden=true;$("error").hidden=false; }
 function spec(value,label){return '<div class="spec"><b>'+esc(value)+'</b><span>'+esc(label)+'</span></div>'}
 function group(title,items){return '<div class="group"><h3>'+esc(title)+'</h3><ul>'+items.map(([k,v])=>'<li><span>'+esc(k)+'</span><strong>'+esc(v)+'</strong></li>').join("")+'</ul></div>'}
 function render(item){
- current=item;photos=Array.isArray(item.images)&&item.images.length?item.images:(item.image?[item.image]:[]);
+ current=item;photos=Array.isArray(item.images)&&item.images.length?item.images:(item.image?[item.image]:[]);galleryIndex=0;
  const per=item.deal==="arenda"?" / месяц":item.deal==="posutochno"?" / сутки":"";
  document.title=item.title+" — "+fmt(item.price)+" ₽ | CITY";
  document.querySelector('meta[name="description"]').content=item.title+" в "+(item.city||"Буйнакске")+". "+item.area+" м². Подробности и связь с агентством CITY.";
@@ -81,11 +85,12 @@ function render(item){
  const comfort=["heating","bathroom","windows","furniture","appliances"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
  const status=["condition","documents","payment","bargaining","parking","utilities"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
  $("details").innerHTML=[space.length?group("Площади и планировка",space):"",comfort.length?group("Комфорт и оснащение",comfort):"",status.length?group("Состояние и условия",status):""].join("")||"<p>Дополнительные характеристики уточняйте у агентства.</p>";
- if(photos.length){$("gallery").innerHTML='<button class="hero-photo" id="hero-photo" aria-label="Открыть фотографию"><img src="'+esc(photos[0])+'" alt="'+esc(item.title)+'"></button>'+(photos.length>1?'<div class="thumbs">'+photos.slice(1,3).map((p,i)=>'<button class="thumb" data-thumb="'+(i+1)+'" aria-label="Открыть фото '+(i+2)+'"><img src="'+esc(p)+'" alt=""></button>').join("")+'</div>':'')+'<span class="gallery-count">'+photos.length+' фото</span>';$("hero-photo").addEventListener("click",()=>openViewer(0));$("gallery").querySelectorAll("[data-thumb]").forEach(b=>b.addEventListener("click",()=>openViewer(Number(b.dataset.thumb))));}
+ if(photos.length){$("gallery").innerHTML='<button class="hero-photo" id="hero-photo" aria-label="Открыть фотографию"><img id="gallery-main-image" src="'+esc(photos[0])+'" alt="'+esc(item.title)+'"></button>'+(photos.length>1?'<div class="gallery-nav"><button type="button" id="gallery-prev" aria-label="Предыдущее фото">‹</button><button type="button" id="gallery-next" aria-label="Следующее фото">›</button></div><div class="thumbs">'+photos.slice(1,3).map((p,i)=>'<button class="thumb" data-thumb="'+(i+1)+'" aria-label="Показать фото '+(i+2)+'"><img src="'+esc(p)+'" alt=""></button>').join("")+'</div>':'')+'<span class="gallery-count">'+photos.length+' фото</span>';$("hero-photo").addEventListener("click",()=>openViewer(galleryIndex));$("gallery").querySelectorAll("[data-thumb]").forEach(b=>b.addEventListener("click",()=>setGalleryPhoto(Number(b.dataset.thumb))));if(photos.length>1){$("gallery-prev").addEventListener("click",()=>setGalleryPhoto(galleryIndex-1));$("gallery-next").addEventListener("click",()=>setGalleryPhoto(galleryIndex+1));}}
  else $("gallery").innerHTML='<div class="gallery-empty">Фотографии скоро появятся</div>';
  $("loading").hidden=true;$("object").hidden=false;
 }
 async function load(){const id=new URLSearchParams(location.search).get("id");if(!id){showError();return;}try{const r=await fetch("./listings.json");if(!r.ok)throw 0;const data=await r.json();const item=data.find(x=>String(x.id)===id);if(!item)throw 0;render(item);}catch(e){showError();}}
+function setGalleryPhoto(i){if(!photos.length)return;galleryIndex=(i+photos.length)%photos.length;const img=$("gallery-main-image");if(img){img.src=photos[galleryIndex];img.alt=(current?.title||"Фото")+" — фото "+(galleryIndex+1);}document.querySelectorAll("[data-thumb]").forEach(b=>b.classList.toggle("active",Number(b.dataset.thumb)===galleryIndex));}
 function openViewer(i){photoIndex=i;$("viewer-image").src=photos[i];$("viewer-image").alt=(current?.title||"Фото")+" — "+(i+1);$("viewer-count").textContent=(i+1)+" / "+photos.length;$("viewer").classList.add("open");}
 function movePhoto(step){if(photos.length<2)return;photoIndex=(photoIndex+step+photos.length)%photos.length;openViewer(photoIndex);}
 function closeViewer(){$("viewer").classList.remove("open");$("viewer-image").src="";}
