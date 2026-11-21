@@ -25,8 +25,8 @@ footer{background:var(--navy);color:#d4dce8;padding:26px 0;font-size:12px}.foot{
 
 /* Gallery refinement: portrait photos, clipped rounded corners and on-page navigation */
 .gallery{display:flex!important;flex-direction:column;align-items:center;height:auto!important;min-height:0!important;gap:12px!important}
-.hero-photo{display:block;width:min(100%,520px);height:auto!important;aspect-ratio:4/5;border:0!important;padding:0!important;border-radius:22px!important;overflow:hidden!important;clip-path:inset(0 round 22px);background:#e9ece8}
-.hero-photo img{display:block;width:100%;height:100%;aspect-ratio:4/5;object-fit:contain;border-radius:22px!important;clip-path:inset(0 round 22px)}
+.hero-photo{appearance:none;-webkit-appearance:none;position:relative;display:block;flex:0 0 auto;width:min(100%,520px);height:auto!important;aspect-ratio:4/5;border:0!important;padding:0!important;border-radius:24px!important;overflow:hidden!important;isolation:isolate;background:transparent!important;box-shadow:0 0 0 1px rgba(16,29,54,.08)}
+.hero-photo img{position:absolute;inset:0;display:block;width:100%;height:100%;aspect-ratio:auto;object-fit:cover;object-position:center;border:0;border-radius:inherit!important;clip-path:none!important}
 .gallery-nav{position:absolute;top:min(34%,300px);left:0;right:0;display:flex;justify-content:space-between;pointer-events:none;padding:0 max(12px,calc((100% - 520px)/2 + 12px));z-index:2}
 .gallery-nav button{pointer-events:auto;width:44px;height:44px;border:1px solid rgba(255,255,255,.65);border-radius:50%;background:rgba(16,29,54,.78);color:#fff;font-size:28px;line-height:1;display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 12px #0003}
 .gallery-nav button:hover{background:rgba(16,29,54,.96)}
