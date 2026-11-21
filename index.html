@@ -922,7 +922,7 @@ function card(i){
   const vis=photos.length?'<button type="button" class="photo-open" data-photo="'+esc(photos[0])+'" data-photo-alt="'+esc(i.title)+'" aria-label="Увеличить фотографию: '+esc(i.title)+'"><img src="'+esc(photos[0])+'" alt="'+esc(i.title)+'" loading="lazy"></button>'+(photos.length>1?'<button type="button" class="gallery-arrow prev" data-gallery-prev="'+i.id+'" aria-label="Предыдущее фото">‹</button><button type="button" class="gallery-arrow next" data-gallery-next="'+i.id+'" aria-label="Следующее фото">›</button><span class="gallery-count" data-gallery-count="'+i.id+'">1 / '+photos.length+'</span>':''):'<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">'+(GLYPH[i.category]||GLYPH.doma)+'</svg>';
   return '<article class="card'+(i.image?' photo-card':'')+'"><div class="visual">'+vis+'<div class="chips"><span class="chip">'+DEALLBL[i.deal]+'</span>'+(i.demo?'<span class="chip o">пример</span>':'')+'</div></div>'
     +'<div class="cbody"><div class="price">'+fmt(i.price)+' ₽'+(per?'<small>'+per+'</small>':'')+'</div><h3>'+esc(i.title)+'</h3><div class="loc"><strong>Город:</strong> '+esc(city)+'</div><ul class="specs">'+specs+'</ul><div class="loc">'+esc(i.location||"Район не указан")+'</div>'
-    +'<div class="acts"><button type="button" class="ask" data-details="'+i.id+'">Подробнее</button><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'WhatsApp</a></div></div></article>';
+    +'<div class="acts"><a class="ask" href="object.html?id='+encodeURIComponent(i.id)+'">Подробнее</a><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'WhatsApp</a></div></div></article>';
 }
 function render(){
   tabs();fields();
