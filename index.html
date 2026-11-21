@@ -479,6 +479,26 @@ footer{background:#06172b}
  .card.photo-card .cbody{padding-top:210px}
 }
 
+/* CITY — фото остаётся светлым, подписи собраны снизу */
+.card.photo-card .visual{background:#10233a}
+.card.photo-card .photo-open img{filter:none}
+.card.photo-card .cbody{
+  margin-top:auto;
+  padding:230px 22px 22px;
+  background:linear-gradient(180deg,
+    rgba(5,17,32,0) 0%,
+    rgba(5,17,32,0) 35%,
+    rgba(5,17,32,.18) 52%,
+    rgba(5,17,32,.62) 72%,
+    rgba(5,17,32,.92) 100%);
+}
+.card.photo-card .price,
+.card.photo-card .cbody h3,
+.card.photo-card .loc{color:#fff}
+@media(max-width:600px){
+  .card.photo-card .cbody{padding:230px 17px 18px;gap:10px}
+}
+
 /* Реальные отзывы клиентов */
 .review-note{color:var(--mut);font-size:14px}
 .review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
