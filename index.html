@@ -476,32 +476,35 @@ footer{background:#06172b}
 }
 @media(min-width:601px){
  .card.photo-card{min-height:620px}
- .card.photo-card .cbody{min-height:620px;padding:0 22px 22px}
+ .card.photo-card .cbody{padding:clamp(170px,25%,230px) 22px 22px}
 }
 
 /* CITY — фото остаётся светлым, подписи собраны снизу */
 .card.photo-card .visual{background:#10233a}
 .card.photo-card .photo-open img{filter:none}
 .card.photo-card .cbody{
-  position:relative;
-  align-self:stretch;
-  flex:1 1 auto;
-  min-height:590px;
-  margin-top:0;
+  position:absolute;
+  left:0;right:0;bottom:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
   justify-content:flex-end;
-  padding:0 22px 22px;
+  min-height:0;
+  margin:0;
+  padding:clamp(150px,27%,230px) 22px 22px;
+  color:#fff;
   background:linear-gradient(180deg,
     rgba(5,17,32,0) 0%,
-    rgba(5,17,32,0) 48%,
-    rgba(5,17,32,.10) 62%,
-    rgba(5,17,32,.48) 78%,
-    rgba(5,17,32,.90) 100%);
+    rgba(5,17,32,0) 38%,
+    rgba(5,17,32,.12) 55%,
+    rgba(5,17,32,.58) 78%,
+    rgba(5,17,32,.94) 100%);
 }
 .card.photo-card .price,
 .card.photo-card .cbody h3,
 .card.photo-card .loc{color:#fff}
 @media(max-width:600px){
-  .card.photo-card .cbody{min-height:610px;padding:0 17px 18px;gap:10px}
+  .card.photo-card .cbody{padding:clamp(150px,34%,220px) 17px 18px;gap:10px}
 }
 
 /* Реальные отзывы клиентов */
