@@ -549,6 +549,11 @@ footer{background:#06172b}
 @media(max-width:600px){
   .visual{height:clamp(300px,82vw,340px)}
 }
+
+/* Описание объекта в окне «Подробнее» */
+.detail-desc{margin:16px 0 0;font-size:15px;line-height:1.65;color:var(--ink);white-space:pre-line}
+.dialog p.price{font-size:26px;line-height:1.2;color:var(--ink);margin:6px 0 4px}
+.dialog p.price small{font-size:13px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -623,7 +628,7 @@ footer{background:#06172b}
   <div class="wrap">
     <div class="head">
       <h2>Объекты</h2>
-      <div class="tools"><span id="count"></span><select id="sort" aria-label="Сортировка"><option value="">По умолчанию</option><option value="asc">Сначала дешевле</option><option value="desc">Сначала дороже</option></select></div>
+      <div class="tools"><span id="count"></span><select id="sort" aria-label="Сортировка"><option value="">Сначала новые</option><option value="asc">Сначала дешевле</option><option value="desc">Сначала дороже</option></select></div>
     </div>
     <div class="cards" id="cards"></div>
     <div class="empty" id="empty">По этим параметрам вариантов пока нет. Измените фильтры или оставьте заявку, и мы подберём объект.</div>
@@ -799,7 +804,7 @@ function list(){
   const landText=i=>String(i.landType||i.purpose||i.extra||"").toLocaleLowerCase("ru");
   const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||landText(i).includes(landType.toLocaleLowerCase("ru")))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
   const so=$("sort").value;
-  if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);
+  if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);else x.sort((p,q)=>(Number(q.id)||0)-(Number(p.id)||0));
   return x;
 }
 function card(i){
@@ -833,9 +838,11 @@ function showDetails(id){
   activeDetails=item;
   const city=cityName(item)||"Город не указан";
   const per=item.deal==="arenda"?"в месяц":item.deal==="posutochno"?"в сутки":"";
-  const rows=[["Город",city],["Адрес / район",item.location||"Не указан"],["Тип сделки",DEALLBL[item.deal]||"Не указан"],["Площадь",(item.area??"—")+(item.category==="uchastki"?" сот.":" м²")],["Комнаты",item.rooms?item.rooms:"—"],["Дополнительно",item.extra||"—"]];
+  const rows=[["Город",city],["Адрес / район",item.location||"Не указан"],["Тип сделки",DEALLBL[item.deal]||"Не указан"],["Площадь",(item.area??"—")+(item.category==="uchastki"?" сот.":" м²")],["Комнаты",item.rooms?item.rooms:"—"]];
+  if(item.floor)rows.push(["Этаж",item.floor+(item.floors?" из "+item.floors:"")]);
+  else if(item.extra)rows.push(["Дополнительно",item.extra]);
   $("details-title").textContent=item.title;
-  $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>';
+  $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>'+(item.description?'<p class="detail-desc">'+esc(item.description)+'</p>':'');
   $("details-modal").classList.add("open");
 }
 document.querySelector("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
