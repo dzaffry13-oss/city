@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#101D36">
+<title>CITY — управление объектами</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#13262F;--navy:#101D36;--mut:#64727A;--bg:#F4F5F2;--line:#DEE3DF;--sun:#F0C579;--green:#1D5C4D;--red:#B3382C;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+.top{position:sticky;top:0;z-index:10;background:var(--navy);color:#fff}
+.top .in{max-width:1000px;margin:auto;padding:0 18px;height:60px;display:flex;align-items:center;gap:14px}
+.top b{letter-spacing:.08em}.top .sp{flex:1}
+.top a,.top button{color:#F0C579;font-weight:700;font-size:14px;background:none;border:0;cursor:pointer;text-decoration:none}
+.wrap{max-width:1000px;margin:auto;padding:24px 18px 90px}
+h1{font:600 28px/1.2 "Playfair Display",Georgia,serif;margin:0 0 6px}
+h2{font:600 22px/1.2 "Playfair Display",Georgia,serif;margin:0 0 14px}
+.sub{color:var(--mut);margin:0 0 20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:11px;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--navy);color:#fff}
+.btn.pri{background:var(--sun);border-color:var(--sun)}.btn.pri:hover{background:#e6c783;color:var(--navy)}
+.btn.dng{border-color:var(--red);color:var(--red)}.btn.dng:hover{background:var(--red);color:#fff}
+.btn.sm{min-height:36px;padding:0 13px;font-size:13px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.steps{padding-left:20px;margin:0 0 18px}.steps li{margin-bottom:8px}
+code{background:#eef1ee;padding:2px 6px;border-radius:6px;font-size:13px}
+label{display:block;font-weight:700;font-size:13px;margin:0 0 5px}
+input[type=text],input[type=password],input[type=number],input[type=search],select,textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+textarea{min-height:170px;resize:vertical;line-height:1.55}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid rgba(29,92,77,.35);outline-offset:1px}
+.err{color:var(--red);font-weight:600;min-height:22px;margin:10px 0 0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.bar input{flex:1 1 220px;max-width:340px}.bar .sp{flex:1}
+.item{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px}
+.item.off{opacity:.62}
+.thumb{width:96px;height:96px;border-radius:12px;background:#e9ece8 center/cover no-repeat;display:grid;place-items:center;color:var(--mut);font-size:12px}
+.item h3{font-size:16px;margin:0 0 3px;line-height:1.3}
+.item .meta{color:var(--mut);font-size:13px}
+.item .price{font-weight:800;margin-top:2px}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:#e9ece8;color:#445;margin-right:5px;vertical-align:middle}
+.tag.demo{background:#fdecc8;color:#7a5200}.tag.hid{background:#f3d7d3;color:var(--red)}
+.acts{display:flex;flex-direction:column;gap:7px}
+.empty{text-align:center;color:var(--mut);padding:40px 10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
+.grid .full{grid-column:1/-1}
+.hint{color:var(--mut);font-size:12px;margin-top:4px}
+.sec{margin:26px 0 12px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.ph{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#e9ece8;border:2px solid transparent}
+.ph.cover{border-color:var(--sun)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .cv{position:absolute;left:6px;top:6px;background:var(--sun);color:var(--navy);font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px}
+.ph .pb{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:5px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.ph .pb button{width:30px;height:30px;border:0;border-radius:8px;background:rgba(255,255,255,.92);cursor:pointer;font-size:16px;line-height:1}
+.add{aspect-ratio:3/4;border:2px dashed #b9c2bf;border-radius:12px;display:grid;place-items:center;text-align:center;color:var(--mut);font-weight:700;cursor:pointer;padding:8px;background:#fafbfa}
+.add:hover{border-color:var(--green);color:var(--green)}
+.chk{display:flex;gap:10px;align-items:center;font-weight:600;font-size:14px;margin:0}
+.chk input{width:20px;height:20px}
+details{border:1px solid var(--line);border-radius:12px;padding:0 16px;background:#fff}
+details summary{cursor:pointer;font-weight:700;padding:14px 0}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:16px}
+details .grid{padding-bottom:18px}
+.foot{position:sticky;bottom:0;background:rgba(244,245,242,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);margin:28px -18px 0;padding:12px 18px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:var(--navy);color:#fff;padding:13px 20px;border-radius:12px;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(0,0,0,.25);font-weight:600}
+.toast.bad{background:var(--red)}
+.busy{position:fixed;inset:0;z-index:70;background:rgba(244,245,242,.8);display:grid;place-items:center;font-weight:800;font-size:17px}
+.busy span{background:#fff;padding:18px 26px;border-radius:14px;box-shadow:0 8px 28px rgba(16,29,54,.15)}
+@media(max-width:700px){
+  .item{grid-template-columns:76px minmax(0,1fr)}
+  .thumb{width:76px;height:76px}
+  .item .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .grid{grid-template-columns:1fr}
+  .panel{padding:18px}
+  h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><b>CITY</b><span style="color:#C5CEDB;font-size:13px">управление объектами</span><span class="sp"></span><a href="./index.html" target="_blank" rel="noopener">Открыть сайт</a><button type="button" id="logout" hidden>Выйти</button></div></div>
+
+<main class="wrap">
+
+<!-- Вход -->
+<section id="v-login" hidden>
+  <h1>Вход в панель</h1>
+  <p class="sub">Один раз подключите панель к сайту. Ключ хранится только в этом браузере.</p>
+  <div class="panel">
+    <ol class="steps">
+      <li>Откройте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener"><u>создание ключа на GitHub</u></a> (войдите в свой аккаунт).</li>
+      <li>Название: <code>CITY admin</code>. Срок действия: <b>1 год</b> (максимум).</li>
+      <li>Repository access: <b>Only select repositories</b> → выберите <code>city</code>.</li>
+      <li>Permissions → Repository permissions → <b>Contents: Read and write</b>.</li>
+      <li>Нажмите Generate token, скопируйте ключ (начинается с <code>github_pat_</code>) и вставьте ниже.</li>
+    </ol>
+    <label for="token">Ключ доступа</label>
+    <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+    <p class="err" id="login-err" role="alert"></p>
+    <button class="btn pri" type="button" id="login-go">Войти</button>
+    <p class="hint" style="margin-top:14px">Никому не передавайте ключ. Если потеряли телефон или компьютер, удалите ключ на странице GitHub → Settings → Developer settings.</p>
+  </div>
+</section>
+
+<!-- Список -->
+<section id="v-list" hidden>
+  <h1>Объекты</h1>
+  <p class="sub" id="list-sub"></p>
+  <div class="bar">
+    <button class="btn pri" type="button" id="new-btn">+ Добавить объект</button>
+    <input type="search" id="q" placeholder="Поиск по названию или адресу" aria-label="Поиск">
+    <span class="sp"></span>
+    <button class="btn sm dng" type="button" id="del-demo" hidden>Удалить все примеры</button>
+  </div>
+  <div id="items"></div>
+</section>
+
+<!-- Форма -->
+<section id="v-edit" hidden>
+  <p><button class="btn sm" type="button" id="back">← К списку</button></p>
+  <h1 id="edit-title">Новый объект</h1>
+  <p class="sub">Заполните поля. Обязательные: название, цена, площадь.</p>
+  <form class="panel" id="form" novalidate>
+    <div class="grid">
+      <div><label for="f-category">Что продаём</label><select id="f-category"></select></div>
+      <div><label for="f-deal">Тип сделки</label><select id="f-deal"><option value="prodazha">Продажа</option><option value="arenda">Аренда</option><option value="posutochno">Посуточно</option></select></div>
+      <div class="full"><label for="f-title">Название</label><input id="f-title" type="text" maxlength="90" placeholder="Например: Однушка с дизайнерским ремонтом"><div class="hint">Коротко, лучше в одну строку: так красивее в карточке.</div></div>
+      <div><label for="f-price">Цена, ₽</label><input id="f-price" type="text" inputmode="numeric" placeholder="4 800 000"></div>
+      <div><label for="f-area" id="l-area">Площадь, м²</label><input id="f-area" type="text" inputmode="decimal" placeholder="33"></div>
+      <div><label for="f-city">Город</label><input id="f-city" type="text" value="Буйнакск"></div>
+      <div><label for="f-location">Адрес или район</label><input id="f-location" type="text" placeholder="Буйнакск · ул. Муслима Атаева, 25/2"></div>
+      <div id="w-rooms"><label for="f-rooms">Комнат</label><select id="f-rooms"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+      <div id="w-floor"><label for="f-floor">Этаж</label><input id="f-floor" type="text" inputmode="numeric" placeholder="1"></div>
+      <div id="w-floors"><label for="f-floors">Этажей в доме</label><input id="f-floors" type="text" inputmode="numeric" placeholder="4"></div>
+      <div id="w-land"><label for="f-land">Категория земли</label><select id="f-land"><option value="">—</option><option>ИЖС</option><option>ЛПХ</option><option>СНТ</option><option>Сельхозназначения</option><option>Коммерческая</option></select></div>
+    </div>
+
+    <div class="sec">Фотографии</div>
+    <div class="photos" id="photos"></div>
+    <div class="hint">Первое фото показывается в каталоге. Фото сами уменьшаются, на них автоматически ставится логотип CITY.</div>
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="f-wm" checked> Ставить логотип на новые фото</label>
+    <input type="file" id="file" accept="image/*" multiple hidden>
+
+    <div class="sec">Описание</div>
+    <textarea id="f-desc" aria-label="Описание" placeholder="Расскажите об объекте: ремонт, мебель, техника, двор, документы. Пустая строка делит текст на абзацы."></textarea>
+    <div class="hint">Не пишите сюда заметки для себя: описание видят все посетители.</div>
+
+    <div class="sec">Дополнительно</div>
+    <details>
+      <summary>Подробные характеристики (необязательно)</summary>
+      <div class="grid" id="det-grid"></div>
+    </details>
+    <div class="grid" style="margin-top:16px">
+      <div class="full"><label for="f-extra">Короткая подпись в карточке</label><input id="f-extra" type="text" maxlength="40" placeholder="Заполнится сама, например «Этаж 1 из 4»"></div>
+      <div class="full"><label class="chk"><input type="checkbox" id="f-show" checked> Показывать на сайте</label><div class="hint">Снимите галочку, чтобы спрятать объект, не удаляя (например, если задаток внесён).</div></div>
+    </div>
+
+    <p class="err" id="edit-err" role="alert"></p>
+    <div class="foot">
+      <button class="btn" type="button" id="cancel">Отмена</button>
+      <button class="btn pri" type="submit" id="save">Опубликовать</button>
+    </div>
+  </form>
+</section>
+</main>
+
+<div class="busy" id="busy" hidden><span id="busy-t">Сохраняем…</span></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+const OWNER="dzaffry13-oss",REPO="city",BRANCH="main",API="https://api.github.com/repos/"+OWNER+"/"+REPO;
+const CATS=[["kvartiry","Квартира"],["doma","Дом"],["uchastki","Земельный участок"],["kommerciya","Коммерческая недвижимость"]];
+const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет"],["payment","Ипотека / рассрочка","Ипотека не рассматривается"],["bargaining","Торг","Небольшой торг возможен"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Все подключены"]];
+const DEALLBL={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>new Intl.NumberFormat("ru-RU").format(Number(n)||0);
+let TOKEN="",LIST=[],editing=null,photos=[];
+
+/* ---------- хранение ключа ---------- */
+const store={get(){try{return localStorage.getItem("city_admin_token")||""}catch(e){return ""}},set(v){try{localStorage.setItem("city_admin_token",v)}catch(e){}},del(){try{localStorage.removeItem("city_admin_token")}catch(e){}}};
+
+/* ---------- GitHub API ---------- */
+async function gh(path,opt={}){
+  const r=await fetch(API+path,{...opt,headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+TOKEN,...(opt.body?{"Content-Type":"application/json"}:{})}});
+  if(!r.ok){const e=new Error("HTTP "+r.status);e.status=r.status;try{e.body=await r.json()}catch(x){}throw e}
+  return r.status===204?null:r.json();
+}
+const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,"")),c=>c.charCodeAt(0)));
+const b64enc=s=>{const b=new TextEncoder().encode(s);let o="";for(let i=0;i<b.length;i+=0x8000)o+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(o)};
+async function readList(){const f=await gh("/contents/listings.json?ref="+BRANCH);return{list:JSON.parse(b64dec(f.content)),sha:f.sha}}
+/* Применяет изменение к самой свежей версии файла; при конфликте повторяет. */
+async function commitList(mutate,message){
+  for(let k=0;k<3;k++){
+    const {list,sha}=await readList();
+    const next=mutate(list);
+    try{
+      await gh("/contents/listings.json",{method:"PUT",body:JSON.stringify({message,branch:BRANCH,sha,content:b64enc(JSON.stringify(next,null,2)+"\n")})});
+      LIST=next;return;
+    }catch(e){if(e.status!==409&&e.status!==422||k===2)throw e}
+  }
+}
+async function uploadFile(path,base64,message){await gh("/contents/"+path,{method:"PUT",body:JSON.stringify({message,branch:BRANCH,content:base64})})}
+async function removeFile(path){
+  try{const f=await gh("/contents/"+encodeURI(path)+"?ref="+BRANCH);await gh("/contents/"+encodeURI(path),{method:"DELETE",body:JSON.stringify({message:"Удалено фото объекта",branch:BRANCH,sha:f.sha})})}catch(e){}
+}
+const ownFile=p=>/^assets\/obj-/.test(p||"");
+
+/* ---------- интерфейс ---------- */
+function show(v){["login","list","edit"].forEach(x=>$("v-"+x).hidden=x!==v);$("logout").hidden=v==="login";window.scrollTo(0,0)}
+let tt;function toast(t,bad){const el=$("toast");el.textContent=t;el.className="toast"+(bad?" bad":"");el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,bad?7000:4500)}
+function busy(t){$("busy-t").textContent=t||"Сохраняем…";$("busy").hidden=false}
+function idle(){$("busy").hidden=true}
+function explain(e){
+  if(e.status===401)return"Ключ не подходит или истёк. Выйдите и войдите с новым ключом.";
+  if(e.status===403||e.status===404)return"Нет доступа к репозиторию. Проверьте, что у ключа выбран репозиторий city и права Contents: Read and write.";
+  if(e.status===409||e.status===422)return"Файл изменили в другом месте. Обновите страницу и повторите.";
+  if(e instanceof TypeError)return"Нет связи с интернетом. Повторите позже.";
+  return"Не удалось сохранить: "+(e.body?.message||e.message);
+}
+
+/* ---------- вход ---------- */
+async function login(t,silent){
+  TOKEN=t.trim();$("login-err").textContent="";
+  if(!TOKEN){$("login-err").textContent="Вставьте ключ.";return}
+  busy("Проверяем ключ…");
+  try{
+    const repo=await gh("");
+    if(repo.permissions&&!repo.permissions.push)throw Object.assign(new Error("ro"),{status:403});
+    store.set(TOKEN);await loadList();show("list");
+  }catch(e){
+    if(silent){store.del();show("login")}else{$("login-err").textContent=explain(e);show("login")}
+  }finally{idle()}
+}
+$("login-go").addEventListener("click",()=>login($("token").value));
+$("token").addEventListener("keydown",e=>{if(e.key==="Enter")login($("token").value)});
+$("logout").addEventListener("click",()=>{store.del();TOKEN="";$("token").value="";show("login")});
+
+/* ---------- список ---------- */
+async function loadList(){LIST=(await readList()).list;renderList()}
+function renderList(){
+  const q=$("q").value.trim().toLowerCase();
+  const rows=[...LIST].sort((a,b)=>b.id-a.id).filter(i=>!q||(i.title+" "+(i.location||"")).toLowerCase().includes(q));
+  const demo=LIST.filter(i=>i.demo).length;
+  $("list-sub").textContent="Всего: "+LIST.length+(demo?" (из них примеров: "+demo+")":"");
+  $("del-demo").hidden=!demo;
+  $("items").innerHTML=rows.length?rows.map(i=>{
+    const cover=(i.images&&i.images[0])||i.image;
+    const per=i.deal==="arenda"?" / мес":i.deal==="posutochno"?" / сутки":"";
+    return '<div class="item'+(i.hidden?' off':'')+'"><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
+     +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
+     +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
+  }).join(""):'<div class="empty">'+(LIST.length?"Ничего не найдено.":"Объектов пока нет. Нажмите «Добавить объект».")+'</div>';
+}
+$("q").addEventListener("input",renderList);
+$("items").addEventListener("click",async e=>{
+  const b=e.target.closest("button");if(!b)return;
+  const id=+(b.dataset.edit||b.dataset.vis||b.dataset.del);const it=LIST.find(x=>x.id===id);if(!it)return;
+  if(b.dataset.edit){openForm(it);return}
+  if(b.dataset.vis){
+    busy(it.hidden?"Показываем на сайте…":"Скрываем с сайта…");
+    try{await commitList(l=>l.map(x=>{if(x.id!==id)return x;const y={...x};if(y.hidden)delete y.hidden;else y.hidden=true;return y}),(it.hidden?"Показан объект: ":"Скрыт объект: ")+it.title);renderList();toast(it.hidden?"Объект скрыт. Сайт обновится через 1–2 минуты.":"Объект снова виден. Сайт обновится через 1–2 минуты.")}
+    catch(err){toast(explain(err),true)}finally{idle()}
+    return;
+  }
+  if(b.dataset.del){
+    if(!confirm("Удалить объект «"+it.title+"» вместе с фото? Это нельзя отменить."))return;
+    busy("Удаляем…");
+    try{
+      await commitList(l=>l.filter(x=>x.id!==id),"Удалён объект: "+it.title);
+      for(const p of new Set([...(it.images||[]),it.image].filter(ownFile)))await removeFile(p);
+      renderList();toast("Объект удалён. Сайт обновится через 1–2 минуты.");
+    }catch(err){toast(explain(err),true)}finally{idle()}
+  }
+});
+$("del-demo").addEventListener("click",async()=>{
+  const n=LIST.filter(i=>i.demo).length;
+  if(!confirm("Удалить все примеры ("+n+" шт.)? Ваши настоящие объекты останутся."))return;
+  busy("Удаляем примеры…");
+  try{await commitList(l=>l.filter(x=>!x.demo),"Удалены примеры объектов");renderList();toast("Примеры удалены. Сайт обновится через 1–2 минуты.")}
+  catch(err){toast(explain(err),true)}finally{idle()}
+});
+$("new-btn").addEventListener("click",()=>openForm(null));
+
+/* ---------- форма ---------- */
+$("det-grid").innerHTML=DETAILS.map(([k,l,p])=>'<div><label for="d-'+k+'">'+l+'</label><input id="d-'+k+'" type="text" placeholder="'+esc(p)+'"></div>').join("");
+function catOptions(cur){
+  const o=[...CATS];if(cur&&!o.some(c=>c[0]===cur))o.push([cur,cur]);
+  $("f-category").innerHTML=o.map(([v,l])=>'<option value="'+esc(v)+'">'+esc(l)+'</option>').join("");
+}
+function syncFields(){
+  const c=$("f-category").value,land=c==="uchastki",flat=c==="kvartiry"||c==="komnaty",home=c==="doma";
+  $("l-area").textContent=land?"Площадь, соток":"Площадь, м²";
+  $("w-rooms").hidden=land;$("w-floor").hidden=!flat;$("w-floors").hidden=!(flat||home);$("w-land").hidden=!land;
+}
+$("f-category").addEventListener("change",syncFields);
+$("f-price").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"");e.target.value=d?fmt(d):""});
+function openForm(it){
+  editing=it;catOptions(it?.category);
+  $("edit-title").textContent=it?"Редактирование объекта":"Новый объект";
+  $("save").textContent=it?"Сохранить изменения":"Опубликовать";
+  const v=(id,val)=>$(id).value=val??"";
+  v("f-category",it?.category||"kvartiry");v("f-deal",it?.deal||"prodazha");v("f-title",it?.title);v("f-price",it?.price?fmt(it.price):"");v("f-area",it?.area);
+  v("f-city",it?.city||"Буйнакск");v("f-location",it?.location);v("f-rooms",it?.rooms);v("f-floor",it?.floor);v("f-floors",it?.floors);
+  v("f-land",it?.landType||it?.purpose);v("f-desc",it?.description);v("f-extra",it?.extra);$("f-show").checked=!it?.hidden;
+  DETAILS.forEach(([k])=>v("d-"+k,it?.details?.[k]));
+  document.querySelector("details").open=!!it?.details&&Object.values(it.details).some(Boolean);
+  photos=(it?(it.images&&it.images.length?it.images:(it.image?[it.image]:[])):[]).map(p=>({path:p,url:p}));
+  $("edit-err").textContent="";syncFields();drawPhotos();show("edit");
+}
+function drawPhotos(){
+  $("photos").innerHTML=photos.map((p,i)=>'<div class="ph'+(i===0?' cover':'')+'"><img src="'+esc(p.url)+'" alt="">'+(i===0?'<span class="cv">Обложка</span>':'')
+    +'<div class="pb"><span>'+(i>0?'<button type="button" data-ph="left" data-i="'+i+'" aria-label="Сдвинуть влево" title="Сделать ближе к началу">←</button>':'')+'</span><button type="button" data-ph="del" data-i="'+i+'" aria-label="Удалить фото" title="Удалить фото">×</button></div></div>').join("")
+    +'<div class="add" id="add-photo" role="button" tabindex="0">+ Добавить фото</div>';
+}
+$("photos").addEventListener("click",e=>{
+  if(e.target.closest("#add-photo")){$("file").click();return}
+  const b=e.target.closest("[data-ph]");if(!b)return;const i=+b.dataset.i;
+  if(b.dataset.ph==="del"){const [r]=photos.splice(i,1);if(r.blobUrl)URL.revokeObjectURL(r.blobUrl)}
+  else if(i>0)[photos[i-1],photos[i]]=[photos[i],photos[i-1]];
+  drawPhotos();
+});
+$("photos").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.id==="add-photo"){e.preventDefault();$("file").click()}});
+
+/* Обработка фото: уменьшение, исправление поворота и логотип */
+let logoImg=null;
+function loadLogo(){return logoImg||(logoImg=new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="assets/city-logo-mark.png"}))}
+async function processPhoto(file,wm){
+  const bmp=await createImageBitmap(file,{imageOrientation:"from-image"});
+  const k=Math.min(1,1600/Math.max(bmp.width,bmp.height)),w=Math.round(bmp.width*k),h=Math.round(bmp.height*k);
+  const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");
+  x.drawImage(bmp,0,0,w,h);
+  if(wm){
+    const logo=await loadLogo(),lw=w*0.22,lh=lw*logo.naturalHeight/logo.naturalWidth,px=w-lw-w*0.05,py=h-lh-w*0.085;
+    x.save();x.globalAlpha=.5;x.shadowColor="rgba(0,0,0,.45)";x.shadowBlur=Math.max(3,lw/30);x.shadowOffsetY=2;x.drawImage(logo,px,py,lw,lh);x.restore();
+  }
+  return new Promise(r=>c.toBlob(r,"image/jpeg",.86));
+}
+$("file").addEventListener("change",async e=>{
+  const files=[...e.target.files];e.target.value="";if(!files.length)return;
+  busy("Обрабатываем фото…");
+  try{
+    for(const f of files){
+      const blob=await processPhoto(f,$("f-wm").checked);
+      const u=URL.createObjectURL(blob);photos.push({blob,url:u,blobUrl:u});
+    }
+    drawPhotos();
+  }catch(err){toast("Не удалось открыть фото. Попробуйте формат JPG или PNG.",true)}finally{idle()}
+});
+const blobB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(",")[1]);f.readAsDataURL(b)});
+
+/* ---------- сохранение ---------- */
+const num=s=>{const n=parseFloat(String(s).replace(/\s/g,"").replace(",","."));return isNaN(n)?null:n};
+function collect(id){
+  const cat=$("f-category").value,land=cat==="uchastki",flat=cat==="kvartiry"||cat==="komnaty",home=cat==="doma";
+  const o={id,category:cat,deal:$("f-deal").value,title:$("f-title").value.trim(),price:num($("f-price").value),area:num($("f-area").value),
+    location:$("f-location").value.trim(),demo:false};
+  const city=$("f-city").value.trim();if(city)o.city=city;
+  if(!land&&$("f-rooms").value)o.rooms=+$("f-rooms").value;
+  const fl=num($("f-floor").value),fls=num($("f-floors").value);
+  if(flat&&fl)o.floor=fl;if((flat||home)&&fls)o.floors=fls;
+  if(land&&$("f-land").value)o.landType=$("f-land").value;
+  let extra=$("f-extra").value.trim();
+  if(!extra){if(flat&&fl)extra="Этаж "+fl+(fls?" из "+fls:"");else if(land&&$("f-land").value)extra=$("f-land").value}
+  if(extra)o.extra=extra;
+  const desc=$("f-desc").value.trim();if(desc)o.description=desc;
+  const det={};DETAILS.forEach(([k])=>{const v=$("d-"+k).value.trim();if(v)det[k]=v});if(Object.keys(det).length)o.details=det;
+  if(!$("f-show").checked)o.hidden=true;
+  return o;
+}
+function validate(o){
+  if(!o.title)return"Укажите название.";
+  if(!o.price||o.price<=0)return"Укажите цену.";
+  if(!o.area||o.area<=0)return"Укажите площадь.";
+  return"";
+}
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=editing?editing.id:Math.max(0,...LIST.map(x=>+x.id||0))+1;
+  const o=collect(id),bad=validate(o);
+  if(bad){$("edit-err").textContent=bad;return}
+  $("edit-err").textContent="";
+  busy(photos.some(p=>p.blob)?"Загружаем фото и публикуем…":"Публикуем…");
+  try{
+    const paths=[];let n=0;const stamp=Date.now().toString(36);
+    for(const p of photos){
+      if(p.blob){n++;const path="assets/obj-"+id+"-"+stamp+"-"+n+".jpg";await uploadFile(path,await blobB64(p.blob),"Фото объекта: "+o.title);paths.push(path)}
+      else paths.push(p.path);
+    }
+    if(paths.length){o.image=paths[0];o.images=paths}
+    const old=editing?[...(editing.images||[]),editing.image].filter(Boolean):[];
+    await commitList(l=>{
+      const cur=l.find(x=>x.id===id);
+      const merged=cur?{...cur,...o}:o;
+      ["image","images","hidden","extra","description","details","rooms","floor","floors","landType"].forEach(k=>{if(!(k in o))delete merged[k]});
+      if(cur&&cur.demo===false||!cur)merged.demo=false;
+      return cur?l.map(x=>x.id===id?merged:x):[...l,merged];
+    },(editing?"Изменён объект: ":"Добавлен объект: ")+o.title);
+    for(const p of new Set(old.filter(p=>ownFile(p)&&!paths.includes(p))))await removeFile(p);
+    renderList();show("list");
+    toast((editing?"Изменения сохранены":"Объект добавлен")+". Сайт обновится через 1–2 минуты.");
+  }catch(err){$("edit-err").textContent=explain(err)}finally{idle()}
+});
+function leaveForm(){if(confirm("Закрыть без сохранения?")){photos.forEach(p=>p.blobUrl&&URL.revokeObjectURL(p.blobUrl));show("list")}}
+$("back").addEventListener("click",leaveForm);$("cancel").addEventListener("click",leaveForm);
+
+/* ---------- старт ---------- */
+(function(){const t=store.get();if(t){busy("Загружаем объекты…");login(t,true)}else show("login")})();
+</script>
+</body>
+</html>

@@ -1048,7 +1048,7 @@ $("price-done").addEventListener("click",()=>{updatePriceSummary();closePrice();
 ["price-min","price-max"].forEach(id=>$(id).addEventListener("input",updatePriceSummary));
 document.addEventListener("click",e=>{if(!$("price-control").contains(e.target))closePrice()});
 
-fetch("listings.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{L=d.filter(i=>cityName(i)==="Буйнакск");render()}).catch(()=>{$("empty").textContent="Не удалось загрузить объявления. Позвоните нам: "+PHONE_TEXT;$("empty").style.display="block"});
+fetch("listings.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{L=d.filter(i=>cityName(i)==="Буйнакск"&&!i.hidden);render()}).catch(()=>{$("empty").textContent="Не удалось загрузить объявления. Позвоните нам: "+PHONE_TEXT;$("empty").style.display="block"});
 
 /* ---- окно заявки ---- */
 function openModal(t){$("mt").textContent=t;$("modal").classList.add("open")}
