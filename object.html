@@ -84,12 +84,12 @@ function render(item){
   if(item.area)specRows.push(spec(item.area+" м²","Общая площадь"));
   addSpec("condition","Ремонт");
   addSpec("livingArea","Жилая площадь");
-  if(item.floor||item.floors)specRows.push(spec((item.floor||"—")+(item.floors?" из "+item.floors:""),"Этаж"));
-  addSpec("kitchenArea","Площадь кухни");
-  addSpec("ceilingHeight","Высота потолков");
   addSpec("bathroom","Санузел");
-  addSpec("windows","Окна");
+  addSpec("kitchenArea","Площадь кухни");
   addSpec("heating","Отопление");
+  addSpec("ceilingHeight","Высота потолков");
+  addSpec("windows","Окна");
+  if(item.floor||item.floors)specRows.push(spec((item.floor||"—")+(item.floors?" из "+item.floors:""),"Этаж"));
  }else{
   if(item.area)specRows.push(spec(item.area+(item.category==="uchastki"?" соток":" м²"),"Общая площадь"));
   if(item.rooms)specRows.push(spec(item.rooms,"Количество комнат"));
