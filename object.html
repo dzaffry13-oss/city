@@ -80,6 +80,12 @@ h1{
   h1{font-size:clamp(29px,7.2vw,36px);line-height:1.16;letter-spacing:-.025em}
 }
 
+
+/* Keep the concise listing headline on one line on desktop */
+h1{font-size:clamp(30px,2.15vw,38px);line-height:1.16;letter-spacing:-.025em;max-width:none;white-space:nowrap}
+@media(max-width:800px){h1{font-size:clamp(28px,4.2vw,36px);white-space:normal}}
+@media(max-width:600px){h1{font-size:clamp(28px,7.2vw,35px);white-space:normal}}
+
 </style>
 </head>
 <body>
