@@ -139,7 +139,6 @@ function render(item){
  $("crumb-title").textContent=item.title;$("deal").textContent=(dealLabels[item.deal]||"Недвижимость")+" · "+(item.city||"Буйнакск");
  $("title").textContent=item.title;$("price").innerHTML=esc(fmt(item.price)+" ₽")+ '<small>'+esc(per.trim())+'</small>';
  const detail=item.details||{},specLeft=[],specRight=[];
- const addSpec=(key,label,format=v=>v)=>{if(detail[key])specRows.push(spec(format(detail[key]),label));};
  if(item.category==="kvartiry"||item.category==="komnaty"){
   if(item.rooms)specLeft.push(spec(item.rooms,"Количество комнат"));
   if(item.area)specRight.push(spec(item.area+" м²","Общая площадь"));
