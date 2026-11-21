@@ -144,7 +144,20 @@
       "assets/obj-11-mwqkj5ef-3.jpg",
       "assets/obj-11-mwqkj5ef-4.jpg",
       "assets/obj-11-mwqkj5ef-5.jpg"
-    ]
+    ],
+    "details": {
+      "kitchenArea": "16",
+      "livingArea": "59",
+      "ceilingHeight": "3",
+      "bathroom": "Соывмещенный",
+      "windows": "Во двор и на улицу",
+      "condition": "Без ремонта",
+      "documents": "Полный пакет",
+      "payment": "Ипотека не рассматривается",
+      "bargaining": "Небольшой торг",
+      "parking": "Открытая во дворе",
+      "utilities": "Все подключены"
+    }
   },
   {
     "id": 12,
