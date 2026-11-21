@@ -543,17 +543,25 @@ footer{background:#06172b}
   .about-c .vals>div:first-child{border-top:0}
 }
 
-/* CITY — компактные фотографии объектов, вертикальные снимки целиком без обрезки */
-.visual{height:320px;aspect-ratio:auto;min-height:0;background-color:#edf1f5}
-.visual img{object-fit:contain}
-@media(max-width:600px){
-  .visual{height:clamp(300px,82vw,340px)}
-}
-
-/* Описание объекта в окне «Подробнее» */
+/* CITY — аккуратная рамка фотографий и просмотр в полном размере */
+.visual{position:relative;height:300px;min-height:0;aspect-ratio:auto;background:#edf1f5;overflow:hidden}
+.photo-open{position:absolute;inset:0;display:grid;place-items:center;width:100%;height:100%;padding:10px;border:0;background:transparent;cursor:zoom-in}
+.photo-open img{position:static;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block}
+.photo-open:focus-visible{outline:3px solid var(--acc);outline-offset:-4px}
+.visual .chips{z-index:2;pointer-events:none}
+@media(max-width:600px){.visual{height:260px}}
+.photo-modal{display:none;position:fixed;inset:0;z-index:90;background:rgba(4,12,24,.94);place-items:center;padding:24px}
+.photo-modal.open{display:grid}
+.photo-modal img{display:block;max-width:min(1100px,94vw);max-height:86dvh;width:auto;height:auto;object-fit:contain;border-radius:8px}
+.photo-modal .close{position:fixed;right:18px;top:18px;width:44px;height:44px;font-size:28px;background:#fff;color:#10233d}
+.details-dialog{max-width:680px;max-height:min(88dvh,900px);overflow:auto}
+.detail-list{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+.detail-list div{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.detail-list dt{flex:1}.detail-list dd{flex:1;text-align:right}
 .detail-desc{margin:16px 0 0;font-size:15px;line-height:1.65;color:var(--ink);white-space:pre-line}
 .dialog p.price{font-size:26px;line-height:1.2;color:var(--ink);margin:6px 0 4px}
 .dialog p.price small{font-size:13px;color:var(--mut)}
+@media(max-width:600px){.details-dialog{width:calc(100% - 16px);max-height:88dvh}.detail-list{grid-template-columns:1fr}.detail-list div{gap:12px}}
 </style>
 </head>
 <body>
@@ -739,8 +747,13 @@ footer{background:#06172b}
 </div>
 
 
+<div class="photo-modal" id="photo-modal" role="dialog" aria-modal="true" aria-label="Фотография объекта">
+  <button class="close" type="button" data-close-photo aria-label="Закрыть">&times;</button>
+  <img id="photo-full" src="" alt="">
+</div>
+
 <div class="modal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-title">
-  <div class="dialog">
+  <div class="dialog details-dialog">
     <button class="close" type="button" data-close-details aria-label="Закрыть">&times;</button>
     <h3 id="details-title">Информация об объекте</h3>
     <div id="details-content"></div>
@@ -814,7 +827,7 @@ function card(i){
   const msg="Здравствуйте! Интересует объект: "+i.title+", город: "+city+", "+fmt(i.price)+" ₽"+(per?" "+per:"")+". Он ещё актуален?";
   const wa="https://wa.me/"+PHONE_DIGITS+"?text="+encodeURIComponent(msg);
   const specs=[i.rooms?i.rooms+" комн.":"",fmt(i.area)+" "+u,i.extra||""].filter(Boolean).map(t=>"<li>"+esc(t)+"</li>").join("");
-  const vis=i.image?'<img src="'+esc(i.image)+'" alt="'+esc(i.title)+'" loading="lazy">':'<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">'+(GLYPH[i.category]||GLYPH.doma)+'</svg>';
+  const vis=i.image?'<button type="button" class="photo-open" data-photo="'+esc(i.image)+'" data-photo-alt="'+esc(i.title)+'" aria-label="Увеличить фотографию: '+esc(i.title)+'"><img src="'+esc(i.image)+'" alt="'+esc(i.title)+'" loading="lazy"></button>':'<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">'+(GLYPH[i.category]||GLYPH.doma)+'</svg>';
   return '<article class="card"><div class="visual">'+vis+'<div class="chips"><span class="chip">'+DEALLBL[i.deal]+'</span>'+(i.demo?'<span class="chip o">пример</span>':'')+'</div></div>'
     +'<div class="cbody"><div class="price">'+fmt(i.price)+' ₽'+(per?'<small>'+per+'</small>':'')+'</div><h3>'+esc(i.title)+'</h3><div class="loc"><strong>Город:</strong> '+esc(city)+'</div><ul class="specs">'+specs+'</ul><div class="loc">'+esc(i.location||"Район не указан")+'</div>'
     +'<div class="acts"><button type="button" class="ask" data-details="'+i.id+'">Подробнее</button><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'WhatsApp</a></div></div></article>';
@@ -829,6 +842,8 @@ function render(){
 $("cats").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(b){S.cat=b.dataset.cat;render()}});
 $("deal-select").addEventListener("change",e=>{S.deal=e.target.value;render()});
 $("cards").addEventListener("click",e=>{
+  const photo=e.target.closest("[data-photo]");
+  if(photo){openPhoto(photo.dataset.photo,photo.dataset.photoAlt||"Фото объекта");return;}
   const b=e.target.closest("[data-details]");
   if(b)showDetails(b.dataset.details);
 });
@@ -838,13 +853,18 @@ function showDetails(id){
   activeDetails=item;
   const city=cityName(item)||"Город не указан";
   const per=item.deal==="arenda"?"в месяц":item.deal==="posutochno"?"в сутки":"";
-  const rows=[["Город",city],["Адрес / район",item.location||"Не указан"],["Тип сделки",DEALLBL[item.deal]||"Не указан"],["Площадь",(item.area??"—")+(item.category==="uchastki"?" сот.":" м²")],["Комнаты",item.rooms?item.rooms:"—"]];
-  if(item.floor)rows.push(["Этаж",item.floor+(item.floors?" из "+item.floors:"")]);
-  else if(item.extra)rows.push(["Дополнительно",item.extra]);
+  const rows=[["Город",city],["Адрес / район",item.location||"Не указан"],["Тип сделки",DEALLBL[item.deal]||"Не указан"],["Площадь", (item.area??"—")+(item.category==="uchastki"?" сот.":" м²")],["Комнаты",item.rooms||"—"],["Этаж",item.floor?(item.floor+(item.floors?" из "+item.floors:"")):(item.extra||"—")]];
+  const labels={kitchenArea:"Площадь кухни",livingArea:"Жилая площадь",ceilingHeight:"Высота потолков",heating:"Отопление",bathroom:"Санузел",windows:"Окна",furniture:"Мебель",appliances:"Техника",condition:"Состояние",documents:"Документы",payment:"Ипотека / рассрочка",bargaining:"Торг",parking:"Парковка",utilities:"Коммуникации"};
+  Object.entries(item.details||{}).forEach(([key,value])=>{if(value)rows.push([labels[key]||key,value])});
   $("details-title").textContent=item.title;
   $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>'+(item.description?'<p class="detail-desc">'+esc(item.description)+'</p>':'');
   $("details-modal").classList.add("open");
 }
+function openPhoto(src,alt){$("photo-full").src=src;$("photo-full").alt=alt;$("photo-modal").classList.add("open");}
+function closePhoto(){$("photo-modal").classList.remove("open");$("photo-full").src="";}
+document.querySelector("[data-close-photo]").addEventListener("click",closePhoto);
+$("photo-modal").addEventListener("click",e=>{if(e.target.id==="photo-modal")closePhoto();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePhoto();$("details-modal").classList.remove("open");}});
 document.querySelector("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
 $("details-modal").addEventListener("click",e=>{if(e.target.id==="details-modal")$("details-modal").classList.remove("open")});
 $("details-request").addEventListener("click",()=>{if(activeDetails){$("details-modal").classList.remove("open");openModal("Заявка: "+activeDetails.title+" — "+cityName(activeDetails))}});
