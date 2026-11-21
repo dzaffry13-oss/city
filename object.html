@@ -52,7 +52,7 @@ footer{background:var(--navy);color:#d4dce8;padding:26px 0;font-size:12px}.foot{
 <div class="main-col">
 <section class="panel description-panel"><h2>Описание квартиры</h2><p class="description" id="description"></p></section>
 <section class="panel"><h2>Основные характеристики</h2><div class="specs" id="specs"></div></section>
-<section class="panel"><h2>Подробные характеристики</h2><div class="detail-groups" id="details"></div></section>
+
 </div>
 <aside class="side"><div class="contact"><h2>Заинтересовал объект?</h2><p>Оставьте заявку — мы ответим на вопросы и поможем договориться о просмотре.</p><button class="btn" id="request-open">Оставить заявку</button><a class="phone-link" id="phone-link" href="tel:+79094833939">+7 909 483-39-39</a><p class="note">Связь напрямую с агентством CITY</p></div></aside>
 </div>
@@ -70,7 +70,6 @@ $("year").textContent=new Date().getFullYear();
 $("phone-link").href="tel:+"+PHONE;$("phone-link").textContent=PHONE_TEXT;
 function showError(){ $("loading").hidden=true;$("error").hidden=false; }
 function spec(value,label){return '<div class="spec"><span>'+esc(label)+'</span><b>'+esc(value)+'</b></div>'}
-function group(title,items){return '<div class="group"><h3>'+esc(title)+'</h3><ul>'+items.map(([k,v])=>'<li><span>'+esc(k)+'</span><strong>'+esc(v)+'</strong></li>').join("")+'</ul></div>'}
 function render(item){
  current=item;photos=Array.isArray(item.images)&&item.images.length?item.images:(item.image?[item.image]:[]);galleryIndex=0;
  const per=item.deal==="arenda"?" / месяц":item.deal==="posutochno"?" / сутки":"";
@@ -99,11 +98,7 @@ function render(item){
  }
  $("specs").innerHTML=specRows.join("")||'<p>Основные характеристики уточняйте у агентства.</p>';
  $("description").textContent=item.description||(item.category==="kvartiry"?"Квартира площадью "+(item.area||"—")+" м². Подробности об объекте можно уточнить у агентства CITY.":"Подробности об объекте можно уточнить у агентства CITY.");
- const labels={kitchenArea:"Площадь кухни",livingArea:"Жилая площадь",ceilingHeight:"Высота потолков",heating:"Отопление",bathroom:"Санузел",windows:"Окна",furniture:"Мебель",appliances:"Техника",condition:"Состояние",documents:"Документы",payment:"Ипотека / рассрочка",bargaining:"Торг",parking:"Парковка",utilities:"Коммуникации"};
- const d=item.details||{},space=["kitchenArea","livingArea","ceilingHeight"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
- const comfort=["heating","bathroom","windows","furniture","appliances"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
- const status=["condition","documents","payment","bargaining","parking","utilities"].filter(k=>d[k]).map(k=>[labels[k],d[k]]);
- $("details").innerHTML=[space.length?group("Площади и планировка",space):"",comfort.length?group("Комфорт и оснащение",comfort):"",status.length?group("Состояние и условия",status):""].join("")||"<p>Дополнительные характеристики уточняйте у агентства.</p>";
+
  if(photos.length){$("gallery").innerHTML='<button class="hero-photo" id="hero-photo" aria-label="Открыть фотографию"><img id="gallery-main-image" src="'+esc(photos[0])+'" alt="'+esc(item.title)+'"></button>'+(photos.length>1?'<div class="gallery-nav"><button type="button" id="gallery-prev" aria-label="Предыдущее фото">‹</button><button type="button" id="gallery-next" aria-label="Следующее фото">›</button></div><div class="thumbs">'+photos.slice(1,3).map((p,i)=>'<button class="thumb" data-thumb="'+(i+1)+'" aria-label="Показать фото '+(i+2)+'"><img src="'+esc(p)+'" alt=""></button>').join("")+'</div>':'')+'<span class="gallery-count">'+photos.length+' фото</span>';$("hero-photo").addEventListener("click",()=>openViewer(galleryIndex));$("gallery").querySelectorAll("[data-thumb]").forEach(b=>b.addEventListener("click",()=>setGalleryPhoto(Number(b.dataset.thumb))));if(photos.length>1){$("gallery-prev").addEventListener("click",()=>setGalleryPhoto(galleryIndex-1));$("gallery-next").addEventListener("click",()=>setGalleryPhoto(galleryIndex+1));}}
  else $("gallery").innerHTML='<div class="gallery-empty">Фотографии скоро появятся</div>';
  $("loading").hidden=true;$("object").hidden=false;
