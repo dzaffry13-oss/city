@@ -102,13 +102,21 @@
     "id": 9,
     "category": "kommerciya",
     "deal": "prodazha",
-    "title": "Участок под строи",
-    "price": 3200000,
-    "area": 25,
-    "location": "Буйнакск · район уточняется",
+    "title": "Участок под коммерцию",
+    "price": 1350000,
+    "area": 6,
+    "location": "Буйнакск · рынок",
     "demo": false,
-    "extra": "ИЖС",
-    "city": "Буйнакск"
+    "extra": "Коммерческая недвижимость",
+    "city": "Буйнакск",
+    "description": "Продается земельный участок под коммерцию Площадью 6м2\n\nОчень проходимое место\n\nПолный пакет документов \n\nНа первом фото макет, показано то как можно использоваться эту землю.",
+    "image": "assets/obj-9-mwqt7chb-1.jpg",
+    "images": [
+      "assets/obj-9-mwqt7chb-1.jpg",
+      "assets/obj-9-mwqt7chb-2.jpg",
+      "assets/obj-9-mwqt7chb-3.jpg",
+      "assets/obj-9-mwqt7chb-4.jpg"
+    ]
   },
   {
     "id": 10,
