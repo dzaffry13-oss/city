@@ -632,7 +632,25 @@ footer{background:#06172b}
 .dialog p.price{font-size:26px;line-height:1.2;color:var(--ink);margin:6px 0 4px}
 .dialog p.price small{font-size:13px;color:var(--mut)}
 @media(max-width:600px){.details-dialog{width:calc(100% - 16px);max-height:88dvh}.detail-list{grid-template-columns:1fr}.detail-list div{gap:12px}}
-\n/* CITY — на дополнительных фото скрываем обложечный текст и градиент */\n.card.photo-card.gallery-secondary .cbody,\n.card.photo-card.gallery-secondary .chips{display:none!important}\n</style>
+
+/* CITY — дополнительные снимки без обложечного текста */
+.card.photo-card.gallery-secondary .cbody,
+.card.photo-card.gallery-secondary .chips{display:none!important}
+.photo-modal{display:none;position:fixed;inset:0;z-index:90;background:rgba(4,12,24,.96);place-items:center;padding:60px 64px}
+.photo-modal.open{display:grid}
+.photo-modal img{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:calc(100vw - 128px);max-height:calc(100dvh - 120px);width:auto;height:auto;object-fit:contain;border-radius:8px;touch-action:pan-y}
+.photo-modal .close{position:fixed;right:18px;top:18px;width:44px;height:44px;font-size:28px;background:#fff;color:#10233d;z-index:3}
+.photo-modal .photo-nav{position:fixed;top:50%;transform:translateY(-50%);z-index:3;width:48px;height:48px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:34px;line-height:1;display:grid;place-items:center;cursor:pointer}
+.photo-modal .photo-nav.prev{left:16px}.photo-modal .photo-nav.next{right:16px}
+.photo-modal .photo-counter{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.45);padding:5px 12px;border-radius:20px;font-size:13px}
+.photo-modal .photo-nav[hidden],.photo-modal .photo-counter[hidden]{display:none}
+@media(max-width:600px){
+ .photo-modal{padding:54px 8px 64px}
+ .photo-modal img{max-width:calc(100vw - 16px);max-height:calc(100dvh - 118px)}
+ .photo-modal .photo-nav{width:40px;height:40px;font-size:28px;background:rgba(0,0,0,.35)}
+ .photo-modal .photo-nav.prev{left:8px}.photo-modal .photo-nav.next{right:8px}
+}
+</style>
 </head>
 <body>
 <header class="top">
@@ -817,9 +835,12 @@ footer{background:#06172b}
 </div>
 
 
-<div class="photo-modal" id="photo-modal" role="dialog" aria-modal="true" aria-label="Фотография объекта">
+<div class="photo-modal" id="photo-modal" role="dialog" aria-modal="true" aria-label="Фотографии объекта">
   <button class="close" type="button" data-close-photo aria-label="Закрыть">&times;</button>
+  <button class="photo-nav prev" type="button" data-full-prev aria-label="Предыдущее фото">‹</button>
   <img id="photo-full" src="" alt="">
+  <button class="photo-nav next" type="button" data-full-next aria-label="Следующее фото">›</button>
+  <span class="photo-counter" id="photo-counter"></span>
 </div>
 
 <div class="modal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="details-title">
@@ -929,7 +950,7 @@ $("cards").addEventListener("click",e=>{
     return;
   }
   const photo=e.target.closest("[data-photo]");
-  if(photo){openPhoto(photo.dataset.photo,photo.dataset.photoAlt||"Фото объекта");return;}
+  if(photo){const card=photo.closest(".card");const id=card.querySelector("[data-gallery-next]")?.dataset.galleryNext||card.querySelector("[data-gallery-prev]")?.dataset.galleryPrev;const item=L.find(x=>String(x.id)===String(id))||L.find(x=>(Array.isArray(x.images)&&x.images.includes(photo.dataset.photo))||x.image===photo.dataset.photo);const photos=item?(Array.isArray(item.images)&&item.images.length?item.images:(item.image?[item.image]:[])):[photo.dataset.photo];openPhoto(photos,Number(photo.dataset.photoIndex||0),photo.dataset.photoAlt||"Фото объекта");return;}
   const b=e.target.closest("[data-details]");
   if(b)showDetails(b.dataset.details);
 });
@@ -946,11 +967,26 @@ function showDetails(id){
   $("details-content").innerHTML='<p class="price">'+fmt(item.price)+' ₽ '+(per?'<small>'+per+'</small>':'')+'</p><dl class="detail-list">'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join("")+'</dl>'+(item.description?'<p class="detail-desc">'+esc(item.description)+'</p>':'');
   $("details-modal").classList.add("open");
 }
-function openPhoto(src,alt){$("photo-full").src=src;$("photo-full").alt=alt;$("photo-modal").classList.add("open");}
-function closePhoto(){$("photo-modal").classList.remove("open");$("photo-full").src="";}
+let fullPhotos=[],fullPhotoIndex=0,fullPhotoAlt="Фото объекта",touchStartX=0;
+function showFullPhoto(){
+  if(!fullPhotos.length)return;
+  $("photo-full").src=fullPhotos[fullPhotoIndex];$("photo-full").alt=fullPhotoAlt+" — фото "+(fullPhotoIndex+1);
+  const multiple=fullPhotos.length>1;
+  document.querySelector("[data-full-prev]").hidden=!multiple;
+  document.querySelector("[data-full-next]").hidden=!multiple;
+  $("photo-counter").hidden=!multiple;
+  $("photo-counter").textContent=(fullPhotoIndex+1)+" / "+fullPhotos.length;
+}
+function moveFullPhoto(step){if(fullPhotos.length<2)return;fullPhotoIndex=(fullPhotoIndex+step+fullPhotos.length)%fullPhotos.length;showFullPhoto();}
+function openPhoto(photos,index,alt){fullPhotos=photos;fullPhotoIndex=Math.max(0,Math.min(index,photos.length-1));fullPhotoAlt=alt;$("photo-modal").classList.add("open");showFullPhoto();}
+function closePhoto(){$("photo-modal").classList.remove("open");$("photo-full").src="";fullPhotos=[];}
 document.querySelector("[data-close-photo]").addEventListener("click",closePhoto);
+document.querySelector("[data-full-prev]").addEventListener("click",()=>moveFullPhoto(-1));
+document.querySelector("[data-full-next]").addEventListener("click",()=>moveFullPhoto(1));
 $("photo-modal").addEventListener("click",e=>{if(e.target.id==="photo-modal")closePhoto();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePhoto();$("details-modal").classList.remove("open");}});
+$("photo-modal").addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
+$("photo-modal").addEventListener("touchend",e=>{const dx=e.changedTouches[0].screenX-touchStartX;if(Math.abs(dx)>45)moveFullPhoto(dx<0?1:-1);},{passive:true});
+document.addEventListener("keydown",e=>{if($("photo-modal").classList.contains("open")){if(e.key==="ArrowRight")moveFullPhoto(1);if(e.key==="ArrowLeft")moveFullPhoto(-1);}if(e.key==="Escape"){closePhoto();$("details-modal").classList.remove("open");}});
 document.querySelector("[data-close-details]").addEventListener("click",()=>$("details-modal").classList.remove("open"));
 $("details-modal").addEventListener("click",e=>{if(e.target.id==="details-modal")$("details-modal").classList.remove("open")});
 $("details-request").addEventListener("click",()=>{if(activeDetails){$("details-modal").classList.remove("open");openModal("Заявка: "+activeDetails.title+" — "+cityName(activeDetails))}});
