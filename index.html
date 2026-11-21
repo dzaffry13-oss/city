@@ -632,7 +632,7 @@ footer{background:#06172b}
 .dialog p.price{font-size:26px;line-height:1.2;color:var(--ink);margin:6px 0 4px}
 .dialog p.price small{font-size:13px;color:var(--mut)}
 @media(max-width:600px){.details-dialog{width:calc(100% - 16px);max-height:88dvh}.detail-list{grid-template-columns:1fr}.detail-list div{gap:12px}}
-</style>
+\n/* CITY — на дополнительных фото скрываем обложечный текст и градиент */\n.card.photo-card.gallery-secondary .cbody,\n.card.photo-card.gallery-secondary .chips{display:none!important}\n</style>
 </head>
 <body>
 <header class="top">
@@ -925,6 +925,7 @@ $("cards").addEventListener("click",e=>{
     photoButton.dataset.photoIndex=String(index);photoButton.dataset.photo=photos[index];
     const img=photoButton.querySelector("img");img.src=photos[index];img.alt=item.title+" — фото "+(index+1);
     visual.querySelector("[data-gallery-count]").textContent=(index+1)+" / "+photos.length;
+    visual.closest(".card").classList.toggle("gallery-secondary",index!==0);
     return;
   }
   const photo=e.target.closest("[data-photo]");
