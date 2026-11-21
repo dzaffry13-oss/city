@@ -136,14 +136,24 @@
   },
   {
     "id": 12,
-    "category": "kommerciya",
+    "category": "uchastki",
     "deal": "prodazha",
-    "title": "Офисное помещение",
-    "price": 4300000,
-    "area": 55,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "city": "Буйнакск"
+    "title": "Земельный участок для дачи",
+    "price": 970000,
+    "area": 5,
+    "location": "Буйнакск · в сторону Агачкалы",
+    "demo": false,
+    "city": "Буйнакск",
+    "landType": "Сельхозназначения",
+    "extra": "Сельхозназначения",
+    "description": "Продается земельный участок в дачном поселке \nНе далеко от города, в сторону Агачкалы\nЖивописное и тихое место, самый раз для постройки дачного домика \nПроводят электричество к каждому участку\nПолный пакет документов.",
+    "image": "assets/obj-12-mwqk9wpy-1.jpg",
+    "images": [
+      "assets/obj-12-mwqk9wpy-1.jpg",
+      "assets/obj-12-mwqk9wpy-2.jpg",
+      "assets/obj-12-mwqk9wpy-3.jpg",
+      "assets/obj-12-mwqk9wpy-4.jpg"
+    ]
   },
   {
     "id": 13,
