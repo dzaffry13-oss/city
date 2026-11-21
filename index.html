@@ -669,19 +669,20 @@ footer{background:#06172b}
   transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease;
 }
 .acts .ask:after{
-  content:"›";
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:22px;
-  height:22px;
-  margin-left:2px;
-  border:1px solid rgba(16,35,58,.16);
-  border-radius:50%;
-  font-size:20px;
-  line-height:1;
+  content:"";
+  display:inline-block;
+  flex:0 0 19px;
+  width:19px;
+  height:14px;
+  margin-left:3px;
+  border:0;
+  border-radius:0;
+  background:
+    linear-gradient(var(--ink),var(--ink)) left 1px top 1px/18px 2px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) left 1px center/13px 2px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) left 1px bottom 1px/9px 2px no-repeat;
   transform:translateX(0);
-  transition:transform .2s ease,background .2s ease,border-color .2s ease;
+  transition:transform .22s ease,background .22s ease;
 }
 .acts .ask:hover{
   background:#fff;
@@ -689,7 +690,13 @@ footer{background:#06172b}
   box-shadow:0 7px 18px rgba(16,29,54,.11);
   transform:translateY(-2px);
 }
-.acts .ask:hover:after{transform:translateX(2px);background:var(--sun);border-color:var(--sun)}
+.acts .ask:hover:after{
+  transform:translateX(3px);
+  background:
+    linear-gradient(#c99b43,#c99b43) left 1px top 1px/18px 2px no-repeat,
+    linear-gradient(#c99b43,#c99b43) left 1px center/13px 2px no-repeat,
+    linear-gradient(#c99b43,#c99b43) left 1px bottom 1px/9px 2px no-repeat;
+}
 .acts .ask:active{transform:translateY(0);box-shadow:0 2px 6px rgba(16,29,54,.07)}
 .acts .ask:focus-visible{outline:3px solid rgba(242,211,142,.75);outline-offset:3px}
 @media(max-width:520px){
