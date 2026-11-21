@@ -462,6 +462,8 @@ footer{background:#06172b}
 .card.photo-card .cbody h3{font-size:19px;line-height:1.35}
 .card.photo-card .loc{color:rgba(255,255,255,.88)}
 .card.photo-card .specs li{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.card.photo-card .cbody>*{pointer-events:auto}
+.card.photo-card .gallery-arrow,.card.photo-card .gallery-count{pointer-events:auto}
 .card.photo-card .acts{padding-top:6px}
 .card.photo-card .acts .ask{background:rgba(255,255,255,.96);color:#10233a;border-color:#fff}
 .card.photo-card .acts .wa{color:#10233a}
@@ -486,6 +488,7 @@ footer{background:#06172b}
   position:absolute;
   left:0;right:0;bottom:0;
   z-index:2;
+  pointer-events:none;
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
