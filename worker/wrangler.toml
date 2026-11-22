@@ -7,5 +7,13 @@ compatibility_date = "2026-11-01"
 # Когда подключите свой домен, добавьте его сюда, например: "https://dzaffry13-oss.github.io,https://city-bynaksk.ru"
 ALLOWED_ORIGINS = "https://city05.ru,https://www.city05.ru,https://city-diz.pages.dev,https://dzaffry13-oss.github.io"
 
+# Лимит заявок: 5 запросов за 60 секунд на один IP.
+[[ratelimits]]
+name = "LEAD_RATE_LIMITER"
+namespace_id = "1001"
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
 # Секреты BOT_TOKEN и CHAT_ID в этот файл не пишутся.
 # Их задают командой: npx wrangler secret put BOT_TOKEN
