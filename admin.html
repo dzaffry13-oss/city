@@ -43,7 +43,7 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid r
 .err{color:var(--red);font-weight:600;min-height:22px;margin:10px 0 0}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
 .bar input{flex:1 1 220px;max-width:340px}.bar .sp{flex:1}
-.item{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px}
+.item{display:grid;grid-template-columns:auto 96px minmax(0,1fr) auto;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px}
 .item.off{opacity:.62}
 .thumb{width:96px;height:96px;border-radius:12px;background:#e9ece8 center/cover no-repeat;display:grid;place-items:center;color:var(--mut);font-size:12px}
 .item h3{font-size:16px;margin:0 0 3px;line-height:1.3}
@@ -52,6 +52,11 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid r
 .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:#e9ece8;color:#445;margin-right:5px;vertical-align:middle}
 .tag.demo{background:#fdecc8;color:#7a5200}.tag.hid{background:#f3d7d3;color:var(--red)}
 .acts{display:flex;flex-direction:column;gap:7px}
+.ord{display:flex;flex-direction:column;gap:6px;align-items:center}
+.ord button{width:44px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:18px;line-height:1;cursor:pointer}
+.ord button:disabled{opacity:.3;cursor:default}
+.ordbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff8e1;border:1px solid #f0d98a;border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.ordbar span{flex:1 1 200px;font-weight:600}
 .empty{text-align:center;color:var(--mut);padding:40px 10px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
 .grid .full{grid-column:1/-1}
@@ -78,7 +83,7 @@ details .grid{padding-bottom:18px}
 .busy{position:fixed;inset:0;z-index:70;background:rgba(244,245,242,.8);display:grid;place-items:center;font-weight:800;font-size:17px}
 .busy span{background:#fff;padding:18px 26px;border-radius:14px;box-shadow:0 8px 28px rgba(16,29,54,.15)}
 @media(max-width:700px){
-  .item{grid-template-columns:76px minmax(0,1fr)}
+  .item{grid-template-columns:auto 76px minmax(0,1fr)}
   .thumb{width:76px;height:76px}
   .item .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
   .grid{grid-template-columns:1fr}
@@ -122,6 +127,7 @@ details .grid{padding-bottom:18px}
     <span class="sp"></span>
     <button class="btn sm dng" type="button" id="del-demo" hidden>Удалить все примеры</button>
   </div>
+  <div class="ordbar" id="ordbar" hidden><span>Порядок изменён. Сохраните, чтобы он появился на сайте.</span><button class="btn" id="ord-save">Сохранить порядок</button><button class="btn" id="ord-cancel">Отменить</button></div>
   <div id="items"></div>
 </section>
 
@@ -207,7 +213,7 @@ async function commitList(mutate,message){
     const next=mutate(list);
     try{
       await gh("/contents/listings.json",{method:"PUT",body:JSON.stringify({message,branch:BRANCH,sha,content:b64enc(JSON.stringify(next,null,2)+"\n")})});
-      LIST=next;return;
+      LIST=next;dirty=false;return;
     }catch(e){if(e.status!==409&&e.status!==422||k===3)throw e;await new Promise(r=>setTimeout(r,700*(k+1)))}
   }
 }
@@ -248,24 +254,42 @@ $("token").addEventListener("keydown",e=>{if(e.key==="Enter")login($("token").va
 $("logout").addEventListener("click",()=>{store.del();TOKEN="";$("token").value="";show("login")});
 
 /* ---------- список ---------- */
-async function loadList(){LIST=(await readList()).list;renderList()}
+let dirty=false;
+async function loadList(){LIST=(await readList()).list;dirty=false;renderList()}
+function move(id,to){
+  const i=LIST.findIndex(x=>x.id===id);if(i<0)return;
+  const j=to==="top"?0:i+to;if(j<0||j>=LIST.length)return;
+  const a=[...LIST];const [it]=a.splice(i,1);a.splice(j,0,it);LIST=a;dirty=true;renderList();
+}
+$("ord-cancel").addEventListener("click",async()=>{busy("Возвращаем порядок…");try{await loadList()}catch(e){toast(explain(e),true)}finally{idle()}});
+$("ord-save").addEventListener("click",async()=>{
+  const ids=LIST.map(x=>x.id);busy("Сохраняем порядок…");
+  try{
+    await commitList(l=>{const m=new Map(l.map(x=>[x.id,x]));const out=ids.filter(id=>m.has(id)).map(id=>m.get(id));const set=new Set(ids);return[...l.filter(x=>!set.has(x.id)),...out]},"Изменён порядок объектов");
+    dirty=false;renderList();toast("Порядок сохранён. Сайт обновится через 1–2 минуты.");
+  }catch(err){toast(explain(err),true)}finally{idle()}
+});
 function renderList(){
   const q=$("q").value.trim().toLowerCase();
-  const rows=[...LIST].sort((a,b)=>b.id-a.id).filter(i=>!q||(i.title+" "+(i.location||"")).toLowerCase().includes(q));
+  const rows=LIST.filter(i=>!q||(i.title+" "+(i.location||"")).toLowerCase().includes(q));
+  const canMove=!q;$("ordbar").hidden=!dirty;
   const demo=LIST.filter(i=>i.demo).length;
   $("list-sub").textContent="Всего: "+LIST.length+(demo?" (из них примеров: "+demo+")":"");
   $("del-demo").hidden=!demo;
   $("items").innerHTML=rows.length?rows.map(i=>{
     const cover=(i.images&&i.images[0])||i.image;
     const per=i.deal==="arenda"?" / мес":i.deal==="posutochno"?" / сутки":"";
-    return '<div class="item'+(i.hidden?' off':'')+'"><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
+    const pos=LIST.indexOf(i);
+    return '<div class="item'+(i.hidden?' off':'')+'"><div class="ord"><button data-up="'+i.id+'" title="Выше" aria-label="Поднять выше"'+(!canMove||pos===0?' disabled':'')+'>↑</button><button data-down="'+i.id+'" title="Ниже" aria-label="Опустить ниже"'+(!canMove||pos===LIST.length-1?' disabled':'')+'>↓</button></div><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
      +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
      +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-link="'+i.id+'">Скопировать ссылку</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
   }).join(""):'<div class="empty">'+(LIST.length?"Ничего не найдено.":"Объектов пока нет. Нажмите «Добавить объект».")+'</div>';
 }
 $("q").addEventListener("input",renderList);
 $("items").addEventListener("click",async e=>{
-  const b=e.target.closest("button");if(!b)return;
+  const b=e.target.closest("button");if(!b||b.disabled)return;
+  if(b.dataset.up){move(+b.dataset.up,-1);return}
+  if(b.dataset.down){move(+b.dataset.down,1);return}
   const id=+(b.dataset.edit||b.dataset.vis||b.dataset.del||b.dataset.link);const it=LIST.find(x=>x.id===id);if(!it)return;
   if(b.dataset.edit){openForm(it);return}
   if(b.dataset.link){
@@ -415,7 +439,7 @@ $("form").addEventListener("submit",async e=>{
       const merged=cur?{...cur,...o}:o;
       ["image","images","hidden","verified","extra","description","details","rooms","floor","floors","landType"].forEach(k=>{if(!(k in o))delete merged[k]});
       if(cur&&cur.demo===false||!cur)merged.demo=false;
-      return cur?l.map(x=>x.id===id?merged:x):[...l,merged];
+      return cur?l.map(x=>x.id===id?merged:x):[merged,...l];
     },(editing?"Изменён объект: ":"Добавлен объект: ")+o.title);
     for(const p of new Set(old.filter(p=>ownFile(p)&&!paths.includes(p))))await removeFile(p);
     renderList();show("list");

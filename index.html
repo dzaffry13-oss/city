@@ -909,7 +909,7 @@ footer{background:#06172b}
   <div class="wrap">
     <div class="head">
       <h2>Объекты</h2>
-      <div class="tools"><span id="count"></span><select id="sort" aria-label="Сортировка"><option value="">Сначала новые</option><option value="asc">Сначала дешевле</option><option value="desc">Сначала дороже</option></select></div>
+      <div class="tools"><span id="count"></span><select id="sort" aria-label="Сортировка"><option value="">По умолчанию</option><option value="asc">Сначала дешевле</option><option value="desc">Сначала дороже</option></select></div>
     </div>
     <div class="cards" id="cards"></div>
     <div class="more-wrap" id="more-wrap" hidden><button type="button" class="btn line" id="more-btn">Показать ещё</button></div>
@@ -1126,7 +1126,7 @@ function list(){
   };
   const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||S.cat!=="uchastki"||(i.category==="uchastki"&&landPurposeMatches(i,landType)))&&(!condition||!["kvartiry","doma"].includes(S.cat)||String(i.condition||i.details?.condition||"").trim().toLocaleLowerCase("ru")===condition)&&selectedUtilities.every(u=>itemUtilities(i).includes(u))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
   const so=$("sort").value;
-  if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);else x.sort((p,q)=>(Number(q.id)||0)-(Number(p.id)||0));
+  if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);
   return x;
 }
 function card(i){
