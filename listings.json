@@ -60,17 +60,6 @@
     "city": "Буйнакск"
   },
   {
-    "id": 5,
-    "category": "komnaty",
-    "deal": "arenda",
-    "title": "Комната в квартире",
-    "price": 8000,
-    "area": 14,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "city": "Буйнакск"
-  },
-  {
     "id": 6,
     "category": "doma",
     "deal": "prodazha",
