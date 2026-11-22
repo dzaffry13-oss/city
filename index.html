@@ -98,6 +98,13 @@ h1{font-family:var(--display);font-weight:500;font-size:clamp(31px,6.2vw,74px);l
 .frow .btn{height:48px;padding-block:0}
 
 
+
+.filter-grid .check-field{grid-column:span 1;min-width:0}
+.check-field{border:0}
+.check-field legend{display:block;font-size:13px;font-weight:600;color:var(--mut);margin:0 0 10px 2px}
+.check-options{display:flex;flex-wrap:wrap;gap:9px 14px}
+.check-options label{display:inline-flex;align-items:center;gap:7px;margin:0;color:var(--ink);font-size:14px;font-weight:500;cursor:pointer}
+.check-options input{width:17px;height:17px;accent-color:var(--ink);cursor:pointer}
 .advanced-filters{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:18px}.advanced-filters[hidden]{display:none}.filter-section{display:grid;gap:10px}.filter-section>strong{font-size:14px}.filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.filter-footer{display:flex;justify-content:flex-end;gap:10px}.finder-actions .field{max-width:260px}.finder-actions .btn{height:48px}.finder-actions .btn.line{color:var(--ink);border-color:var(--line);background:#fff}.finder-actions .btn.line:hover{background:var(--ink);color:#fff}
 @media(max-width:760px){.filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.finder-actions .field{flex:1 1 100%;max-width:none}.finder-actions .btn{flex:1 1 100%}}
 
@@ -794,9 +801,23 @@ footer{background:#06172b}
       <div class="filter-grid">
         <div class="field" id="f-area-min"><label for="area-min">Площадь от</label><input id="area-min" type="number" min="0" inputmode="numeric" placeholder="От"></div>
         <div class="field" id="f-area-max"><label for="area-max">Площадь до</label><input id="area-max" type="number" min="0" inputmode="numeric" placeholder="До"></div>
-        <div class="field" id="f-land-type" hidden><label for="land-type-advanced">Категория земли</label><select id="land-type-advanced"><option value="">Любая категория</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческая</option></select></div>
+        <div class="field" id="f-land-type" hidden><label for="land-type-advanced">Назначение участка</label><select id="land-type-advanced"><option value="">Любое назначение</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческое</option></select></div>
+        <div class="field" id="f-condition" hidden><label for="condition">Состояние ремонта</label><select id="condition"><option value="">Любое состояние</option><option value="Без ремонта">Без ремонта</option><option value="Косметический">Косметический</option><option value="Евроремонт">Евроремонт</option><option value="Дизайнерский">Дизайнерский</option></select></div>
         <div class="field" id="f-floor" hidden><label for="floor">Этаж</label><input id="floor" type="number" min="1" inputmode="numeric" placeholder="Например, 3"></div>
         <div class="field" id="f-floors" hidden><label for="floors">Этажей в доме</label><input id="floors" type="number" min="1" inputmode="numeric" placeholder="Например, 5"></div>
+        <fieldset class="field check-field" id="f-home-utilities" hidden><legend>Коммуникации</legend><div class="check-options">
+          <label><input type="checkbox" name="home-utility" value="electricity"> Электричество</label>
+          <label><input type="checkbox" name="home-utility" value="water"> Вода</label>
+          <label><input type="checkbox" name="home-utility" value="gas"> Газ</label>
+          <label><input type="checkbox" name="home-utility" value="sewerage"> Канализация</label>
+          <label><input type="checkbox" name="home-utility" value="heating"> Отопление</label>
+        </div></fieldset>
+        <fieldset class="field check-field" id="f-land-utilities" hidden><legend>Коммуникации</legend><div class="check-options">
+          <label><input type="checkbox" name="land-utility" value="electricity"> Электричество</label>
+          <label><input type="checkbox" name="land-utility" value="water"> Вода</label>
+          <label><input type="checkbox" name="land-utility" value="gas"> Газ</label>
+          <label><input type="checkbox" name="land-utility" value="sewerage"> Канализация</label>
+        </div></fieldset>
       </div>
       <div class="filter-footer"><button class="btn line sm" type="button" id="reset-filters">Сбросить</button><button class="show-listings" type="submit">Показать объявления</button></div>
     </div>
@@ -972,18 +993,39 @@ function fields(){
   $("quick-rooms").hidden=!isRoom;
   $("quick-land").hidden=!land;
   $("f-land-type").hidden=!land;
+  $("f-condition").hidden=!(isFlat||isHome);
+  $("f-home-utilities").hidden=!isHome;
+  $("f-land-utilities").hidden=!land;
   $("f-floor").hidden=!isFlat;
   $("f-floors").hidden=!(isFlat||isHome);
   $("f-area-min").querySelector("label").textContent=land?"Площадь от, сот.":"Площадь от, м²";
   $("f-area-max").querySelector("label").textContent=land?"Площадь до, сот.":"Площадь до, м²";
+}
+const UTILITY_ALIASES={
+  electricity:["electricity","электричество","свет","электроэнергия"],
+  water:["water","вода","водоснабжение"],
+  gas:["gas","газ","газоснабжение"],
+  sewerage:["sewerage","канализация","водоотведение"],
+  heating:["heating","отопление"]
+};
+function itemUtilities(i){
+  const d=i.details||{},raw=i.communications??i.utilities??d.communications??d.utilities??[];
+  let values=[];
+  if(Array.isArray(raw))values=raw;
+  else if(raw&&typeof raw==="object")values=Object.keys(raw).filter(k=>raw[k]===true);
+  else if(typeof raw==="string")values=raw.split(/[,;|]+/);
+  const normalized=values.map(v=>String(v).trim().toLocaleLowerCase("ru"));
+  return Object.keys(UTILITY_ALIASES).filter(key=>normalized.some(v=>UTILITY_ALIASES[key].includes(v)));
 }
 function list(){
   const r=$("rooms").value,min=+$("price-min").value||0,max=+$("price-max").value||Infinity;
   const amin=+$("area-min").value||0,amax=+$("area-max").value||Infinity;
   const floor=+$("floor").value||0,floors=+$("floors").value||0;
   const landType=$("land-type").value||$("land-type-advanced").value;
+  const condition=$("condition").value.trim().toLocaleLowerCase("ru");
+  const selectedUtilities=[...document.querySelectorAll("#advanced-filters input[name='home-utility']:checked,#advanced-filters input[name='land-utility']:checked")].map(el=>el.value);
   const landText=i=>String(i.landType||i.purpose||i.extra||"").toLocaleLowerCase("ru");
-  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||landText(i).includes(landType.toLocaleLowerCase("ru")))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
+  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||landText(i).includes(landType.toLocaleLowerCase("ru")))&&(!condition||String(i.condition||i.details?.condition||"").trim().toLocaleLowerCase("ru")===condition)&&selectedUtilities.every(u=>itemUtilities(i).includes(u))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
   const so=$("sort").value;
   if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);else x.sort((p,q)=>(Number(q.id)||0)-(Number(p.id)||0));
   return x;
@@ -1054,7 +1096,8 @@ $("photo-modal").addEventListener("click",e=>{if(e.target.id==="photo-modal")clo
 $("photo-modal").addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
 $("photo-modal").addEventListener("touchend",e=>{const dx=e.changedTouches[0].screenX-touchStartX;if(Math.abs(dx)>45)moveFullPhoto(dx<0?1:-1);},{passive:true});
 document.addEventListener("keydown",e=>{if($("photo-modal").classList.contains("open")){if(e.key==="ArrowRight")moveFullPhoto(1);if(e.key==="ArrowLeft")moveFullPhoto(-1);}if(e.key==="Escape")closePhoto();});
-["rooms","land-type","land-type-advanced","price-min","price-max","area-min","area-max","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
+["rooms","land-type","land-type-advanced","price-min","price-max","area-min","area-max","condition","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
+$("advanced-filters").addEventListener("change",e=>{if(e.target.matches("input[type='checkbox']"))render()});
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
 const mobileMenu=$("mobile-menu"),menuToggle=$("mobile-menu-toggle");
 menuToggle.addEventListener("click",()=>{
@@ -1070,7 +1113,7 @@ mobileMenu.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
 
 tabs();fields();
 $("toggle-filters").addEventListener("click",()=>{const panel=$("advanced-filters"),open=panel.hidden;panel.hidden=!open;$("quick-show-listings").hidden=open;$("toggle-filters").setAttribute("aria-expanded",String(open));$("toggle-filters").textContent=open?"Скрыть фильтры":"☷ Все фильтры"});
-$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","land-type","land-type-advanced","floor","floors"].forEach(id=>$(id).value="");S.deal="";$("sort").value="";updatePriceSummary();render()});
+$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","land-type","land-type-advanced","condition","floor","floors"].forEach(id=>$(id).value="");document.querySelectorAll("#advanced-filters input[type='checkbox']").forEach(el=>el.checked=false);S.deal="";$("sort").value="";updatePriceSummary();render()});
 function updatePriceSummary(){
   const min=$("price-min").value,max=$("price-max").value;
   $("price-summary").textContent=min||max?(min?fmt(+min):"0")+" — "+(max?fmt(+max):"∞")+" ₽":"Любая цена";
