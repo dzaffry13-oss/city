@@ -38,6 +38,10 @@ export default {
     // Скрытое поле-ловушка для ботов: люди его не заполняют.
     if (clip(data.website, 100)) return reply(200, { ok: true });
 
+    if (data.consent !== 'on' && data.consent !== true) {
+      return reply(400, { ok: false, error: 'consent' });
+    }
+
     const name = clip(data.name, 80);
     const phone = clip(data.phone, 30);
     const message = clip(data.message, 1000);
