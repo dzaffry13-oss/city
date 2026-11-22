@@ -96,19 +96,6 @@
     "city": "Буйнакск"
   },
   {
-    "id": 7,
-    "category": "doma",
-    "deal": "prodazha",
-    "title": "Дом с участком",
-    "price": 9800000,
-    "area": 160,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "rooms": 5,
-    "extra": "Участок 8 соток",
-    "city": "Буйнакск"
-  },
-  {
     "id": 8,
     "category": "uchastki",
     "deal": "prodazha",
