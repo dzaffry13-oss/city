@@ -532,8 +532,10 @@ async function drawCover(it){
   const src=photosOf(it)[0];
   if(src){
     try{
-      const im=await loadImg(src),k=Math.max(W/im.width,PH/im.height),w=im.width*k,h=im.height*k;
-      ctx.save();ctx.beginPath();ctx.rect(0,0,W,PH);ctx.clip();ctx.drawImage(im,(W-w)/2,(PH-h)/2,w,h);ctx.restore();
+      const im=await loadImg(src);
+      /* Логотип на фото стоит справа внизу (ширина 22%, отступ справа 5%). Берём левую часть кадра, где его нет. */
+      let sw=im.width*.71,sh=sw*PH/W;if(sh>im.height){sh=im.height;sw=sh*W/PH}
+      ctx.drawImage(im,0,(im.height-sh)*.4,sw,sh,0,0,W,PH);
     }catch(e){}
   }
   const SANS='"Manrope","Segoe UI",Arial,sans-serif',SERIF='"Playfair Display",Georgia,serif';
@@ -543,8 +545,6 @@ async function drawCover(it){
   const bw=ctx.measureText(deal).width+52;
   ctx.fillStyle="#E8C476";ctx.beginPath();ctx.roundRect(40,40,bw,64,32);ctx.fill();
   ctx.fillStyle="#101D36";ctx.textBaseline="middle";ctx.fillText(deal,66,73);
-  // водяной знак: сверху по центру
-  try{const wm=await loadImg("assets/city-logo-mark.png"),ww=W*.15,wh=wm.height/wm.width*ww;ctx.save();ctx.globalAlpha=.75;ctx.drawImage(wm,(W-ww)/2,22,ww,wh);ctx.restore()}catch(e){}
   // цена
   ctx.textBaseline="alphabetic";ctx.fillStyle="#E8C476";ctx.font="700 78px "+SERIF;
   const price=fmt(it.price)+perOf(it);
