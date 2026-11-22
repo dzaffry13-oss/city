@@ -45,8 +45,8 @@ export async function onRequest({ request, env, params }) {
     `<base href="/">`,
   ].join('\n');
 
-  // Краткое содержание для поисковиков; браузер подменит его полной версией страницы.
-  const plain = `<h2>${esc(item.title)}</h2><p>${esc(fmt(item.price))} ₽${esc(per)}. ${esc(item.location || '')}</p><p>${esc(String(item.description || '')).replace(/\n+/g, '<br>')}</p>`;
+  // Основное содержание сразу присутствует в HTML-ответе, до выполнения JavaScript.
+  const plain = `<div class="server-summary"><p class="eyebrow">${esc(item.deal === 'arenda' ? 'Аренда' : item.deal === 'posutochno' ? 'Посуточно' : 'Продажа')} · ${esc(item.city || 'Буйнакск')}</p><h1>${esc(item.title)}</h1><p class="server-price">${esc(fmt(item.price))} ₽${esc(per)}</p><p>${esc(item.location || '')}</p><p>${esc(String(item.description || '')).replace(/\n+/g, '<br>')}</p></div>`;
 
   html = html
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`)
