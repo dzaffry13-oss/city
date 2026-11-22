@@ -35,18 +35,6 @@
     ]
   },
   {
-    "id": 3,
-    "category": "kvartiry",
-    "deal": "arenda",
-    "title": "Двухкомнатная квартира",
-    "price": 20000,
-    "area": 50,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "rooms": 2,
-    "city": "Буйнакск"
-  },
-  {
     "id": 9,
     "category": "kommerciya",
     "deal": "prodazha",
