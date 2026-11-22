@@ -142,7 +142,7 @@ details .grid{padding-bottom:18px}
       <div id="w-rooms"><label for="f-rooms">Комнат</label><select id="f-rooms"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
       <div id="w-floor"><label for="f-floor">Этаж</label><input id="f-floor" type="text" inputmode="numeric" placeholder="1"></div>
       <div id="w-floors"><label for="f-floors">Этажей в доме</label><input id="f-floors" type="text" inputmode="numeric" placeholder="4"></div>
-      <div id="w-land"><label for="f-land">Категория земли</label><select id="f-land"><option value="">—</option><option>ИЖС</option><option>ЛПХ</option><option>СНТ</option><option>Сельхозназначения</option><option>Коммерческая</option></select></div>
+      <div id="w-land"><label for="f-land">Категория земли</label><select id="f-land"><option value="">—</option><option>ИЖС</option><option>ЛПХ</option><option>Садоводство</option><option>Коммерческое</option><option>Сельскохозяйственное</option></select></div>
     </div>
 
     <div class="sec">Фотографии</div>
@@ -181,7 +181,7 @@ details .grid{padding-bottom:18px}
 <script>
 const OWNER="dzaffry13-oss",REPO="city",BRANCH="main",API="https://api.github.com/repos/"+OWNER+"/"+REPO;
 const CATS=[["kvartiry","Квартира"],["doma","Дом"],["uchastki","Земельный участок"],["kommerciya","Коммерческая недвижимость"]];
-const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет"],["payment","Ипотека / рассрочка","Ипотека не рассматривается"],["bargaining","Торг","Небольшой торг возможен"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Все подключены"],["tradeIn","Trade-in / обмен","Рассматриваем обмен"],["infrastructure","Инфраструктура рядом","Школа, магазин, остановка в 5 минутах"]];
+const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Без ремонта, Косметический, Евроремонт или Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет"],["payment","Ипотека / рассрочка","Ипотека не рассматривается"],["bargaining","Торг","Небольшой торг возможен"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Электричество, вода, газ, канализация, отопление"],["tradeIn","Trade-in / обмен","Рассматриваем обмен"],["infrastructure","Инфраструктура рядом","Школа, магазин, остановка в 5 минутах"]];
 const DEALLBL={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -300,6 +300,9 @@ $("new-btn").addEventListener("click",()=>openForm(null));
 
 /* ---------- форма ---------- */
 $("det-grid").innerHTML=DETAILS.map(([k,l,p])=>'<div><label for="d-'+k+'">'+l+'</label><input id="d-'+k+'" type="text" placeholder="'+esc(p)+'"></div>').join("");
+$("d-condition").setAttribute("list","dl-condition");
+$("d-condition").insertAdjacentHTML("afterend",'<datalist id="dl-condition"><option value="Без ремонта"><option value="Косметический"><option value="Евроремонт"><option value="Дизайнерский"></datalist>');
+$("d-utilities").insertAdjacentHTML("afterend",'<div class="hint">Перечислите через запятую: так объект найдётся по фильтру «Коммуникации» на сайте.</div>');
 function catOptions(cur){
   const o=[...CATS];if(cur&&!o.some(c=>c[0]===cur))o.push([cur,cur]);
   $("f-category").innerHTML=o.map(([v,l])=>'<option value="'+esc(v)+'">'+esc(l)+'</option>').join("");
