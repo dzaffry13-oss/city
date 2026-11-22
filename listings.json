@@ -84,18 +84,6 @@
     "city": "Буйнакск"
   },
   {
-    "id": 8,
-    "category": "uchastki",
-    "deal": "prodazha",
-    "title": "Земельный участок",
-    "price": 1800000,
-    "area": 10,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "extra": "ИЖС",
-    "city": "Буйнакск"
-  },
-  {
     "id": 9,
     "category": "kommerciya",
     "deal": "prodazha",
