@@ -615,6 +615,9 @@ footer{background:#06172b}
 .about-text{max-width:44em;margin:0 auto}
 .about-text p{max-width:none;margin:0 0 14px;font-size:16.5px;line-height:1.7}
 .about-text p:last-child{margin-bottom:0}
+.about-text .about-more{display:inline-flex;align-items:center;gap:7px;margin:8px 0 0;padding:9px 15px;border-radius:9px;background:var(--sun);color:var(--ink);font-weight:800;text-decoration:none;transition:background .15s,transform .15s}
+.about-text .about-more:hover{background:#E6C783;transform:translateY(-1px)}
+.about-text .about-more:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
 .about-c .vals{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:44px;border-top:1.5px solid var(--ink)}
 .about-c .vals>div{padding:26px 22px 6px;border-radius:0;border-left:1px solid var(--line)}
 .about-c .vals>div:first-child{border-left:0}
@@ -927,7 +930,7 @@ footer{background:#06172b}
     <h2>Доверие дороже денег</h2>
     <div class="about-text">
       <p>CITY работает в Буйнакске с 2020 года. За это время название CITY стало частью нашей ежедневной работы и отношений с людьми, которые обращаются к нам за помощью с недвижимостью.</p>
-      <p>Каждый объект и каждую сделку мы проверяем лично и досконально. Для нас важно не просто свести стороны, а разобраться в деталях, честно рассказать о ситуации и провести клиента через весь процесс.</p><p>Также помогаем с покупкой и продажей недвижимости с использованием материнского капитала и с объектами, находящимися в залоге. <a href="/uslugi/">Подробнее об услугах CITY.</a></p>
+      <p>Каждый объект и каждую сделку мы проверяем лично и досконально. Для нас важно не просто свести стороны, а разобраться в деталях, честно рассказать о ситуации и провести клиента через весь процесс.</p><p>Также помогаем с покупкой и продажей недвижимости с использованием материнского капитала и с объектами, находящимися в залоге. <a class="about-more" href="/uslugi/">Подробнее об услугах CITY <span aria-hidden="true">→</span></a></p>
     </div>
     <div class="vals">
       <div><b>С 2020 года в Буйнакске</b><span>Знаем местный рынок и его особенности.</span></div>
