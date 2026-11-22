@@ -1023,9 +1023,10 @@ function list(){
   const floor=+$("floor").value||0,floors=+$("floors").value||0;
   const landType=$("land-type").value||$("land-type-advanced").value;
   const condition=$("condition").value.trim().toLocaleLowerCase("ru");
-  const selectedUtilities=[...document.querySelectorAll("#advanced-filters input[name='home-utility']:checked,#advanced-filters input[name='land-utility']:checked")].map(el=>el.value);
+  const utilitySelector=S.cat==="doma"?"#advanced-filters input[name='home-utility']:checked":S.cat==="uchastki"?"#advanced-filters input[name='land-utility']:checked":null;
+  const selectedUtilities=utilitySelector?[...document.querySelectorAll(utilitySelector)].map(el=>el.value):[];
   const landText=i=>String(i.landType||i.purpose||i.extra||"").toLocaleLowerCase("ru");
-  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||landText(i).includes(landType.toLocaleLowerCase("ru")))&&(!condition||String(i.condition||i.details?.condition||"").trim().toLocaleLowerCase("ru")===condition)&&selectedUtilities.every(u=>itemUtilities(i).includes(u))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
+  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||S.cat!=="uchastki"||(i.category==="uchastki"&&landText(i).includes(landType.toLocaleLowerCase("ru"))))&&(!condition||!["kvartiry","doma"].includes(S.cat)||String(i.condition||i.details?.condition||"").trim().toLocaleLowerCase("ru")===condition)&&selectedUtilities.every(u=>itemUtilities(i).includes(u))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
   const so=$("sort").value;
   if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);else x.sort((p,q)=>(Number(q.id)||0)-(Number(p.id)||0));
   return x;
