@@ -61,6 +61,9 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid r
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
 .grid .full{grid-column:1/-1}
 .hint{color:var(--mut);font-size:12px;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.chips button{min-height:32px;padding:4px 11px;border:1px solid var(--line);border-radius:99px;background:#fff;font-size:13px;cursor:pointer;color:inherit}
+.chips button.on{background:var(--green);border-color:var(--green);color:#fff}
 .sec{margin:26px 0 12px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
 .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
 .ph{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#e9ece8;border:2px solid transparent}
@@ -323,9 +326,38 @@ $("del-demo").addEventListener("click",async()=>{
 $("new-btn").addEventListener("click",()=>openForm(null));
 
 /* ---------- форма ---------- */
-$("det-grid").innerHTML=DETAILS.map(([k,l,p])=>'<div><label for="d-'+k+'">'+l+'</label><input id="d-'+k+'" type="text" placeholder="'+esc(p)+'"></div>').join("");
-$("d-condition").setAttribute("list","dl-condition");
-$("d-condition").insertAdjacentHTML("afterend",'<datalist id="dl-condition"><option value="Без ремонта"><option value="Косметический"><option value="Евроремонт"><option value="Дизайнерский"></datalist>');
+/* Быстрые варианты, как на Авито: s — один вариант, m — несколько через запятую */
+const QUICK={
+ ceilingHeight:["s","2,5 м","2,6 м","2,7 м","2,8 м","3 м","3,2 м"],
+ heating:["s","Центральное","Индивидуальное газовое","Электрическое","Печное","Автономное","Нет"],
+ bathroom:["s","Совмещённый","Раздельный","2 санузла","На улице"],
+ windows:["m","Во двор","На улицу","На солнечную сторону","Пластиковые","Деревянные"],
+ condition:["s","Без ремонта","Косметический","Евроремонт","Дизайнерский"],
+ furniture:["m","Без мебели","Кухня","Шкаф","Кровать","Диван","Спальные места"],
+ appliances:["m","Холодильник","Стиральная машина","Телевизор","Кондиционер","Водонагреватель","Посудомоечная машина","Плита"],
+ documents:["s","Собственник","Свидетельство о собственности","Выписка ЕГРН","Договор купли-продажи","Полный пакет документов","Земля в собственности"],
+ payment:["m","Наличные","Ипотека","Мат. капитал","Сертификат","Рассрочка","Только наличные"],
+ bargaining:["s","Торг уместен","Небольшой торг","Без торга","Торг у собственника"],
+ parking:["s","Во дворе","Гараж","Подземная","Нет","Рядом с домом"],
+ utilities:["m","Электричество","Вода","Газ","Канализация","Отопление","Интернет"],
+ tradeIn:["s","Рассматриваем обмен","Обмен возможен","Обмен не рассматривается","Рассмотрю варианты"],
+ infrastructure:["m","Школа","Детский сад","Магазин","Остановка","Аптека","Больница","Рынок","Парк","Мечеть","Кафе","Спортплощадка"]
+};
+$("det-grid").innerHTML=DETAILS.map(([k,l,p])=>'<div><label for="d-'+k+'">'+l+'</label><input id="d-'+k+'" type="text" placeholder="'+esc(p)+'">'+(QUICK[k]?'<div class="chips" data-k="'+k+'" data-t="'+QUICK[k][0]+'">'+QUICK[k].slice(1).map(c=>'<button type="button">'+esc(c)+'</button>').join("")+'</div>':'')+'</div>').join("");
+const splitV=s=>s.split(",").map(x=>x.trim()).filter(Boolean);
+function syncChips(k){
+  const box=document.querySelector('.chips[data-k="'+k+'"]');if(!box)return;
+  const cur=splitV($("d-"+k).value.toLowerCase()),one=box.dataset.t==="s";
+  box.querySelectorAll("button").forEach(b=>{const t=b.textContent.toLowerCase();b.classList.toggle("on",one?$("d-"+k).value.trim().toLowerCase()===t:cur.includes(t))});
+}
+$("det-grid").addEventListener("click",e=>{
+  const b=e.target.closest(".chips button");if(!b)return;
+  const box=b.parentNode,k=box.dataset.k,inp=$("d-"+k),t=b.textContent;
+  if(box.dataset.t==="s")inp.value=inp.value.trim()===t?"":t;
+  else{const c=splitV(inp.value),i=c.findIndex(x=>x.toLowerCase()===t.toLowerCase());if(i>=0)c.splice(i,1);else c.push(t);inp.value=c.join(", ")}
+  syncChips(k);
+});
+$("det-grid").addEventListener("input",e=>{if(e.target.id)syncChips(e.target.id.slice(2))});
 $("d-utilities").insertAdjacentHTML("afterend",'<div class="hint">Перечислите через запятую: так объект найдётся по фильтру «Коммуникации» на сайте.</div>');
 function catOptions(cur){
   const o=[...CATS];if(cur&&!o.some(c=>c[0]===cur))o.push([cur,cur]);
@@ -346,7 +378,7 @@ function openForm(it){
   v("f-category",it?.category||"kvartiry");v("f-deal",it?.deal||"prodazha");v("f-title",it?.title);v("f-price",it?.price?fmt(it.price):"");v("f-area",it?.area);
   v("f-city",it?.city||"Буйнакск");v("f-location",it?.location);v("f-rooms",it?.rooms);v("f-floor",it?.floor);v("f-floors",it?.floors);
   v("f-land",it?.landType||it?.purpose);v("f-desc",it?.description);v("f-extra",it?.extra);$("f-show").checked=!it?.hidden;$("f-verified").checked=!!it?.verified;
-  DETAILS.forEach(([k])=>v("d-"+k,it?.details?.[k]));
+  DETAILS.forEach(([k])=>{v("d-"+k,it?.details?.[k]);syncChips(k)});
   document.querySelector("details").open=!!it?.details&&Object.values(it.details).some(Boolean);
   photos=(it?(it.images&&it.images.length?it.images:(it.image?[it.image]:[])):[]).map(p=>({path:p,url:p}));
   $("edit-err").textContent="";syncFields();drawPhotos();show("edit");
