@@ -798,6 +798,13 @@ footer{background:#06172b}
   footer .chan .ic{width:21px;height:21px;flex:none}
 }
 
+
+/* Ненавязчивая SEO-навигация в подвале */
+.seo-nav{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;margin:28px 0 20px;padding:17px 0;border-top:1px solid rgba(215,174,93,.28);border-bottom:1px solid rgba(215,174,93,.28)}
+.seo-nav span{flex-basis:100%;font-size:10px;font-weight:800;letter-spacing:.14em;color:#d9b76e}
+.seo-nav a{font-size:13px;color:#d5deea;transition:color .15s}
+.seo-nav a:hover{color:#f0cf83}
+@media(max-width:600px){.seo-nav{gap:10px 14px;margin:22px 0 16px}.seo-nav a{font-size:12px}}
 </style>
 </head>
 <body>
@@ -968,6 +975,14 @@ footer{background:#06172b}
         <a class="btn ghost" data-tg target="_blank" rel="noopener" href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Telegram</a>
       </div>
     </div>
+    <nav class="seo-nav" aria-label="Информация для клиентов">
+      <span>ИНФОРМАЦИЯ ДЛЯ КЛИЕНТОВ</span>
+      <a href="/pokupka/">Покупка недвижимости</a>
+      <a href="/prodazha/">Продажа недвижимости</a>
+      <a href="/arenda/">Аренда</a>
+      <a href="/uslugi/">Услуги CITY</a>
+      <a href="/o-kompanii/">О компании</a>
+    </nav>
     <div class="fine"><span>CITY — агентство недвижимости в Буйнакске</span><span>&copy; <span id="year"></span> CITY</span></div>
     <div class="req-line"><span>ИП Джафаров Насрутдин Иразханович</span><span>ИНН 054306624140 · ОГРНИП 325050000033623</span><span>Республика Дагестан, г. Буйнакск, ул. Батырая, 1</span><span><a href="mailto:info@city05.ru">info@city05.ru</a> · <a href="/privacy.html">Политика конфиденциальности</a></span></div>
   </div>
