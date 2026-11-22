@@ -60,18 +60,6 @@
     "city": "Буйнакск"
   },
   {
-    "id": 4,
-    "category": "kvartiry",
-    "deal": "posutochno",
-    "title": "Квартира посуточно",
-    "price": 2500,
-    "area": 35,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "rooms": 1,
-    "city": "Буйнакск"
-  },
-  {
     "id": 5,
     "category": "komnaty",
     "deal": "arenda",
