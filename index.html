@@ -782,7 +782,7 @@ footer{background:#06172b}
     <div class="finder-bar">
       <div class="field category-field"><label for="deal-select">Сделка</label><select id="deal-select" aria-label="Тип сделки"></select></div>
       <div class="field rooms-quick" id="quick-rooms"><label for="rooms">Комнаты</label><select id="rooms"><option value="">Любое количество</option><option value="1">1 комната</option><option value="2">2 комнаты</option><option value="3">3 комнаты</option><option value="4">4 и больше</option></select></div>
-      <div class="field land-quick" id="quick-land" hidden><label for="land-type">Категория земли</label><select id="land-type"><option value="">Любая категория</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческая</option></select></div>
+      <div class="field land-quick" id="quick-land" hidden><label for="land-type">Назначение участка</label><select id="land-type"><option value="">Любое назначение</option><option value="ИЖС">ИЖС — строительство жилого дома</option><option value="ЛПХ">ЛПХ — личное подсобное хозяйство</option><option value="Садоводство">Садоводство</option><option value="Коммерческое">Коммерческое использование</option><option value="Сельскохозяйственное">Сельскохозяйственное использование</option></select></div>
       <div class="price-control" id="price-control">
         <span class="price-caption">Цена</span>
         <button class="price-trigger" type="button" id="price-trigger" aria-expanded="false"><span id="price-summary">Любая цена</span><span class="price-chevron" aria-hidden="true"></span></button>
@@ -801,7 +801,6 @@ footer{background:#06172b}
       <div class="filter-grid">
         <div class="field" id="f-area-min"><label for="area-min">Площадь от</label><input id="area-min" type="number" min="0" inputmode="numeric" placeholder="От"></div>
         <div class="field" id="f-area-max"><label for="area-max">Площадь до</label><input id="area-max" type="number" min="0" inputmode="numeric" placeholder="До"></div>
-        <div class="field" id="f-land-type" hidden><label for="land-type-advanced">Назначение участка</label><select id="land-type-advanced"><option value="">Любое назначение</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческое</option></select></div>
         <div class="field" id="f-condition" hidden><label for="condition">Состояние ремонта</label><select id="condition"><option value="">Любое состояние</option><option value="Без ремонта">Без ремонта</option><option value="Косметический">Косметический</option><option value="Евроремонт">Евроремонт</option><option value="Дизайнерский">Дизайнерский</option></select></div>
         <div class="field" id="f-floor" hidden><label for="floor">Этаж</label><input id="floor" type="number" min="1" inputmode="numeric" placeholder="Например, 3"></div>
         <div class="field" id="f-floors" hidden><label for="floors">Этажей в доме</label><input id="floors" type="number" min="1" inputmode="numeric" placeholder="Например, 5"></div>
@@ -1021,12 +1020,23 @@ function list(){
   const r=$("rooms").value,min=+$("price-min").value||0,max=+$("price-max").value||Infinity;
   const amin=+$("area-min").value||0,amax=+$("area-max").value||Infinity;
   const floor=+$("floor").value||0,floors=+$("floors").value||0;
-  const landType=$("land-type").value||$("land-type-advanced").value;
+  const landType=$("land-type").value;
   const condition=$("condition").value.trim().toLocaleLowerCase("ru");
   const utilitySelector=S.cat==="doma"?"#advanced-filters input[name='home-utility']:checked":S.cat==="uchastki"?"#advanced-filters input[name='land-utility']:checked":null;
   const selectedUtilities=utilitySelector?[...document.querySelectorAll(utilitySelector)].map(el=>el.value):[];
-  const landText=i=>String(i.landType||i.purpose||i.extra||"").toLocaleLowerCase("ru");
-  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||S.cat!=="uchastki"||(i.category==="uchastki"&&landText(i).includes(landType.toLocaleLowerCase("ru"))))&&(!condition||!["kvartiry","doma"].includes(S.cat)||String(i.condition||i.details?.condition||"").trim().toLocaleLowerCase("ru")===condition)&&selectedUtilities.every(u=>itemUtilities(i).includes(u))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
+  const landText=i=>String(i.landType||i.purpose||i.extra||"").trim().toLocaleLowerCase("ru");
+  const landPurposeMatches=(item,selected)=>{
+    const value=landText(item);
+    const aliases={
+      "ижс":["ижс","для индивидуального жилищного строительства"],
+      "лпх":["лпх","личное подсобное хозяйство"],
+      "садоводство":["садоводство","снт","ведение садоводства","садовый участок"],
+      "коммерческое":["коммерческое","коммерция","торговля","общественное питание"],
+      "сельскохозяйственное":["сельхозназначения","сельскохозяйственное","сельхоз","кфх","ведение сельского хозяйства"]
+    };
+    return (aliases[selected.toLocaleLowerCase("ru")]||[selected.toLocaleLowerCase("ru")]).some(alias=>value.includes(alias));
+  };
+  const x=L.filter(i=>(!S.cat||i.category===S.cat)&&(!S.deal||i.deal===S.deal)&&(!r||(r==="4"?i.rooms>=4:String(i.rooms)===r))&&(!landType||S.cat!=="uchastki"||(i.category==="uchastki"&&landPurposeMatches(i,landType)))&&(!condition||!["kvartiry","doma"].includes(S.cat)||String(i.condition||i.details?.condition||"").trim().toLocaleLowerCase("ru")===condition)&&selectedUtilities.every(u=>itemUtilities(i).includes(u))&&i.price>=min&&i.price<=max&&i.area>=amin&&i.area<=amax&&(!floor||Number(i.floor)===floor)&&(!floors||Number(i.floors)===floors));
   const so=$("sort").value;
   if(so)x.sort((p,q)=>so==="asc"?p.price-q.price:q.price-p.price);else x.sort((p,q)=>(Number(q.id)||0)-(Number(p.id)||0));
   return x;
@@ -1097,7 +1107,7 @@ $("photo-modal").addEventListener("click",e=>{if(e.target.id==="photo-modal")clo
 $("photo-modal").addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
 $("photo-modal").addEventListener("touchend",e=>{const dx=e.changedTouches[0].screenX-touchStartX;if(Math.abs(dx)>45)moveFullPhoto(dx<0?1:-1);},{passive:true});
 document.addEventListener("keydown",e=>{if($("photo-modal").classList.contains("open")){if(e.key==="ArrowRight")moveFullPhoto(1);if(e.key==="ArrowLeft")moveFullPhoto(-1);}if(e.key==="Escape")closePhoto();});
-["rooms","land-type","land-type-advanced","price-min","price-max","area-min","area-max","condition","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
+["rooms","land-type","price-min","price-max","area-min","area-max","condition","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("advanced-filters").addEventListener("change",e=>{if(e.target.matches("input[type='checkbox']"))render()});
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
 const mobileMenu=$("mobile-menu"),menuToggle=$("mobile-menu-toggle");
@@ -1114,7 +1124,7 @@ mobileMenu.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
 
 tabs();fields();
 $("toggle-filters").addEventListener("click",()=>{const panel=$("advanced-filters"),open=panel.hidden;panel.hidden=!open;$("quick-show-listings").hidden=open;$("toggle-filters").setAttribute("aria-expanded",String(open));$("toggle-filters").textContent=open?"Скрыть фильтры":"☷ Все фильтры"});
-$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","land-type","land-type-advanced","condition","floor","floors"].forEach(id=>$(id).value="");document.querySelectorAll("#advanced-filters input[type='checkbox']").forEach(el=>el.checked=false);S.deal="";$("sort").value="";updatePriceSummary();render()});
+$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","land-type","condition","floor","floors"].forEach(id=>$(id).value="");document.querySelectorAll("#advanced-filters input[type='checkbox']").forEach(el=>el.checked=false);S.deal="";$("sort").value="";updatePriceSummary();render()});
 function updatePriceSummary(){
   const min=$("price-min").value,max=$("price-max").value;
   $("price-summary").textContent=min||max?(min?fmt(+min):"0")+" — "+(max?fmt(+max):"∞")+" ₽":"Любая цена";
