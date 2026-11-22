@@ -26,6 +26,11 @@ export default {
     if (!originOk) return reply(403, { ok: false, error: 'origin' });
     if (!env.BOT_TOKEN || !env.CHAT_ID) return reply(500, { ok: false, error: 'config' });
 
+    // Ограничение частоты заявок: 5 запросов за 60 секунд на IP.
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const { success } = await env.LEAD_RATE_LIMITER.limit({ key: ip });
+    if (!success) return reply(429, { ok: false, error: 'rate_limited' });
+
     let data;
     try {
       const raw = await request.text();
