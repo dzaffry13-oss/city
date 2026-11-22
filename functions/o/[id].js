@@ -29,7 +29,7 @@ export async function onRequest({ request, env, params }) {
     url: page,
     ...(item.updated ? { datePosted: item.updated } : {}),
     ...(photos.length ? { image: photos } : {}),
-    offers: { '@type': 'Offer', price: Number(item.price) || 0, priceCurrency: 'RUB', availability: 'https://schema.org/InStock' },
+    offers: { '@type': 'Offer', price: Number(item.price) || 0, priceCurrency: 'RUB' },
     address: { '@type': 'PostalAddress', addressLocality: item.city || 'Буйнакск', addressCountry: 'RU', streetAddress: String(item.location || '').replace(/^.*?·\s*/, '') },
   };
   const meta = [
