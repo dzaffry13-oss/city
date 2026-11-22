@@ -720,6 +720,14 @@ footer{background:#06172b}
 @media(max-width:900px){.wa-float{display:none}}
 .more-wrap{display:flex;justify-content:center;margin-top:26px}
 .more-wrap .btn{min-width:220px}
+.consent{display:flex;gap:10px;align-items:flex-start;margin:12px 0 4px;font-size:13px;line-height:1.45;font-weight:500;color:#56666D;cursor:pointer}
+.consent input{flex:none;width:20px;height:20px;margin:1px 0 0;accent-color:#1D5C4D}
+.consent a{color:#1D5C4D;text-decoration:underline;text-underline-offset:2px}
+.req-line{margin-top:14px;display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12.5px;line-height:1.5;color:#9FB1BA}
+.req-line a{color:#C5D3DA;text-decoration:underline;text-underline-offset:2px}
+.consent{display:flex!important;align-items:flex-start;gap:10px}
+.consent input[type=checkbox]{flex:none;width:20px!important;height:20px!important;min-height:0!important;padding:0!important;margin:1px 0 0!important;border-radius:4px}
+.consent span{flex:1;min-width:0;text-align:left}
 </style>
 </head>
 <body>
@@ -879,6 +887,7 @@ footer{background:#06172b}
       </div>
     </div>
     <div class="fine"><span>CITY — агентство недвижимости в Буйнакске</span><span>&copy; <span id="year"></span> CITY</span></div>
+    <div class="req-line"><span>ИП Джафаров Насрутдин Иразханович</span><span>ИНН 054306624140 · ОГРНИП 325050000033623</span><span>Республика Дагестан, г. Буйнакск, ул. Батырая, 1</span><span><a href="mailto:agentstvocity@gmail.com">agentstvocity@gmail.com</a> · <a href="/privacy.html">Политика конфиденциальности</a></span></div>
   </div>
 </footer>
 
@@ -899,10 +908,10 @@ footer{background:#06172b}
       <input name="phone" required type="tel" maxlength="30" placeholder="Номер телефона" autocomplete="tel">
       <textarea name="message" maxlength="1000" placeholder="Что вас интересует?"></textarea>
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="consent"><input type="checkbox" name="consent" required><span>Я согласен(на) на <a href="/privacy.html" target="_blank" rel="noopener">обработку персональных данных</a></span></label>
       <button class="btn acc" id="send" style="width:100%;margin-top:6px">Отправить заявку</button>
       <p id="status" role="status" style="font-size:13.5px;min-height:20px;margin:10px 0 0"></p>
     </form>
-    <p style="font-size:11.5px;margin:6px 0 0">Отправляя заявку, вы соглашаетесь на обработку указанных данных для связи с вами.</p>
   </div>
 </div>
 
