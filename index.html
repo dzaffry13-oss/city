@@ -991,7 +991,6 @@ function fields(){
   const isFlat=S.cat==="kvartiry",isHome=S.cat==="doma",isRoom=ROOMS.includes(S.cat),land=S.cat==="uchastki";
   $("quick-rooms").hidden=!isRoom;
   $("quick-land").hidden=!land;
-  $("f-land-type").hidden=!land;
   $("f-condition").hidden=!(isFlat||isHome);
   $("f-home-utilities").hidden=!isHome;
   $("f-land-utilities").hidden=!land;
