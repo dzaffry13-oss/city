@@ -193,22 +193,22 @@ const store={get(){try{return localStorage.getItem("city_admin_token")||""}catch
 
 /* ---------- GitHub API ---------- */
 async function gh(path,opt={}){
-  const r=await fetch(API+path,{...opt,headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+TOKEN,...(opt.body?{"Content-Type":"application/json"}:{})}});
+  const r=await fetch(API+path,{cache:"no-store",...opt,headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+TOKEN,...(opt.body?{"Content-Type":"application/json"}:{})}});
   if(!r.ok){const e=new Error("HTTP "+r.status);e.status=r.status;try{e.body=await r.json()}catch(x){}throw e}
   return r.status===204?null:r.json();
 }
 const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,"")),c=>c.charCodeAt(0)));
 const b64enc=s=>{const b=new TextEncoder().encode(s);let o="";for(let i=0;i<b.length;i+=0x8000)o+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(o)};
-async function readList(){const f=await gh("/contents/listings.json?ref="+BRANCH);return{list:JSON.parse(b64dec(f.content)),sha:f.sha}}
+async function readList(){const f=await gh("/contents/listings.json?ref="+BRANCH+"&_="+Date.now());return{list:JSON.parse(b64dec(f.content)),sha:f.sha}}
 /* Применяет изменение к самой свежей версии файла; при конфликте повторяет. */
 async function commitList(mutate,message){
-  for(let k=0;k<3;k++){
+  for(let k=0;k<4;k++){
     const {list,sha}=await readList();
     const next=mutate(list);
     try{
       await gh("/contents/listings.json",{method:"PUT",body:JSON.stringify({message,branch:BRANCH,sha,content:b64enc(JSON.stringify(next,null,2)+"\n")})});
       LIST=next;return;
-    }catch(e){if(e.status!==409&&e.status!==422||k===2)throw e}
+    }catch(e){if(e.status!==409&&e.status!==422||k===3)throw e;await new Promise(r=>setTimeout(r,700*(k+1)))}
   }
 }
 async function uploadFile(path,base64,message){await gh("/contents/"+path,{method:"PUT",body:JSON.stringify({message,branch:BRANCH,content:base64})})}
