@@ -741,6 +741,22 @@ footer{background:#06172b}
 .consent{display:flex!important;align-items:flex-start;gap:10px}
 .consent input[type=checkbox]{flex:none;width:20px!important;height:20px!important;min-height:0!important;padding:0!important;margin:1px 0 0!important;border-radius:4px}
 .consent span{flex:1;min-width:0;text-align:left}
+
+/* Золотой фирменный акцент заголовка первого экрана */
+.hero h1{
+  color:#d7ae5d;
+  background:
+    repeating-linear-gradient(112deg,rgba(255,255,255,.13) 0 1px,rgba(95,61,17,.10) 1px 2px,transparent 2px 6px),
+    radial-gradient(ellipse at 18% 28%,rgba(255,244,202,.52) 0 1px,transparent 2.2px),
+    radial-gradient(ellipse at 73% 66%,rgba(91,59,18,.24) 0 1px,transparent 2.5px),
+    linear-gradient(112deg,#b88a37 0%,#f2d38e 19%,#d7ae5d 37%,#fff0bc 49%,#c99b43 64%,#e8c476 82%,#a8792e 100%);
+  background-size:100% 100%,19px 17px,23px 21px,100% 100%;
+  background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 1px 0 rgba(255,232,174,.08);
+}
+
 </style>
 </head>
 <body>
@@ -768,7 +784,7 @@ footer{background:#06172b}
   
   <div class="wrap hero-in">
     <h1>Агентство недвижимости CITY</h1>
-    <p class="lead">Мы знаем, как правильно: купить, продать, сдать или снять недвижимость в Буйнакске. Работаем с 2020 года, рядом с городом и его жителями.</p>
+    <p class="lead">Мы поможем Вам купить, продать, сдать или снять недвижимость в Буйнакске. Работаем с 2020 года, рядом с городом и его жителями.</p>
     <div class="hero-cta">
       <a class="btn acc" href="#catalog">Смотреть объекты</a>
       <button class="btn line" type="button" data-open="Продать или сдать недвижимость">Продать или сдать</button>
