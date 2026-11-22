@@ -81,6 +81,14 @@ details summary{cursor:pointer;font-weight:700;padding:14px 0}
 details[open] summary{border-bottom:1px solid var(--line);margin-bottom:16px}
 details .grid{padding-bottom:18px}
 .foot{position:sticky;bottom:0;background:rgba(244,245,242,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);margin:28px -18px 0;padding:12px 18px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+.share-back{position:fixed;inset:0;z-index:65;background:rgba(16,29,54,.55);display:grid;place-items:center;padding:16px;overflow:auto}
+.share-back[hidden]{display:none}
+.share{background:#fff;border-radius:18px;padding:18px;width:min(460px,100%);max-height:calc(100vh - 32px);overflow:auto}
+.share h3{margin:0 0 12px;font-size:17px}
+.share canvas{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);display:block;background:#e9ece8}
+.share .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.share .row .btn{flex:1 1 150px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:var(--navy);color:#fff;padding:13px 20px;border-radius:12px;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(0,0,0,.25);font-weight:600}
 .toast.bad{background:var(--red)}
 .busy{position:fixed;inset:0;z-index:70;background:rgba(244,245,242,.8);display:grid;place-items:center;font-weight:800;font-size:17px}
@@ -185,6 +193,7 @@ details .grid{padding-bottom:18px}
 </main>
 
 <div class="busy" id="busy" hidden><span id="busy-t">Сохраняем…</span></div>
+<div class="share-back" id="share-back" hidden><div class="share" role="dialog" aria-modal="true" aria-labelledby="share-t"><h3 id="share-t">Для соцсетей</h3><canvas id="share-cv" width="1080" height="1350"></canvas><div class="row"><button class="btn" id="sh-cover">Скачать обложку</button><button class="btn" id="sh-zip">Скачать все фото</button><button class="btn" id="sh-text">Копировать текст</button><button class="btn" id="sh-close">Закрыть</button></div></div></div>
 <div class="toast" id="toast" hidden role="status"></div>
 
 <script>
@@ -285,7 +294,7 @@ function renderList(){
     const pos=LIST.indexOf(i);
     return '<div class="item'+(i.hidden?' off':'')+'"><div class="ord"><button data-up="'+i.id+'" title="Выше" aria-label="Поднять выше"'+(!canMove||pos===0?' disabled':'')+'>↑</button><button data-down="'+i.id+'" title="Ниже" aria-label="Опустить ниже"'+(!canMove||pos===LIST.length-1?' disabled':'')+'>↓</button></div><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
      +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
-     +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-link="'+i.id+'">Скопировать ссылку</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
+     +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-link="'+i.id+'">Скопировать ссылку</button><button class="btn sm" data-share="'+i.id+'">Для соцсетей</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
   }).join(""):'<div class="empty">'+(LIST.length?"Ничего не найдено.":"Объектов пока нет. Нажмите «Добавить объект».")+'</div>';
 }
 $("q").addEventListener("input",renderList);
@@ -293,8 +302,9 @@ $("items").addEventListener("click",async e=>{
   const b=e.target.closest("button");if(!b||b.disabled)return;
   if(b.dataset.up){move(+b.dataset.up,-1);return}
   if(b.dataset.down){move(+b.dataset.down,1);return}
-  const id=+(b.dataset.edit||b.dataset.vis||b.dataset.del||b.dataset.link);const it=LIST.find(x=>x.id===id);if(!it)return;
+  const id=+(b.dataset.edit||b.dataset.vis||b.dataset.del||b.dataset.link||b.dataset.share);const it=LIST.find(x=>x.id===id);if(!it)return;
   if(b.dataset.edit){openForm(it);return}
+  if(b.dataset.share){openShare(it);return}
   if(b.dataset.link){
     const link=location.origin+"/o/"+id;
     try{await navigator.clipboard.writeText(link);toast("Ссылка скопирована: "+link)}catch(err){prompt("Скопируйте ссылку:",link)}
@@ -480,6 +490,119 @@ $("form").addEventListener("submit",async e=>{
 });
 function leaveForm(){if(confirm("Закрыть без сохранения?")){photos.forEach(p=>p.blobUrl&&URL.revokeObjectURL(p.blobUrl));show("list")}}
 $("back").addEventListener("click",leaveForm);$("cancel").addEventListener("click",leaveForm);
+
+
+/* ---------- для соцсетей: обложка, архив фото, текст поста (сайт не затрагивается) ---------- */
+const PHONE_TXT="+7 909 483-39-39";
+let SH=null;
+const photosOf=it=>(it.images&&it.images.length?it.images:(it.image?[it.image]:[]));
+const specsOf=it=>{
+  const u=it.category==="uchastki"?"сот.":"м²",p=[];
+  if(it.category==="uchastki"){if(it.area)p.push(it.area+" "+u);if(it.landType||it.purpose)p.push(it.landType||it.purpose)}
+  else{if(it.rooms&&(it.category==="kvartiry"||it.category==="doma"))p.push(it.rooms+" комн.");if(it.area)p.push(it.area+" "+u);
+    if(it.floor)p.push("этаж "+it.floor+(it.floors?" из "+it.floors:""));else if(it.extra)p.push(it.extra)}
+  return p;
+};
+const perOf=it=>it.deal==="arenda"?" ₽ / мес":it.deal==="posutochno"?" ₽ / сутки":" ₽";
+const addrOf=it=>String(it.location||it.city||"").replace(/^.*?·\s*/,"");
+function postText(it){
+  const tags={kvartiry:"#квартира #квартирывбуйнакске",doma:"#дом #домавбуйнакске",uchastki:"#участок #землявбуйнакске",kommerciya:"#коммерческаянедвижимость"}[it.category]||"";
+  const deal={prodazha:"#продажа",arenda:"#аренда",posutochno:"#посуточно"}[it.deal]||"";
+  const desc=String(it.description||"").replace(/\s+/g," ").trim();
+  return [(DEALLBL[it.deal]||"")+": "+it.title,"",
+    "💰 "+fmt(it.price)+perOf(it),
+    "📍 "+(it.city||"Буйнакск")+(addrOf(it)?", "+addrOf(it):""),
+    specsOf(it).length?"📐 "+specsOf(it).join(" · "):"",
+    desc?"\n"+(desc.length>420?desc.slice(0,420).replace(/\s\S*$/,"")+"…":desc):"",
+    "","Звоните или пишите в WhatsApp: "+PHONE_TXT,
+    "Подробности и фото: "+location.origin+"/o/"+it.id,"",
+    "#недвижимость #буйнакск #дагестан #CITY "+deal+" "+tags].filter((x,i,arr)=>x!==""||arr[i-1]!=="").join("\n");
+}
+const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error("img"));im.src=src+(src.includes("?")?"&":"?")+"_="+Date.now()});
+function wrap(ctx,text,maxW,maxLines){
+  const words=String(text).split(/\s+/),lines=[];let cur="";
+  for(const w of words){const t=cur?cur+" "+w:w;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t}
+  if(cur)lines.push(cur);
+  if(lines.length>maxLines){lines.length=maxLines;let l=lines[maxLines-1];while(ctx.measureText(l+"…").width>maxW&&l.length)l=l.slice(0,-1);lines[maxLines-1]=l.replace(/\s+$/,"")+"…"}
+  return lines;
+}
+async function drawCover(it){
+  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=930;
+  ctx.fillStyle="#101D36";ctx.fillRect(0,0,W,H);
+  const src=photosOf(it)[0];
+  if(src){
+    try{
+      const im=await loadImg(src),k=Math.max(W/im.width,PH/im.height),w=im.width*k,h=im.height*k;
+      ctx.save();ctx.beginPath();ctx.rect(0,0,W,PH);ctx.clip();ctx.drawImage(im,(W-w)/2,(PH-h)/2,w,h);ctx.restore();
+    }catch(e){}
+  }
+  const SANS='"Manrope","Segoe UI",Arial,sans-serif',SERIF='"Playfair Display",Georgia,serif';
+  ctx.fillStyle="#E8C476";ctx.fillRect(0,PH,W,5);
+  // метка сделки на фото
+  const deal=(DEALLBL[it.deal]||"").toUpperCase();ctx.font="800 30px "+SANS;
+  const bw=ctx.measureText(deal).width+52;
+  ctx.fillStyle="#E8C476";ctx.beginPath();ctx.roundRect(40,40,bw,64,32);ctx.fill();
+  ctx.fillStyle="#101D36";ctx.textBaseline="middle";ctx.fillText(deal,66,73);
+  // цена
+  ctx.textBaseline="alphabetic";ctx.fillStyle="#E8C476";ctx.font="700 78px "+SERIF;
+  const price=fmt(it.price)+perOf(it);
+  let fs=78;while(ctx.measureText(price).width>W-100&&fs>40){fs-=4;ctx.font="700 "+fs+"px "+SERIF}
+  ctx.fillText(price,50,PH+105);
+  // название
+  ctx.fillStyle="#fff";ctx.font="700 40px "+SANS;
+  const tl=wrap(ctx,it.title,W-100,2);tl.forEach((l,i)=>ctx.fillText(l,50,PH+165+i*50));
+  let y=PH+165+tl.length*50+6;
+  // характеристики и адрес
+  ctx.fillStyle="#C9D4E3";ctx.font="600 30px "+SANS;
+  const sp=specsOf(it).join("  ·  ");if(sp){ctx.fillText(wrap(ctx,sp,W-100,1)[0],50,y+30);y+=46}
+  const ad=(it.city||"Буйнакск")+(addrOf(it)?", "+addrOf(it):"");
+  ctx.fillText(wrap(ctx,"📍 "+ad,W-100,1)[0],50,y+30);
+  // подвал: телефон и логотип
+  ctx.fillStyle="#E8C476";ctx.font="800 34px "+SANS;ctx.textAlign="right";ctx.fillText(PHONE_TXT,W-50,H-34);ctx.textAlign="left";
+  try{const lg=await loadImg("assets/city-logo-mark.png"),lh=56,lw=lg.width/lg.height*lh;ctx.drawImage(lg,50,H-34-lh+8,lw,lh);
+    ctx.fillStyle="#fff";ctx.font="700 34px "+SERIF;ctx.fillText("CITY",50+lw+12,H-34)}catch(e){ctx.fillStyle="#fff";ctx.font="700 34px "+SERIF;ctx.fillText("CITY",50,H-34)}
+}
+async function openShare(it){
+  SH=it;$("share-t").textContent="Для соцсетей: "+it.title;$("share-back").hidden=false;
+  const cv=$("share-cv");cv.getContext("2d").clearRect(0,0,cv.width,cv.height);
+  busy("Готовим обложку…");try{await drawCover(it)}catch(e){toast("Не удалось собрать обложку.",true)}finally{idle()}
+}
+function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+$("sh-close").addEventListener("click",()=>{$("share-back").hidden=true;SH=null});
+$("share-back").addEventListener("click",e=>{if(e.target.id==="share-back"){$("share-back").hidden=true;SH=null}});
+$("sh-cover").addEventListener("click",()=>{if(!SH)return;$("share-cv").toBlob(b=>b?saveBlob(b,"city-"+SH.id+"-instagram.jpg"):toast("Не удалось сохранить.",true),"image/jpeg",.92)});
+$("sh-text").addEventListener("click",async()=>{
+  if(!SH)return;const t=postText(SH);
+  try{await navigator.clipboard.writeText(t);toast("Текст поста скопирован.")}catch(e){prompt("Скопируйте текст:",t)}
+});
+/* Простой ZIP без сжатия (JPEG уже сжаты), без внешних библиотек */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function makeZip(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;const d=new Date();
+  const dt=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1))&0xFFFF,dd=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xFFFF;
+  for(const f of files){
+    const nm=enc.encode(f.name),crc=crc32(f.data),sz=f.data.length;
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(8,0,true);lh.setUint16(10,dt,true);lh.setUint16(12,dd,true);lh.setUint32(14,crc,true);lh.setUint32(18,sz,true);lh.setUint32(22,sz,true);lh.setUint16(26,nm.length,true);lh.setUint16(28,0,true);
+    parts.push(new Uint8Array(lh.buffer),nm,f.data);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(10,0,true);ch.setUint16(12,dt,true);ch.setUint16(14,dd,true);ch.setUint32(16,crc,true);ch.setUint32(20,sz,true);ch.setUint32(24,sz,true);ch.setUint16(28,nm.length,true);ch.setUint32(42,off,true);
+    cen.push(new Uint8Array(ch.buffer),nm);off+=30+nm.length+sz;
+  }
+  const cs=cen.reduce((s,p)=>s+p.length,0),end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cs,true);end.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(end.buffer)],{type:"application/zip"});
+}
+$("sh-zip").addEventListener("click",async()=>{
+  if(!SH)return;const ph=photosOf(SH);if(!ph.length){toast("У объекта нет фото.",true);return}
+  busy("Собираем архив…");
+  try{
+    const files=[];
+    for(let i=0;i<ph.length;i++){const r=await fetch(ph[i]+"?_="+Date.now());if(!r.ok)throw new Error("photo");files.push({name:"city-"+SH.id+"-"+(i+1)+".jpg",data:new Uint8Array(await r.arrayBuffer())})}
+    saveBlob(makeZip(files),"city-"+SH.id+"-photos.zip");
+  }catch(e){toast("Не удалось скачать фото. Проверьте интернет и попробуйте ещё раз.",true)}finally{idle()}
+});
 
 /* ---------- старт ---------- */
 (function(){const t=store.get();if(t){busy("Загружаем объекты…");login(t,true)}else show("login")})();
