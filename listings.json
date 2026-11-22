@@ -47,19 +47,6 @@
     "city": "Буйнакск"
   },
   {
-    "id": 6,
-    "category": "doma",
-    "deal": "prodazha",
-    "title": "Частный дом",
-    "price": 6500000,
-    "area": 120,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "rooms": 4,
-    "extra": "Участок 6 соток",
-    "city": "Буйнакск"
-  },
-  {
     "id": 9,
     "category": "kommerciya",
     "deal": "prodazha",
