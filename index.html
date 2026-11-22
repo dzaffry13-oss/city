@@ -302,7 +302,7 @@ footer{background:#06172b}
 .deal-tab:hover{background:#fff;border-color:#c8d0da;color:var(--ink);transform:translateY(-1px)}
 .deal-tab.active{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 5px 16px rgba(9,29,53,.16)}
 .deal-tab.active:after{content:"";position:absolute;left:22px;right:22px;bottom:5px;height:2px;border-radius:2px;background:#d7b45f;opacity:.95}
-.finder-bar{display:grid;grid-template-columns:minmax(190px,1.2fr) minmax(170px,1fr) minmax(145px,.85fr) auto auto;align-items:stretch;gap:0;padding:8px;background:#fff;border:1px solid #e6eaf0;border-radius:17px;box-shadow:0 12px 34px rgba(11,31,55,.09)}
+.finder-bar{display:grid;grid-template-columns:minmax(190px,1.2fr) minmax(170px,1fr) minmax(145px,.85fr) auto;align-items:stretch;gap:0;padding:8px;background:#fff;border:1px solid #e6eaf0;border-radius:17px;box-shadow:0 12px 34px rgba(11,31,55,.09)}
 .finder-bar .field{min-width:0;display:flex;flex-direction:column;justify-content:center;padding:7px 18px}
 .finder-bar .field+.field{border-left:1px solid #e8ebef}
 .finder-bar label{font-size:11px;font-weight:600;letter-spacing:.035em;text-transform:uppercase;color:#8a94a3;margin:0 0 3px}
@@ -351,7 +351,7 @@ footer{background:#06172b}
 }
 
 /* Price range popover */
-.finder-bar{grid-template-columns:minmax(190px,1.15fr) minmax(165px,1fr) minmax(155px,.9fr) auto auto}
+.finder-bar{grid-template-columns:minmax(190px,1.15fr) minmax(165px,1fr) minmax(155px,.9fr) auto}
 .price-control{position:relative;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:7px 18px;border-left:1px solid #e8ebef}
 .price-caption{font-size:11px;font-weight:600;letter-spacing:.035em;text-transform:uppercase;color:#8a94a3;margin:0 0 3px}
 .price-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;height:30px;padding:0;border:0;background:transparent;color:var(--ink);font-size:15px;font-weight:600;text-align:left;cursor:pointer}
@@ -787,13 +787,11 @@ footer{background:#06172b}
         </div>
       </div>
       <button class="filter-link" type="button" id="toggle-filters" aria-expanded="false">☷ Все фильтры</button>
-      <button class="show-listings" type="submit">Показать объявления</button>
     </div>
     <div class="advanced-filters" id="advanced-filters" hidden>
       <div class="filter-grid">
         <div class="field" id="f-area-min"><label for="area-min">Площадь от</label><input id="area-min" type="number" min="0" inputmode="numeric" placeholder="От"></div>
         <div class="field" id="f-area-max"><label for="area-max">Площадь до</label><input id="area-max" type="number" min="0" inputmode="numeric" placeholder="До"></div>
-        <div class="field" id="f-rooms" hidden><label for="rooms-advanced">Комнаты</label><select id="rooms-advanced"><option value="">Любое количество</option><option value="1">1 комната</option><option value="2">2 комнаты</option><option value="3">3 комнаты</option><option value="4">4 и больше</option></select></div>
         <div class="field" id="f-land-type" hidden><label for="land-type-advanced">Категория земли</label><select id="land-type-advanced"><option value="">Любая категория</option><option value="ИЖС">ИЖС</option><option value="ЛПХ">ЛПХ</option><option value="СНТ">СНТ</option><option value="Сельхозназначения">Сельхозназначения</option><option value="Коммерческая">Коммерческая</option></select></div>
         <div class="field" id="f-floor" hidden><label for="floor">Этаж</label><input id="floor" type="number" min="1" inputmode="numeric" placeholder="Например, 3"></div>
         <div class="field" id="f-floors" hidden><label for="floors">Этажей в доме</label><input id="floors" type="number" min="1" inputmode="numeric" placeholder="Например, 5"></div>
@@ -969,7 +967,6 @@ function tabs(){
 }
 function fields(){
   const isFlat=S.cat==="kvartiry",isHome=S.cat==="doma",isRoom=ROOMS.includes(S.cat),land=S.cat==="uchastki";
-  $("f-rooms").hidden=!isRoom;
   $("quick-rooms").hidden=!isRoom;
   $("quick-land").hidden=!land;
   $("f-land-type").hidden=!land;
@@ -979,7 +976,7 @@ function fields(){
   $("f-area-max").querySelector("label").textContent=land?"Площадь до, сот.":"Площадь до, м²";
 }
 function list(){
-  const r=$("rooms").value||$("rooms-advanced").value,min=+$("price-min").value||0,max=+$("price-max").value||Infinity;
+  const r=$("rooms").value,min=+$("price-min").value||0,max=+$("price-max").value||Infinity;
   const amin=+$("area-min").value||0,amax=+$("area-max").value||Infinity;
   const floor=+$("floor").value||0,floors=+$("floors").value||0;
   const landType=$("land-type").value||$("land-type-advanced").value;
@@ -1055,7 +1052,7 @@ $("photo-modal").addEventListener("click",e=>{if(e.target.id==="photo-modal")clo
 $("photo-modal").addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
 $("photo-modal").addEventListener("touchend",e=>{const dx=e.changedTouches[0].screenX-touchStartX;if(Math.abs(dx)>45)moveFullPhoto(dx<0?1:-1);},{passive:true});
 document.addEventListener("keydown",e=>{if($("photo-modal").classList.contains("open")){if(e.key==="ArrowRight")moveFullPhoto(1);if(e.key==="ArrowLeft")moveFullPhoto(-1);}if(e.key==="Escape")closePhoto();});
-["rooms","rooms-advanced","land-type","land-type-advanced","price-min","price-max","area-min","area-max","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
+["rooms","land-type","land-type-advanced","price-min","price-max","area-min","area-max","floor","floors","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("search").addEventListener("submit",e=>{e.preventDefault();render();$("catalog").scrollIntoView({behavior:"smooth"})});
 const mobileMenu=$("mobile-menu"),menuToggle=$("mobile-menu-toggle");
 menuToggle.addEventListener("click",()=>{
@@ -1071,7 +1068,7 @@ mobileMenu.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
 
 tabs();fields();
 $("toggle-filters").addEventListener("click",()=>{const panel=$("advanced-filters"),open=panel.hidden;panel.hidden=!open;$("toggle-filters").setAttribute("aria-expanded",String(open));$("toggle-filters").textContent=open?"Скрыть фильтры":"Все фильтры"});
-$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","rooms-advanced","land-type","land-type-advanced","floor","floors"].forEach(id=>$(id).value="");S.deal="";$("sort").value="";updatePriceSummary();render()});
+$("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","land-type","land-type-advanced","floor","floors"].forEach(id=>$(id).value="");S.deal="";$("sort").value="";updatePriceSummary();render()});
 function updatePriceSummary(){
   const min=$("price-min").value,max=$("price-max").value;
   $("price-summary").textContent=min||max?(min?fmt(+min):"0")+" — "+(max?fmt(+max):"∞")+" ₽":"Любая цена";
