@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101D36">
-<meta name="description" content="CITY — агентство недвижимости в Буйнакске. Покупка, продажа и аренда недвижимости. Почти 6 лет работы, личная проверка объектов и сопровождение сделок.">
+<meta name="description" content="CITY — агентство недвижимости в Буйнакске. Покупка, продажа и аренда недвижимости. Работаем с 2021 года, личная проверка объектов и сопровождение сделок.">
 <title>CITY — агентство недвижимости в Буйнакске</title>
 <link rel="canonical" href="https://city05.ru/">
 <meta property="og:type" content="website">
@@ -713,6 +713,13 @@ footer{background:#06172b}
   .acts .ask{min-height:48px;padding-inline:16px;font-size:14px}
 }
 
+/* Плавающая кнопка WhatsApp (на телефоне есть нижняя панель) */
+.wa-float{position:fixed;right:22px;bottom:22px;z-index:40;width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 8px 24px rgba(7,27,49,.28);transition:transform .2s}
+.wa-float:hover{transform:translateY(-2px) scale(1.04)}
+.wa-float:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+@media(max-width:900px){.wa-float{display:none}}
+.more-wrap{display:flex;justify-content:center;margin-top:26px}
+.more-wrap .btn{min-width:220px}
 </style>
 </head>
 <body>
@@ -740,7 +747,7 @@ footer{background:#06172b}
   
   <div class="wrap hero-in">
     <h1>Купить, снять или продать<br>недвижимость</h1>
-    <p class="lead">Помогаем покупать, продавать и снимать недвижимость в Буйнакске. Почти 6 лет рядом с городом и его жителями.</p>
+    <p class="lead">Помогаем покупать, продавать и снимать недвижимость в Буйнакске. Работаем с 2021 года, рядом с городом и его жителями.</p>
     <div class="hero-cta">
       <a class="btn acc" href="#catalog">Смотреть объекты</a>
       <button class="btn line" type="button" data-open="Продать или сдать недвижимость">Продать или сдать</button>
@@ -790,6 +797,7 @@ footer{background:#06172b}
       <div class="tools"><span id="count"></span><select id="sort" aria-label="Сортировка"><option value="">Сначала новые</option><option value="asc">Сначала дешевле</option><option value="desc">Сначала дороже</option></select></div>
     </div>
     <div class="cards" id="cards"></div>
+    <div class="more-wrap" id="more-wrap" hidden><button type="button" class="btn line" id="more-btn">Показать ещё</button></div>
     <div class="empty" id="empty">По этим параметрам вариантов пока нет. Измените фильтры или оставьте заявку, и мы подберём объект.</div>
     
   </div>
@@ -821,11 +829,11 @@ footer{background:#06172b}
   <div class="wrap about-c">
     <h2>Доверие дороже денег</h2>
     <div class="about-text">
-      <p>CITY работает в Буйнакске почти 6 лет. За это время название CITY стало частью нашей ежедневной работы и отношений с людьми, которые обращаются к нам за помощью с недвижимостью.</p>
+      <p>CITY работает в Буйнакске с 2021 года. За это время название CITY стало частью нашей ежедневной работы и отношений с людьми, которые обращаются к нам за помощью с недвижимостью.</p>
       <p>Каждый объект и каждую сделку мы проверяем лично и досконально. Для нас важно не просто свести стороны, а разобраться в деталях, честно рассказать о ситуации и провести клиента через весь процесс.</p>
     </div>
     <div class="vals">
-      <div><b>Почти 6 лет в Буйнакске</b><span>Знаем местный рынок и его особенности.</span></div>
+      <div><b>С 2021 года в Буйнакске</b><span>Знаем местный рынок и его особенности.</span></div>
       <div><b>Личная проверка</b><span>Внимательно проверяем детали объекта и сделки.</span></div>
       <div><b>Честный разговор</b><span>Говорим открыто и не обещаем невозможного.</span></div>
       <div><b>Сопровождение</b><span>Остаёмся рядом от первого обращения до результата.</span></div>
@@ -874,6 +882,7 @@ footer{background:#06172b}
   </div>
 </footer>
 
+<a class="wa-float" id="wa-float" href="https://wa.me/79094833939" target="_blank" rel="noopener" aria-label="Написать в WhatsApp"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.200zm4.500-6.100c-.2-.1-1.500-.7-1.700-.8-.2-.1-.4-.1-.6.100l-.8 1c-.1.200-.3.200-.5.100-1.400-.7-2.300-1.200-3.200-2.700-.2-.4.200-.4.700-1.300.1-.2 0-.3 0-.5l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.100-.7.300-.7.700-1 1.500-1 2.300.1 1 .6 2 1.300 2.900 1.100 1.500 2.500 2.700 4.200 3.400 1.600.6 2.300.7 3.100.6.800-.1 1.600-.7 1.900-1.400.2-.5.2-1 .1-1.100l-.5-.3z"/></svg></a>
 <div class="mbar">
   <a class="p" data-call href="#">Позвонить</a>
   <a data-wa target="_blank" rel="noopener" href="#">WhatsApp</a>
@@ -972,20 +981,25 @@ function card(i){
   const city=cityName(i)||"Город не указан";
   const msg="Здравствуйте! Интересует объект: "+i.title+", город: "+city+", "+fmt(i.price)+" ₽"+(per?" "+per:"")+". Он ещё актуален?";
   const wa="https://wa.me/"+PHONE_DIGITS+"?text="+encodeURIComponent(msg);
-  const specs=[i.rooms?i.rooms+" комн.":"",fmt(i.area)+" "+u,i.extra||""].filter(Boolean).map(t=>"<li>"+esc(t)+"</li>").join("");
+  const floorTxt=i.floor?"Этаж "+i.floor+(i.floors?" из "+i.floors:""):"";
+  const specs=[i.rooms?i.rooms+" комн.":"",fmt(i.area)+" "+u,floorTxt||i.extra||""].filter(Boolean).map(t=>"<li>"+esc(t)+"</li>").join("");
   const photos=(Array.isArray(i.images)&&i.images.length?i.images:(i.image?[i.image]:[]));
   const vis=photos.length?'<button type="button" class="photo-open" data-photo="'+esc(photos[0])+'" data-photo-alt="'+esc(i.title)+'" aria-label="Увеличить фотографию: '+esc(i.title)+'"><img src="'+esc(photos[0])+'" alt="'+esc(i.title)+'" loading="lazy"></button>'+(photos.length>1?'<button type="button" class="gallery-arrow prev" data-gallery-prev="'+i.id+'" aria-label="Предыдущее фото">‹</button><button type="button" class="gallery-arrow next" data-gallery-next="'+i.id+'" aria-label="Следующее фото">›</button><span class="gallery-count" data-gallery-count="'+i.id+'">1 / '+photos.length+'</span>':''):'<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">'+(GLYPH[i.category]||GLYPH.doma)+'</svg>';
   return '<article class="card'+(i.image?' photo-card':'')+'"><div class="visual">'+vis+'<div class="chips"><span class="chip">'+DEALLBL[i.deal]+'</span>'+(i.demo?'<span class="chip o">пример</span>':'')+'</div></div>'
     +'<div class="cbody"><div class="price">'+fmt(i.price)+' ₽'+(per?'<small>'+per+'</small>':'')+'</div><h3>'+esc(i.title)+'</h3><div class="loc"><strong>Город:</strong> '+esc(city)+'</div><ul class="specs">'+specs+'</ul><div class="loc">'+esc(i.location||"Район не указан")+'</div>'
     +'<div class="acts"><a class="ask" href="/o/'+encodeURIComponent(i.id)+'">Подробнее</a><a class="btn acc sm wa" href="'+wa+'" target="_blank" rel="noopener">'+ICON_CHAT+'WhatsApp</a></div></div></article>';
 }
-function render(){
+const PAGE=12;let shown=PAGE;
+function render(keep){
   tabs();fields();
+  if(keep!==true)shown=PAGE;
   const x=list();
-  $("cards").innerHTML=x.map(card).join("");
+  $("cards").innerHTML=x.slice(0,shown).map(card).join("");
   $("empty").style.display=x.length?"none":"block";
   $("count").textContent=x.length?"Найдено: "+x.length:"";
+  $("more-wrap").hidden=x.length<=shown;
 }
+$("more-btn").addEventListener("click",()=>{shown+=PAGE;render(true)});
 $("cats").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(b){S.cat=b.dataset.cat;render()}});
 $("deal-select").addEventListener("change",e=>{S.deal=e.target.value;render()});
 $("cards").addEventListener("click",e=>{

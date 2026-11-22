@@ -159,6 +159,7 @@ details .grid{padding-bottom:18px}
     </details>
     <div class="grid" style="margin-top:16px">
       <div class="full"><label for="f-extra">Короткая подпись в карточке</label><input id="f-extra" type="text" maxlength="40" placeholder="Заполнится сама, например «Этаж 1 из 4»"></div>
+      <div class="full"><label class="chk"><input type="checkbox" id="f-verified"> Проверено агентством</label><div class="hint">На странице объекта появится отметка «Проверено CITY». Ставьте её, только если вы лично видели объект и документы.</div></div>
       <div class="full"><label class="chk"><input type="checkbox" id="f-show" checked> Показывать на сайте</label><div class="hint">Снимите галочку, чтобы спрятать объект, не удаляя (например, если задаток внесён).</div></div>
     </div>
 
@@ -177,7 +178,7 @@ details .grid{padding-bottom:18px}
 <script>
 const OWNER="dzaffry13-oss",REPO="city",BRANCH="main",API="https://api.github.com/repos/"+OWNER+"/"+REPO;
 const CATS=[["kvartiry","Квартира"],["doma","Дом"],["uchastki","Земельный участок"],["kommerciya","Коммерческая недвижимость"]];
-const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет"],["payment","Ипотека / рассрочка","Ипотека не рассматривается"],["bargaining","Торг","Небольшой торг возможен"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Все подключены"]];
+const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет"],["payment","Ипотека / рассрочка","Ипотека не рассматривается"],["bargaining","Торг","Небольшой торг возможен"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Все подключены"],["tradeIn","Trade-in / обмен","Рассматриваем обмен"],["infrastructure","Инфраструктура рядом","Школа, магазин, остановка в 5 минутах"]];
 const DEALLBL={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -314,7 +315,7 @@ function openForm(it){
   const v=(id,val)=>$(id).value=val??"";
   v("f-category",it?.category||"kvartiry");v("f-deal",it?.deal||"prodazha");v("f-title",it?.title);v("f-price",it?.price?fmt(it.price):"");v("f-area",it?.area);
   v("f-city",it?.city||"Буйнакск");v("f-location",it?.location);v("f-rooms",it?.rooms);v("f-floor",it?.floor);v("f-floors",it?.floors);
-  v("f-land",it?.landType||it?.purpose);v("f-desc",it?.description);v("f-extra",it?.extra);$("f-show").checked=!it?.hidden;
+  v("f-land",it?.landType||it?.purpose);v("f-desc",it?.description);v("f-extra",it?.extra);$("f-show").checked=!it?.hidden;$("f-verified").checked=!!it?.verified;
   DETAILS.forEach(([k])=>v("d-"+k,it?.details?.[k]));
   document.querySelector("details").open=!!it?.details&&Object.values(it.details).some(Boolean);
   photos=(it?(it.images&&it.images.length?it.images:(it.image?[it.image]:[])):[]).map(p=>({path:p,url:p}));
@@ -378,6 +379,8 @@ function collect(id){
   const desc=$("f-desc").value.trim();if(desc)o.description=desc;
   const det={};DETAILS.forEach(([k])=>{const v=$("d-"+k).value.trim();if(v)det[k]=v});if(Object.keys(det).length)o.details=det;
   if(!$("f-show").checked)o.hidden=true;
+  if($("f-verified").checked)o.verified=true;
+  const t=new Date();o.updated=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
   return o;
 }
 function validate(o){
@@ -404,7 +407,7 @@ $("form").addEventListener("submit",async e=>{
     await commitList(l=>{
       const cur=l.find(x=>x.id===id);
       const merged=cur?{...cur,...o}:o;
-      ["image","images","hidden","extra","description","details","rooms","floor","floors","landType"].forEach(k=>{if(!(k in o))delete merged[k]});
+      ["image","images","hidden","verified","extra","description","details","rooms","floor","floors","landType"].forEach(k=>{if(!(k in o))delete merged[k]});
       if(cur&&cur.demo===false||!cur)merged.demo=false;
       return cur?l.map(x=>x.id===id?merged:x):[...l,merged];
     },(editing?"Изменён объект: ":"Добавлен объект: ")+o.title);

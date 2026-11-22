@@ -27,6 +27,7 @@ export async function onRequest({ request, env, params }) {
     name: item.title,
     description: desc,
     url: page,
+    ...(item.updated ? { datePosted: item.updated } : {}),
     ...(photos.length ? { image: photos } : {}),
     offers: { '@type': 'Offer', price: Number(item.price) || 0, priceCurrency: 'RUB', availability: 'https://schema.org/InStock' },
     address: { '@type': 'PostalAddress', addressLocality: item.city || 'Буйнакск', addressCountry: 'RU', streetAddress: String(item.location || '').replace(/^.*?·\s*/, '') },
