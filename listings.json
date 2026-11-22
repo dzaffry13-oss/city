@@ -35,19 +35,6 @@
     ]
   },
   {
-    "id": 2,
-    "category": "kvartiry",
-    "deal": "prodazha",
-    "title": "Двухкомнатная квартира",
-    "price": 5200000,
-    "area": 56,
-    "location": "Буйнакск · район уточняется",
-    "demo": true,
-    "rooms": 2,
-    "extra": "Этаж 2 из 9",
-    "city": "Буйнакск"
-  },
-  {
     "id": 3,
     "category": "kvartiry",
     "deal": "arenda",
