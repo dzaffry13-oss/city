@@ -302,7 +302,7 @@ footer{background:#06172b}
 .deal-tab:hover{background:#fff;border-color:#c8d0da;color:var(--ink);transform:translateY(-1px)}
 .deal-tab.active{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 5px 16px rgba(9,29,53,.16)}
 .deal-tab.active:after{content:"";position:absolute;left:22px;right:22px;bottom:5px;height:2px;border-radius:2px;background:#d7b45f;opacity:.95}
-.finder-bar{display:grid;grid-template-columns:minmax(190px,1.2fr) minmax(170px,1fr) minmax(145px,.85fr) auto;align-items:stretch;gap:0;padding:8px;background:#fff;border:1px solid #e6eaf0;border-radius:17px;box-shadow:0 12px 34px rgba(11,31,55,.09)}
+.finder-bar{display:grid;grid-template-columns:minmax(190px,1.2fr) minmax(170px,1fr) minmax(145px,.85fr) auto auto;align-items:stretch;gap:0;padding:8px;background:#fff;border:1px solid #e6eaf0;border-radius:17px;box-shadow:0 12px 34px rgba(11,31,55,.09)}
 .finder-bar .field{min-width:0;display:flex;flex-direction:column;justify-content:center;padding:7px 18px}
 .finder-bar .field+.field{border-left:1px solid #e8ebef}
 .finder-bar label{font-size:11px;font-weight:600;letter-spacing:.035em;text-transform:uppercase;color:#8a94a3;margin:0 0 3px}
@@ -351,7 +351,7 @@ footer{background:#06172b}
 }
 
 /* Price range popover */
-.finder-bar{grid-template-columns:minmax(190px,1.15fr) minmax(165px,1fr) minmax(155px,.9fr) auto}
+.finder-bar{grid-template-columns:minmax(190px,1.15fr) minmax(165px,1fr) minmax(155px,.9fr) auto auto}
 .price-control{position:relative;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:7px 18px;border-left:1px solid #e8ebef}
 .price-caption{font-size:11px;font-weight:600;letter-spacing:.035em;text-transform:uppercase;color:#8a94a3;margin:0 0 3px}
 .price-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;height:30px;padding:0;border:0;background:transparent;color:var(--ink);font-size:15px;font-weight:600;text-align:left;cursor:pointer}
@@ -787,6 +787,7 @@ footer{background:#06172b}
         </div>
       </div>
       <button class="filter-link" type="button" id="toggle-filters" aria-expanded="false">☷ Все фильтры</button>
+      <button class="show-listings" type="submit" id="quick-show-listings">Показать объявления</button>
     </div>
     <div class="advanced-filters" id="advanced-filters" hidden>
       <div class="filter-grid">
@@ -796,7 +797,7 @@ footer{background:#06172b}
         <div class="field" id="f-floor" hidden><label for="floor">Этаж</label><input id="floor" type="number" min="1" inputmode="numeric" placeholder="Например, 3"></div>
         <div class="field" id="f-floors" hidden><label for="floors">Этажей в доме</label><input id="floors" type="number" min="1" inputmode="numeric" placeholder="Например, 5"></div>
       </div>
-      <div class="filter-footer"><button class="btn line sm" type="button" id="reset-filters">Сбросить</button><button class="btn acc" type="submit">Показать объекты</button></div>
+      <div class="filter-footer"><button class="btn line sm" type="button" id="reset-filters">Сбросить</button><button class="show-listings" type="submit">Показать объявления</button></div>
     </div>
   </form>
 </div>
@@ -1067,7 +1068,7 @@ mobileMenu.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
 }));
 
 tabs();fields();
-$("toggle-filters").addEventListener("click",()=>{const panel=$("advanced-filters"),open=panel.hidden;panel.hidden=!open;$("toggle-filters").setAttribute("aria-expanded",String(open));$("toggle-filters").textContent=open?"Скрыть фильтры":"Все фильтры"});
+$("toggle-filters").addEventListener("click",()=>{const panel=$("advanced-filters"),open=panel.hidden;panel.hidden=!open;$("quick-show-listings").hidden=open;$("toggle-filters").setAttribute("aria-expanded",String(open));$("toggle-filters").textContent=open?"Скрыть фильтры":"☷ Все фильтры"});
 $("reset-filters").addEventListener("click",()=>{["price-min","price-max","area-min","area-max","rooms","land-type","land-type-advanced","floor","floors"].forEach(id=>$(id).value="");S.deal="";$("sort").value="";updatePriceSummary();render()});
 function updatePriceSummary(){
   const min=$("price-min").value,max=$("price-max").value;
