@@ -3,20 +3,23 @@
 // Доступ только у владельца репозитория: проверяется ключ GitHub из админки.
 
 const REPO = 'dzaffry13-oss/city';
+const MAX_BODY = 20 * 1024 * 1024; // всё письмо
+const MAX_FILE = 4 * 1024 * 1024; // одно фото
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
 export async function onRequestPost({ request, env }) {
   const url = new URL(request.url);
-  const origin = request.headers.get('Origin');
-  if (origin && origin !== url.origin) return json(403, { ok: false, error: 'origin' });
+  if (request.headers.get('Origin') !== url.origin) return json(403, { ok: false, error: 'origin' });
+  const size = Number(request.headers.get('Content-Length') || 0);
+  if (size > MAX_BODY) return json(413, { ok: false, error: 'size' });
   if (!env.TG_BOT_TOKEN || !env.TG_CHANNEL) return json(500, { ok: false, error: 'config' });
 
   let form;
   try { form = await request.formData(); } catch { return json(400, { ok: false, error: 'form' }); }
 
   const token = String(form.get('token') || '');
-  if (!token) return json(401, { ok: false, error: 'auth' });
+  if (!token || token.length > 255) return json(401, { ok: false, error: 'auth' });
   const gh = await fetch(`https://api.github.com/repos/${REPO}`, {
     headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'city-admin', Accept: 'application/vnd.github+json' },
   });
@@ -25,12 +28,15 @@ export async function onRequestPost({ request, env }) {
 
   const caption = String(form.get('caption') || '').slice(0, 1024);
   const files = [];
+  const okFile = (f) => f && typeof f !== 'string' && f.size > 0 && f.size <= MAX_FILE && /^image\/jpeg$/i.test(f.type);
   const cover = form.get('cover');
-  if (!cover || typeof cover === 'string') return json(400, { ok: false, error: 'cover' });
+  if (!okFile(cover)) return json(400, { ok: false, error: 'cover' });
   files.push(cover);
   for (let i = 1; i <= 9; i++) {
     const f = form.get('p' + i);
-    if (f && typeof f !== 'string') files.push(f);
+    if (f == null) continue;
+    if (!okFile(f)) return json(400, { ok: false, error: 'photo' });
+    files.push(f);
   }
 
   const out = new FormData();
