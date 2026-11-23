@@ -193,7 +193,7 @@ details .grid{padding-bottom:18px}
 </main>
 
 <div class="busy" id="busy" hidden><span id="busy-t">Сохраняем…</span></div>
-<div class="share-back" id="share-back" hidden><div class="share" role="dialog" aria-modal="true" aria-labelledby="share-t"><h3 id="share-t">Для соцсетей</h3><canvas id="share-cv" width="1080" height="1350"></canvas><div class="row"><button class="btn" id="sh-cover">Скачать обложку</button><button class="btn" id="sh-zip">Скачать все фото</button><button class="btn" id="sh-text">Копировать текст</button><button class="btn" id="sh-close">Закрыть</button></div></div></div>
+<div class="share-back" id="share-back" hidden><div class="share" role="dialog" aria-modal="true" aria-labelledby="share-t"><h3 id="share-t">Для соцсетей</h3><canvas id="share-cv" width="1080" height="1350"></canvas><div class="row"><button class="btn" id="sh-cover">Скачать обложку</button><button class="btn" id="sh-zip">Скачать все фото</button><button class="btn" id="sh-text">Копировать текст</button><button class="btn pri" id="sh-tg">Опубликовать в Telegram</button><p class="hint" id="sh-tg-note" style="flex:1 1 100%;margin:0"></p><button class="btn" id="sh-close">Закрыть</button></div></div></div>
 <div class="toast" id="toast" hidden role="status"></div>
 
 <script>
@@ -293,7 +293,7 @@ function renderList(){
     const per=i.deal==="arenda"?" / мес":i.deal==="posutochno"?" / сутки":"";
     const pos=LIST.indexOf(i);
     return '<div class="item'+(i.hidden?' off':'')+'"><div class="ord"><button data-up="'+i.id+'" title="Выше" aria-label="Поднять выше"'+(!canMove||pos===0?' disabled':'')+'>↑</button><button data-down="'+i.id+'" title="Ниже" aria-label="Опустить ниже"'+(!canMove||pos===LIST.length-1?' disabled':'')+'>↓</button></div><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
-     +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
+     +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+(i.tgPosted?'<span class="tag">в Telegram</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
      +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-link="'+i.id+'">Скопировать ссылку</button><button class="btn sm" data-share="'+i.id+'">Для соцсетей</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
   }).join(""):'<div class="empty">'+(LIST.length?"Ничего не найдено.":"Объектов пока нет. Нажмите «Добавить объект».")+'</div>';
 }
@@ -522,7 +522,12 @@ function rentLines(it){
   if(d.rentUtilities)p.push("Коммунальные: "+d.rentUtilities);if(d.kids)p.push("С детьми: "+d.kids);if(d.pets)p.push("С животными: "+d.pets);
   return p.length?"🔑 "+p.join(" · "):"";
 }
-function postText(it){
+function postText(it,max){
+  let dl=420,t=buildPost(it,dl);
+  while(max&&t.length>max&&dl>0){dl=Math.max(0,dl-40);t=buildPost(it,dl)}
+  return max?t.slice(0,max):t;
+}
+function buildPost(it,dl){
   const tags={kvartiry:"#квартира #квартирывбуйнакске",doma:"#дом #домавбуйнакске",uchastki:"#участок #землявбуйнакске",kommerciya:"#коммерческаянедвижимость"}[it.category]||"";
   const deal={prodazha:"#продажа",arenda:"#аренда",posutochno:"#посуточно"}[it.deal]||"";
   const desc=String(it.description||"").replace(/\s+/g," ").trim();
@@ -531,7 +536,7 @@ function postText(it){
     "📍 "+(it.city||"Буйнакск")+(addrOf(it)?", "+addrOf(it):""),
     specsOf(it).length?"📐 "+specsOf(it).join(" · "):"",
     it.deal!=="prodazha"&&it.details?rentLines(it):"",
-    desc?"\n"+(desc.length>420?desc.slice(0,420).replace(/\s\S*$/,"")+"…":desc):"",
+    desc&&dl>0?"\n"+(desc.length>dl?desc.slice(0,dl).replace(/\s\S*$/,"")+"…":desc):"",
     "","Звоните или пишите в WhatsApp: "+PHONE_TXT,
     "Подробности и фото: "+location.origin+"/o/"+it.id,"",
     "#недвижимость #буйнакск #дагестан #CITY "+deal+" "+tags].filter((x,i,arr)=>x!==""||arr[i-1]!=="").join("\n");
@@ -583,7 +588,7 @@ async function drawCover(it){
     ctx.fillStyle="#fff";ctx.font="700 34px "+SERIF;ctx.fillText("CITY",50+lw+12,H-34)}catch(e){ctx.fillStyle="#fff";ctx.font="700 34px "+SERIF;ctx.fillText("CITY",50,H-34)}
 }
 async function openShare(it){
-  SH=it;$("share-t").textContent="Для соцсетей: "+it.title;$("share-back").hidden=false;
+  SH=it;$("share-t").textContent="Для соцсетей: "+it.title;$("sh-tg-note").textContent=it.tgPosted?"Уже опубликовано в Telegram: "+new Date(it.tgPosted+"T12:00:00").toLocaleDateString("ru-RU"):"";$("share-back").hidden=false;
   const cv=$("share-cv");cv.getContext("2d").clearRect(0,0,cv.width,cv.height);
   busy("Готовим обложку…");try{await drawCover(it)}catch(e){toast("Не удалось собрать обложку.",true)}finally{idle()}
 }
@@ -594,6 +599,25 @@ $("sh-cover").addEventListener("click",()=>{if(!SH)return;$("share-cv").toBlob(b
 $("sh-text").addEventListener("click",async()=>{
   if(!SH)return;const t=postText(SH);
   try{await navigator.clipboard.writeText(t);toast("Текст поста скопирован.")}catch(e){prompt("Скопируйте текст:",t)}
+});
+
+const TG_ERR={auth:"Нет доступа: войдите в админку заново.",config:"Telegram ещё не настроен на сайте (нужны TG_BOT_TOKEN и TG_CHANNEL в Cloudflare Pages).",chat:"Канал не найден. Проверьте TG_CHANNEL.",rights:"У бота нет прав публиковать в канале. Добавьте его в администраторы канала.",telegram:"Telegram не принял публикацию. Попробуйте ещё раз.",cover:"Не удалось собрать обложку."};
+$("sh-tg").addEventListener("click",async()=>{
+  if(!SH)return;const it=SH;
+  if(it.tgPosted&&!confirm("Этот объект уже публиковался в Telegram. Опубликовать ещё раз?"))return;
+  busy("Публикуем в Telegram…");
+  try{
+    const fd=new FormData();fd.set("token",TOKEN);fd.set("caption",postText(it,1000));
+    const cover=await new Promise(r=>$("share-cv").toBlob(r,"image/jpeg",.92));fd.set("cover",cover,"cover.jpg");
+    const ph=photosOf(it).slice(1,10);
+    for(let i=0;i<ph.length;i++){const r=await fetch(ph[i]+"?_="+Date.now());if(!r.ok)throw new Error("photo");fd.set("p"+(i+1),await r.blob(),"p"+(i+1)+".jpg")}
+    const r=await fetch("/api/publish",{method:"POST",body:fd});let j=null;try{j=await r.json()}catch(e){}
+    if(!r.ok||!j?.ok)throw Object.assign(new Error("tg"),{tg:j?.error||(r.status===404?"config":"telegram")});
+    const today=new Date().toISOString().slice(0,10);
+    await commitList(l=>l.map(x=>x.id===it.id?{...x,tgPosted:today}:x),"Опубликовано в Telegram: "+it.title);
+    it.tgPosted=today;$("sh-tg-note").textContent="Опубликовано в Telegram: "+new Date(today+"T12:00:00").toLocaleDateString("ru-RU");renderList();
+    toast("Опубликовано в Telegram-канале.");
+  }catch(e){console.error("tg-publish",e);toast(e.tg?TG_ERR[e.tg]||TG_ERR.telegram:"Не удалось опубликовать. Попробуйте ещё раз.",true)}finally{idle()}
 });
 /* Простой ZIP без сжатия (JPEG уже сжаты), без внешних библиотек */
 const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
