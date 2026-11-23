@@ -1,8 +1,9 @@
 import { loadListings, isPublic, esc } from './_lib.js';
 
 export async function onRequest({ request, env }) {
-  const origin = new URL(request.url).origin;
-  const list = (await loadListings(env, origin)).filter(isPublic).sort((a, b) => b.id - a.id);
+  const reqOrigin = new URL(request.url).origin;
+  const origin = 'https://city05.ru'; // адреса в карте сайта всегда https и основной домен
+  const list = (await loadListings(env, reqOrigin)).filter(isPublic).sort((a, b) => b.id - a.id);
   const pages = ['pokupka', 'prodazha', 'arenda', 'uslugi', 'o-kompanii'];
   const urls = [`${origin}/`, ...pages.map((p) => `${origin}/${p}/`), ...list.map((i) => `${origin}/o/${encodeURIComponent(i.id)}`)];
   const mod = Object.fromEntries(list.filter((i) => i.updated).map((i) => [`${origin}/o/${encodeURIComponent(i.id)}`, i.updated]));

@@ -18,6 +18,11 @@ export async function onRequest({ request, next }) {
     });
   }
 
+  // Любой http-запрос к основному домену уходит на https.
+  if (url.hostname === 'city05.ru' && url.protocol === 'http:') {
+    return Response.redirect(MAIN + url.pathname + url.search, 301);
+  }
+
   if (url.hostname.endsWith('.pages.dev') || url.hostname === 'www.city05.ru') {
     return Response.redirect(MAIN + url.pathname + url.search, 301);
   }
