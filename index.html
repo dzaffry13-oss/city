@@ -230,6 +230,14 @@ footer h2{font-size:clamp(23px,3.2vw,36px);margin-bottom:18px}
   *{transition:none!important}
 }
 
+/* Перламутровый акцент только для CITY в главном заголовке */
+.hero-title-city{
+ background:linear-gradient(112deg,#fffdf8 0%,#f1e4c5 27%,#fffaf0 48%,#d9c49b 68%,#fffdf8 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ -webkit-text-fill-color:transparent;
+ filter:drop-shadow(0 2px 10px rgba(241,220,177,.24));
+}
+
 /* CITY premium update */
 :root{
  --ink:#0b1d35;--ink2:#213a55;--stone:#f5f6f8;--paper:#fff;
@@ -907,7 +915,7 @@ footer{background:#06172b}
 <section class="hero">
   
   <div class="wrap hero-in">
-    <h1>Агентство недвижимости CITY</h1>
+    <h1>Агентство недвижимости <span class="hero-title-city">CITY</span></h1>
     <p class="lead">Мы поможем вам купить, продать, сдать или снять недвижимость в Буйнакске. Работаем с 2020 года и хорошо знаем рынок недвижимости нашего города.</p>
     <div class="hero-cta">
       <a class="btn acc" href="#catalog">Смотреть объекты</a>
