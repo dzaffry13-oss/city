@@ -26,7 +26,14 @@
       "assets/obj-15-mwswjakw-6.jpg",
       "assets/obj-15-mwswjakw-7.jpg",
       "assets/obj-15-mwswjakw-8.jpg"
-    ]
+    ],
+    "details": {
+      "heating": "Центральное",
+      "bathroom": "Совмещённый",
+      "condition": "Евроремонт",
+      "furniture": "Кухня, Шкаф, Диван",
+      "appliances": "Холодильник, Стиральная машина, Водонагреватель, Плита"
+    }
   },
   {
     "id": 14,
