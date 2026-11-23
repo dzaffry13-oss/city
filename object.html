@@ -209,7 +209,8 @@ function render(item){
  $("wa-float").href="https://wa.me/"+PHONE+"?text="+encodeURIComponent("Здравствуйте! Интересует объект: "+item.title+", "+fmt(item.price)+" ₽. Он ещё актуален?");
  const group=(title,keys)=>{const rows=keys.filter(([k])=>detail[k]).map(([k,l])=>spec(detail[k],l));return rows.length?'<h3 class="sub">'+title+'</h3><div class="specs one">'+rows.map(r=>'<div class="spec-column" style="display:contents">'+r+'</div>').join("")+'</div>':""};
  const infra=detail.infrastructure?'<h3 class="sub">Инфраструктура рядом</h3><p class="description">'+esc(detail.infrastructure)+'</p>':"";
- $("more").innerHTML=group("Условия сделки",[["documents","Документы"],["payment","Ипотека / рассрочка"],["tradeIn","Trade-in / обмен"],["bargaining","Торг"]])
+ $("more").innerHTML=group("Условия аренды",[["rentTerm","Срок аренды"],["deposit","Залог"],["commission","Комиссия"],["rentUtilities","Коммунальные платежи"],["kids","С детьми"],["pets","С животными"]])
+  +group("Условия сделки",[["documents","Документы"],["payment","Ипотека / рассрочка"],["tradeIn","Trade-in / обмен"],["bargaining","Торг"]])
   +group("Дополнительно",[["furniture","Мебель"],["appliances","Техника"],["parking","Парковка"],["utilities","Коммуникации"]])+infra;
  $("loading").hidden=true;$("object").hidden=false;
 }

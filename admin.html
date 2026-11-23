@@ -199,7 +199,7 @@ details .grid{padding-bottom:18px}
 <script>
 const OWNER="dzaffry13-oss",REPO="city",BRANCH="main",API="https://api.github.com/repos/"+OWNER+"/"+REPO;
 const CATS=[["kvartiry","Квартира"],["doma","Дом"],["uchastki","Земельный участок"],["kommerciya","Коммерческая недвижимость"]];
-const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Без ремонта, Косметический, Евроремонт или Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет"],["payment","Ипотека / рассрочка","Ипотека не рассматривается"],["bargaining","Торг","Небольшой торг возможен"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Электричество, вода, газ, канализация, отопление"],["tradeIn","Trade-in / обмен","Рассматриваем обмен"],["infrastructure","Инфраструктура рядом","Школа, магазин, остановка в 5 минутах"]];
+const DETAILS=[["kitchenArea","Площадь кухни","11 м²"],["livingArea","Жилая площадь","22 м²"],["ceilingHeight","Высота потолков","2,8 м"],["heating","Отопление","Индивидуальное"],["bathroom","Санузел","Совмещённый"],["windows","Окна","Во двор"],["condition","Ремонт","Без ремонта, Косметический, Евроремонт или Дизайнерский"],["furniture","Мебель","Кухня, шкаф, диван"],["appliances","Техника","Холодильник, стиральная машина"],["documents","Документы","Полный пакет","s"],["payment","Ипотека / рассрочка","Ипотека не рассматривается","s"],["bargaining","Торг","Небольшой торг возможен","s"],["parking","Парковка","Открытая во дворе"],["utilities","Коммуникации","Электричество, вода, газ, канализация, отопление"],["tradeIn","Trade-in / обмен","Рассматриваем обмен","s"],["infrastructure","Инфраструктура рядом","Школа, магазин, остановка в 5 минутах"],["rentTerm","Срок аренды","Длительный срок","r"],["deposit","Залог","Залог — 1 месяц","r"],["commission","Комиссия","Без комиссии","r"],["rentUtilities","Коммунальные платежи","Включены в стоимость","r"],["kids","С детьми","Можно","r"],["pets","С животными","Обсуждается","r"]];
 const DEALLBL={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -344,16 +344,22 @@ const QUICK={
  windows:["m","Во двор","На улицу","На солнечную сторону","Пластиковые","Деревянные"],
  condition:["s","Без ремонта","Косметический","Евроремонт","Дизайнерский"],
  furniture:["m","Без мебели","Кухня","Шкаф","Кровать","Диван","Спальные места"],
- appliances:["m","Холодильник","Стиральная машина","Телевизор","Кондиционер","Водонагреватель","Посудомоечная машина","Плита"],
+ appliances:["m","Холодильник","Стиральная машина","Телевизор","Кондиционер","Водонагреватель","Посудомоечная машина","Плита","Интернет"],
  documents:["s","Собственник","Свидетельство о собственности","Выписка ЕГРН","Договор купли-продажи","Полный пакет документов","Земля в собственности"],
  payment:["m","Наличные","Ипотека","Мат. капитал","Сертификат","Рассрочка","Только наличные"],
  bargaining:["s","Торг уместен","Небольшой торг","Без торга","Торг у собственника"],
  parking:["s","Во дворе","Гараж","Подземная","Нет","Рядом с домом"],
  utilities:["m","Электричество","Вода","Газ","Канализация","Отопление","Интернет"],
  tradeIn:["s","Рассматриваем обмен","Обмен возможен","Обмен не рассматривается","Рассмотрю варианты"],
+ rentTerm:["s","Длительный срок","От 6 месяцев","От 1 года","Договорный"],
+ deposit:["s","Без залога","Залог — 1 месяц","Залог — половина месяца"],
+ commission:["s","Без комиссии","50% от месячной платы","100% от месячной платы"],
+ rentUtilities:["s","Включены в стоимость","Оплачиваются отдельно","По счётчикам","Свет и вода отдельно"],
+ kids:["s","Можно","Нельзя","Обсуждается"],
+ pets:["s","Можно","Нельзя","Обсуждается"],
  infrastructure:["m","Школа","Детский сад","Магазин","Остановка","Аптека","Больница","Рынок","Парк","Мечеть","Кафе","Спортплощадка"]
 };
-$("det-grid").innerHTML=DETAILS.map(([k,l,p])=>'<div><label for="d-'+k+'">'+l+'</label><input id="d-'+k+'" type="text" placeholder="'+esc(p)+'">'+(QUICK[k]?'<div class="chips" data-k="'+k+'" data-t="'+QUICK[k][0]+'">'+QUICK[k].slice(1).map(c=>'<button type="button">'+esc(c)+'</button>').join("")+'</div>':'')+'</div>').join("");
+$("det-grid").innerHTML=DETAILS.map(([k,l,p])=>'<div id="dw-'+k+'"><label for="d-'+k+'">'+l+'</label><input id="d-'+k+'" type="text" placeholder="'+esc(p)+'">'+(QUICK[k]?'<div class="chips" data-k="'+k+'" data-t="'+QUICK[k][0]+'">'+QUICK[k].slice(1).map(c=>'<button type="button">'+esc(c)+'</button>').join("")+'</div>':'')+'</div>').join("");
 const splitV=s=>s.split(",").map(x=>x.trim()).filter(Boolean);
 function syncChips(k){
   const box=document.querySelector('.chips[data-k="'+k+'"]');if(!box)return;
@@ -376,9 +382,11 @@ function catOptions(cur){
 function syncFields(){
   const c=$("f-category").value,land=c==="uchastki",flat=c==="kvartiry"||c==="komnaty",home=c==="doma";
   $("l-area").textContent=land?"Площадь, соток":"Площадь, м²";
+  const rent=$("f-deal").value!=="prodazha";
+  DETAILS.forEach(([k,,,m])=>{$("dw-"+k).hidden=(m==="s"&&rent)||(m==="r"&&!rent)});
   $("w-rooms").hidden=land;$("w-floor").hidden=!flat;$("w-floors").hidden=!(flat||home);$("w-land").hidden=!land;
 }
-$("f-category").addEventListener("change",syncFields);
+$("f-category").addEventListener("change",syncFields);$("f-deal").addEventListener("change",syncFields);
 $("f-price").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"");e.target.value=d?fmt(d):""});
 function openForm(it){
   editing=it;catOptions(it?.category);
@@ -412,14 +420,17 @@ let logoImg=null;
 function loadLogo(){return logoImg||(logoImg=new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="assets/city-logo-mark.png"}))}
 async function processPhoto(file,wm){
   const bmp=await createImageBitmap(file,{imageOrientation:"from-image"});
-  const k=Math.min(1,1600/Math.max(bmp.width,bmp.height)),w=Math.round(bmp.width*k),h=Math.round(bmp.height*k);
+  const k=Math.min(1,2000/Math.max(bmp.width,bmp.height)),w=Math.round(bmp.width*k),h=Math.round(bmp.height*k);
+  /* уменьшаем ступенями по половине: так резче, чем одним махом */
+  let src=bmp,sw=bmp.width,sh=bmp.height;
+  while(sw/2>=w){const t=document.createElement("canvas");t.width=Math.round(sw/2);t.height=Math.round(sh/2);const tc=t.getContext("2d");tc.imageSmoothingQuality="high";tc.drawImage(src,0,0,t.width,t.height);src=t;sw=t.width;sh=t.height}
   const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");
-  x.drawImage(bmp,0,0,w,h);
+  x.imageSmoothingQuality="high";x.drawImage(src,0,0,w,h);
   if(wm){
     const logo=await loadLogo(),lw=w*0.22,lh=lw*logo.naturalHeight/logo.naturalWidth,px=w-lw-w*0.05,py=h-lh-w*0.085;
     x.save();x.globalAlpha=.5;x.shadowColor="rgba(0,0,0,.45)";x.shadowBlur=Math.max(3,lw/30);x.shadowOffsetY=2;x.drawImage(logo,px,py,lw,lh);x.restore();
   }
-  return new Promise(r=>c.toBlob(r,"image/jpeg",.86));
+  return new Promise(r=>c.toBlob(r,"image/jpeg",.9));
 }
 $("file").addEventListener("change",async e=>{
   const files=[...e.target.files];e.target.value="";if(!files.length)return;
@@ -449,7 +460,7 @@ function collect(id){
   if(!extra){if(flat&&fl)extra="Этаж "+fl+(fls?" из "+fls:"");else if(land&&$("f-land").value)extra=$("f-land").value}
   if(extra)o.extra=extra;
   const desc=$("f-desc").value.trim();if(desc)o.description=desc;
-  const det={};DETAILS.forEach(([k])=>{const v=$("d-"+k).value.trim();if(v)det[k]=v});if(Object.keys(det).length)o.details=det;
+  const det={};DETAILS.forEach(([k])=>{if($("dw-"+k).hidden)return;const v=$("d-"+k).value.trim();if(v)det[k]=v});if(Object.keys(det).length)o.details=det;
   if(!$("f-show").checked)o.hidden=true;
   if($("f-verified").checked)o.verified=true;
   const t=new Date();o.updated=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
@@ -505,6 +516,12 @@ const specsOf=it=>{
 };
 const perOf=it=>it.deal==="arenda"?" ₽ / мес":it.deal==="posutochno"?" ₽ / сутки":" ₽";
 const addrOf=it=>String(it.location||it.city||"").replace(/^.*?·\s*/,"");
+function rentLines(it){
+  const d=it.details||{},p=[];
+  if(d.rentTerm)p.push("Срок: "+d.rentTerm);if(d.deposit)p.push("Залог: "+d.deposit);if(d.commission)p.push("Комиссия: "+d.commission);
+  if(d.rentUtilities)p.push("Коммунальные: "+d.rentUtilities);if(d.kids)p.push("С детьми: "+d.kids);if(d.pets)p.push("С животными: "+d.pets);
+  return p.length?"🔑 "+p.join(" · "):"";
+}
 function postText(it){
   const tags={kvartiry:"#квартира #квартирывбуйнакске",doma:"#дом #домавбуйнакске",uchastki:"#участок #землявбуйнакске",kommerciya:"#коммерческаянедвижимость"}[it.category]||"";
   const deal={prodazha:"#продажа",arenda:"#аренда",posutochno:"#посуточно"}[it.deal]||"";
@@ -513,6 +530,7 @@ function postText(it){
     "💰 "+fmt(it.price)+perOf(it),
     "📍 "+(it.city||"Буйнакск")+(addrOf(it)?", "+addrOf(it):""),
     specsOf(it).length?"📐 "+specsOf(it).join(" · "):"",
+    it.deal!=="prodazha"&&it.details?rentLines(it):"",
     desc?"\n"+(desc.length>420?desc.slice(0,420).replace(/\s\S*$/,"")+"…":desc):"",
     "","Звоните или пишите в WhatsApp: "+PHONE_TXT,
     "Подробности и фото: "+location.origin+"/o/"+it.id,"",
@@ -527,7 +545,7 @@ function wrap(ctx,text,maxW,maxLines){
   return lines;
 }
 async function drawCover(it){
-  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=930;
+  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=930;ctx.imageSmoothingQuality="high";
   ctx.fillStyle="#101D36";ctx.fillRect(0,0,W,H);
   const src=photosOf(it)[0];
   if(src){
@@ -572,7 +590,7 @@ async function openShare(it){
 function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
 $("sh-close").addEventListener("click",()=>{$("share-back").hidden=true;SH=null});
 $("share-back").addEventListener("click",e=>{if(e.target.id==="share-back"){$("share-back").hidden=true;SH=null}});
-$("sh-cover").addEventListener("click",()=>{if(!SH)return;$("share-cv").toBlob(b=>b?saveBlob(b,"city-"+SH.id+"-instagram.jpg"):toast("Не удалось сохранить.",true),"image/jpeg",.92)});
+$("sh-cover").addEventListener("click",()=>{if(!SH)return;$("share-cv").toBlob(b=>b?saveBlob(b,"city-"+SH.id+"-instagram.jpg"):toast("Не удалось сохранить.",true),"image/jpeg",.95)});
 $("sh-text").addEventListener("click",async()=>{
   if(!SH)return;const t=postText(SH);
   try{await navigator.clipboard.writeText(t);toast("Текст поста скопирован.")}catch(e){prompt("Скопируйте текст:",t)}
