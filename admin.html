@@ -630,7 +630,8 @@ async function pushCall(body){
 }
 async function loadPushCount(){
   const n=$("sh-push-note"),b=$("sh-push");n.textContent="";b.hidden=false;
-  try{const j=await pushCall({action:"count"});n.textContent="Подписчиков на уведомления: "+j.total;b.disabled=j.total===0}
+  try{const j=await pushCall({action:"count"});const fm=t=>t?new Date(t).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"давно";
+    n.textContent="Подписчиков на уведомления: "+j.total+(j.subs&&j.subs.length?" (по порядку подписки: "+j.subs.map(x=>(x.d||x.s)+" ("+x.s+"), "+fm(x.t)).join("; ")+")":"");b.disabled=j.total===0}
   catch(e){b.hidden=true;n.textContent=""}
 }
 $("sh-push").addEventListener("click",async()=>{

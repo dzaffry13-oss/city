@@ -21,7 +21,10 @@ export async function onRequestPost({ request, env }) {
   let list = [];
   try { list = JSON.parse((await env.PUSH.get('subs')) || '[]'); } catch {}
 
-  if (data.action === 'count') return json(200, { ok: true, total: list.length });
+  if (data.action === 'count') {
+    const svc = (e) => { try { const h = new URL(e).hostname; return /apple/.test(h) ? 'Apple' : /googleapis/.test(h) ? 'Google' : /mozilla/.test(h) ? 'Firefox' : /windows/.test(h) ? 'Windows' : 'другое'; } catch { return 'другое'; } };
+    return json(200, { ok: true, total: list.length, subs: list.map((s) => ({ t: s.t || 0, d: s.d || '', s: svc(s.e) })) });
+  }
 
   if (data.action === 'prune') {
     const dead = new Set(Array.isArray(data.dead) ? data.dead.map(String) : []);

@@ -3,6 +3,9 @@ import { endpointOk, unb64u } from '../../_push.js';
 const MAX_SUBS = 5000;
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
+// Грубый тип устройства для статистики (сам User-Agent не сохраняется).
+const device = (ua) => (/iPhone|iPad|iPod/i.test(ua || '') ? 'iPhone/iPad' : /Android/i.test(ua || '') ? 'Android' : /Windows|Macintosh|Linux|CrOS/i.test(ua || '') ? 'Компьютер' : '');
+
 async function load(env) {
   try { return JSON.parse((await env.PUSH.get('subs')) || '[]'); } catch { return []; }
 }
@@ -30,7 +33,7 @@ export async function onRequestPost({ request, env }) {
   try { p = String(data.keys?.p256dh || ''); a = String(data.keys?.auth || ''); if (unb64u(p).length !== 65 || unb64u(a).length !== 16) throw 0; } catch { return json(400, { ok: false, error: 'keys' }); }
   if (!list.some((s) => s.e === e)) {
     if (list.length >= MAX_SUBS) return json(429, { ok: false, error: 'limit' });
-    list.push({ e, p, a, t: Date.now() });
+    list.push({ e, p, a, t: Date.now(), d: device(request.headers.get('User-Agent')) });
   } else {
     const i = list.findIndex((s) => s.e === e);
     list[i] = { ...list[i], p, a };
