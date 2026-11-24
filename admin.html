@@ -193,7 +193,7 @@ details .grid{padding-bottom:18px}
 </main>
 
 <div class="busy" id="busy" hidden><span id="busy-t">Сохраняем…</span></div>
-<div class="share-back" id="share-back" hidden><div class="share" role="dialog" aria-modal="true" aria-labelledby="share-t"><h3 id="share-t">Для соцсетей</h3><canvas id="share-cv" width="1080" height="1350"></canvas><div class="row"><button class="btn" id="sh-cover">Скачать обложку</button><button class="btn" id="sh-zip">Скачать все фото</button><button class="btn" id="sh-text">Копировать текст</button><button class="btn pri" id="sh-tg">Опубликовать в Telegram</button><p class="hint" id="sh-tg-note" style="flex:1 1 100%;margin:0"></p><button class="btn" id="sh-close">Закрыть</button></div></div></div>
+<div class="share-back" id="share-back" hidden><div class="share" role="dialog" aria-modal="true" aria-labelledby="share-t"><h3 id="share-t">Для соцсетей</h3><canvas id="share-cv" width="1080" height="1350"></canvas><div class="row"><button class="btn" id="sh-cover">Скачать обложку</button><button class="btn" id="sh-zip">Скачать все фото</button><button class="btn" id="sh-text">Копировать текст</button><button class="btn pri" id="sh-tg">Опубликовать в Telegram</button><button class="btn" id="sh-push">Уведомить подписчиков</button><p class="hint" id="sh-push-note" style="flex:1 1 100%;margin:0"></p><p class="hint" id="sh-tg-note" style="flex:1 1 100%;margin:0"></p><button class="btn" id="sh-close">Закрыть</button></div></div></div>
 <div class="toast" id="toast" hidden role="status"></div>
 
 <script>
@@ -590,6 +590,7 @@ async function drawCover(it){
 async function openShare(it){
   SH=it;$("share-t").textContent="Для соцсетей: "+it.title;$("sh-tg-note").textContent=it.tgPosted?"Уже опубликовано в Telegram: "+new Date(it.tgPosted+"T12:00:00").toLocaleDateString("ru-RU"):"";$("share-back").hidden=false;
   const cv=$("share-cv");cv.getContext("2d").clearRect(0,0,cv.width,cv.height);
+  loadPushCount();
   busy("Готовим обложку…");try{await drawCover(it)}catch(e){toast("Не удалось собрать обложку.",true)}finally{idle()}
 }
 function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
@@ -618,6 +619,36 @@ $("sh-tg").addEventListener("click",async()=>{
     it.tgPosted=today;$("sh-tg-note").textContent="Опубликовано в Telegram: "+new Date(today+"T12:00:00").toLocaleDateString("ru-RU");renderList();
     toast("Опубликовано в Telegram-канале.");
   }catch(e){console.error("tg-publish",e);toast(e.tg?TG_ERR[e.tg]||TG_ERR.telegram:"Не удалось опубликовать. Попробуйте ещё раз.",true)}finally{idle()}
+});
+
+/* Уведомления подписчикам сайта (те, кто добавил сайт на экран «Домой») */
+async function pushCall(body){
+  const r=await fetch("/api/push/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:TOKEN,...body})});
+  let j=null;try{j=await r.json()}catch(e){}
+  if(!r.ok||!j?.ok)throw Object.assign(new Error("push"),{code:j?.error||(r.status===404?"config":"fail")});
+  return j;
+}
+async function loadPushCount(){
+  const n=$("sh-push-note"),b=$("sh-push");n.textContent="";b.hidden=false;
+  try{const j=await pushCall({action:"count"});n.textContent="Подписчиков на уведомления: "+j.total;b.disabled=j.total===0}
+  catch(e){b.hidden=true;n.textContent=""}
+}
+$("sh-push").addEventListener("click",async()=>{
+  if(!SH)return;const it=SH;
+  const title=(DEALLBL[it.deal]||"Новый объект")+": "+it.title,body=fmt(it.price)+perOf(it)+(addrOf(it)?" · "+addrOf(it):"");
+  if(!confirm("Отправить уведомление всем подписчикам?\n\n"+title+"\n"+body))return;
+  busy("Отправляем уведомления…");
+  try{
+    let offset=0,sent=0,total=0;const dead=[];
+    for(let k=0;k<200;k++){
+      const j=await pushCall({title,body,url:"/o/"+it.id,offset});
+      sent+=j.sent;total=j.total;dead.push(...j.dead);
+      if(j.next==null)break;offset=j.next;
+    }
+    if(dead.length)await pushCall({action:"prune",dead}).catch(()=>{});
+    toast("Уведомление доставлено: "+sent+" из "+total+".");loadPushCount();
+  }catch(e){toast(e.code==="config"?"Уведомления ещё не настроены на сайте (нужны VAPID_PUBLIC, VAPID_PRIVATE и привязка PUSH в Cloudflare Pages).":e.code==="auth"?"Нет доступа: войдите в админку заново.":"Не удалось отправить уведомления. Попробуйте ещё раз.",true)}
+  finally{idle()}
 });
 /* Простой ZIP без сжатия (JPEG уже сжаты), без внешних библиотек */
 const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
