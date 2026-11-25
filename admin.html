@@ -47,7 +47,7 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid r
 .item.off{opacity:.62}
 .thumb{width:96px;height:96px;border-radius:12px;background:#e9ece8 center/cover no-repeat;display:grid;place-items:center;color:var(--mut);font-size:12px}
 .item h3{font-size:16px;margin:0 0 3px;line-height:1.3}
-.item .meta{color:var(--mut);font-size:13px}
+.item .meta{color:var(--mut);font-size:13px}.item .stat{color:var(--mut);font-size:12.5px;margin-top:4px}.item .stat b{color:var(--navy,#17233f);font-weight:700}
 .item .price{font-weight:800;margin-top:2px}
 .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:#e9ece8;color:#445;margin-right:5px;vertical-align:middle}
 .tag.demo{background:#fdecc8;color:#7a5200}.tag.hid{background:#f3d7d3;color:var(--red)}
@@ -204,7 +204,8 @@ const DEALLBL={prodazha:"Продажа",arenda:"Аренда",posutochno:"По�
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>new Intl.NumberFormat("ru-RU").format(Number(n)||0);
-let TOKEN="",LIST=[],editing=null,photos=[];
+try{localStorage.setItem("city_owner","1")}catch(e){}
+let TOKEN="",LIST=[],editing=null,photos=[],STATS={};
 
 /* ---------- хранение ключа ---------- */
 const store={get(){try{return localStorage.getItem("city_admin_token")||""}catch(e){return ""}},set(v){try{localStorage.setItem("city_admin_token",v)}catch(e){}},del(){try{localStorage.removeItem("city_admin_token")}catch(e){}}};
@@ -267,7 +268,13 @@ $("logout").addEventListener("click",()=>{store.del();TOKEN="";$("token").value=
 
 /* ---------- список ---------- */
 let dirty=false;
-async function loadList(){LIST=(await readList()).list;dirty=false;renderList()}
+function statLine(i){const s=STATS[i.id];if(!s)return"";const p=[["Просмотры",s.v],["за 7 дн.",s.w7],["звонки",s.c],["WhatsApp",s.w],["заявки",s.l]];return'<div class="stat">'+p.map(x=>x[0]+": <b>"+x[1]+"</b>").join(" · ")+'</div>'}
+async function loadStats(){
+  try{const r=await fetch("/api/stat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"get",token:TOKEN,ids:LIST.map(x=>String(x.id))})});const j=await r.json();if(r.ok&&j.ok){STATS=j.stats||{};renderList()}}catch(e){}
+}
+async function loadList(){LIST=(await readList()).list;dirty=false;renderList();loadStats()}
+/* Скрытые объекты всегда внизу списка */
+const toEnd=(l,id)=>{const it=l.find(x=>x.id===id);return it?[...l.filter(x=>x.id!==id),it]:l};
 function move(id,to){
   const i=LIST.findIndex(x=>x.id===id);if(i<0)return;
   const j=to==="top"?0:i+to;if(j<0||j>=LIST.length)return;
@@ -293,7 +300,7 @@ function renderList(){
     const per=i.deal==="arenda"?" / мес":i.deal==="posutochno"?" / сутки":"";
     const pos=LIST.indexOf(i);
     return '<div class="item'+(i.hidden?' off':'')+'"><div class="ord"><button data-up="'+i.id+'" title="Выше" aria-label="Поднять выше"'+(!canMove||pos===0?' disabled':'')+'>↑</button><button data-down="'+i.id+'" title="Ниже" aria-label="Опустить ниже"'+(!canMove||pos===LIST.length-1?' disabled':'')+'>↓</button></div><div class="thumb"'+(cover?' style="background-image:url(\''+esc(cover)+'\')"':'')+'>'+(cover?'':'нет фото')+'</div>'
-     +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+(i.tgPosted?'<span class="tag">в Telegram</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div></div>'
+     +'<div><h3>'+(i.demo?'<span class="tag demo">пример</span>':'')+(i.hidden?'<span class="tag hid">скрыт</span>':'')+(i.tgPosted?'<span class="tag">в Telegram</span>':'')+esc(i.title)+'</h3><div class="meta">'+esc(DEALLBL[i.deal]||"")+' · '+esc(i.location||i.city||"")+'</div><div class="price">'+fmt(i.price)+' ₽'+per+'</div>'+statLine(i)+'</div>'
      +'<div class="acts"><button class="btn sm" data-edit="'+i.id+'">Изменить</button><button class="btn sm" data-link="'+i.id+'">Скопировать ссылку</button><button class="btn sm" data-share="'+i.id+'">Для соцсетей</button><button class="btn sm" data-vis="'+i.id+'">'+(i.hidden?'Показать':'Скрыть')+'</button><button class="btn sm dng" data-del="'+i.id+'">Удалить</button></div></div>';
   }).join(""):'<div class="empty">'+(LIST.length?"Ничего не найдено.":"Объектов пока нет. Нажмите «Добавить объект».")+'</div>';
 }
@@ -312,7 +319,7 @@ $("items").addEventListener("click",async e=>{
   }
   if(b.dataset.vis){
     busy(it.hidden?"Показываем на сайте…":"Скрываем с сайта…");
-    try{await commitList(l=>l.map(x=>{if(x.id!==id)return x;const y={...x};if(y.hidden)delete y.hidden;else y.hidden=true;return y}),(it.hidden?"Показан объект: ":"Скрыт объект: ")+it.title);renderList();toast(it.hidden?"Объект скрыт. Сайт обновится через 1–2 минуты.":"Объект снова виден. Сайт обновится через 1–2 минуты.")}
+    try{const hide=!it.hidden;await commitList(l=>{const m=l.map(x=>{if(x.id!==id)return x;const y={...x};if(y.hidden)delete y.hidden;else y.hidden=true;return y});return hide?toEnd(m,id):m},(it.hidden?"Показан объект: ":"Скрыт объект: ")+it.title);renderList();toast(it.hidden?"Объект скрыт. Сайт обновится через 1–2 минуты.":"Объект снова виден. Сайт обновится через 1–2 минуты.")}
     catch(err){toast(explain(err),true)}finally{idle()}
     return;
   }
@@ -492,7 +499,8 @@ $("form").addEventListener("submit",async e=>{
       const merged=cur?{...cur,...o}:o;
       ["image","images","hidden","verified","extra","description","details","rooms","floor","floors","landType"].forEach(k=>{if(!(k in o))delete merged[k]});
       if(cur&&cur.demo===false||!cur)merged.demo=false;
-      return cur?l.map(x=>x.id===id?merged:x):[merged,...l];
+      const out=cur?l.map(x=>x.id===id?merged:x):[merged,...l];
+      return merged.hidden&&!(cur&&cur.hidden)?toEnd(out,id):out;
     },(editing?"Изменён объект: ":"Добавлен объект: ")+o.title);
     for(const p of new Set(old.filter(p=>ownFile(p)&&!paths.includes(p))))await removeFile(p);
     renderList();show("list");

@@ -168,8 +168,11 @@ const PHONE="79094833939",PHONE_TEXT="+7 909 483-39-39",LEAD_URL="https://city-l
 const $=id=>document.getElementById(id),esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>new Intl.NumberFormat("ru-RU").format(Number(n)||0),dealLabels={prodazha:"Продажа",arenda:"Аренда",posutochno:"Посуточно"};
 let photos=[],photoIndex=0,galleryIndex=0,touchX=0,current=null;
+
+/* Статистика: свои заходы (с браузера, где открывали админку) и повторы за день не считаются */
+function track(ev,id){try{if(localStorage.getItem("city_owner")||navigator.webdriver)return;const k="st:"+ev+":"+id+":"+new Date().toISOString().slice(0,10);if(ev!=="call"&&ev!=="wa"&&ev!=="lead"?localStorage.getItem(k):sessionStorage.getItem(k))return;(ev==="view"?localStorage:sessionStorage).setItem(k,"1");fetch("/api/stat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:String(id),ev}),keepalive:true}).catch(()=>{})}catch(e){}}
 $("year").textContent=new Date().getFullYear();
-$("phone-link").href="tel:+"+PHONE;$("phone-link").textContent=PHONE_TEXT;
+$("phone-link").href="tel:+"+PHONE;$("phone-link").textContent=PHONE_TEXT;$("phone-link").addEventListener("click",()=>current&&track("call",current.id));$("wa-float").addEventListener("click",()=>current&&track("wa",current.id));
 function showError(){ $("loading").hidden=true;$("error").hidden=false; }
 function spec(value,label){return '<div class="spec"><span>'+esc(label)+'</span><b>'+esc(value)+'</b></div>'}
 function render(item){
@@ -215,7 +218,7 @@ function render(item){
   +group("Дополнительно",[["furniture","Мебель"],["appliances","Техника"],["parking","Парковка"],["utilities","Коммуникации"]])+infra;
  $("loading").hidden=true;$("object").hidden=false;
 }
-async function load(){const pm=location.pathname.match(/\/o\/([^/]+)\/?$/),id=pm?decodeURIComponent(pm[1]):new URLSearchParams(location.search).get("id");if(!id){showError();return;}try{const r=await fetch("./listings.json");if(!r.ok)throw 0;const data=await r.json();const item=data.find(x=>String(x.id)===id);if(!item)throw 0;render(item);}catch(e){showError();}}
+async function load(){const pm=location.pathname.match(/\/o\/([^/]+)\/?$/),id=pm?decodeURIComponent(pm[1]):new URLSearchParams(location.search).get("id");if(!id){showError();return;}try{const r=await fetch("./listings.json");if(!r.ok)throw 0;const data=await r.json();const item=data.find(x=>String(x.id)===id);if(!item)throw 0;render(item);track("view",item.id);}catch(e){showError();}}
 function setGalleryPhoto(i){if(!photos.length)return;galleryIndex=(i+photos.length)%photos.length;const img=$("gallery-main-image");if(img){img.src=photos[galleryIndex];img.alt=(current?.title||"Фото")+" — фото "+(galleryIndex+1);}document.querySelectorAll("[data-thumb]").forEach(b=>b.classList.toggle("active",Number(b.dataset.thumb)===galleryIndex));}
 function openViewer(i){photoIndex=i;$("viewer-image").src=photos[i];$("viewer-image").alt=(current?.title||"Фото")+" — "+(i+1);$("viewer-count").textContent=(i+1)+" / "+photos.length;$("viewer").classList.add("open");}
 function movePhoto(step){if(photos.length<2)return;photoIndex=(photoIndex+step+photos.length)%photos.length;openViewer(photoIndex);}
@@ -225,7 +228,7 @@ $("viewer").addEventListener("touchstart",e=>touchX=e.changedTouches[0].screenX,
 document.addEventListener("keydown",e=>{if(!$("viewer").classList.contains("open"))return;if(e.key==="Escape")closeViewer();if(e.key==="ArrowRight")movePhoto(1);if(e.key==="ArrowLeft")movePhoto(-1)});
 function openForm(){$("lead-modal").classList.add("open");$("lead-name").focus();}
 $("request-open").addEventListener("click",openForm);$("form-close").addEventListener("click",()=>$("lead-modal").classList.remove("open"));$("lead-modal").addEventListener("click",e=>{if(e.target===$("lead-modal"))$("lead-modal").classList.remove("open")});
-$("lead-form").addEventListener("submit",async e=>{e.preventDefault();const f=e.currentTarget,st=$("lead-status"),btn=$("lead-send");if(!LEAD_URL){st.textContent="Не удалось отправить. Позвоните нам: "+PHONE_TEXT;return;}btn.disabled=true;btn.textContent="Отправляем…";st.textContent="";const d=Object.fromEntries(new FormData(f));d.topic="Заявка по объекту: "+(current?.title||"Недвижимость");d.message=(d.message||"Интересует объект")+`\nЦена: ${fmt(current?.price)} ₽\nАдрес: ${current?.location||current?.city||"не указан"}`;d.page=location.href;try{const r=await fetch(LEAD_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});if(!r.ok)throw 0;st.textContent="Заявка отправлена. Мы свяжемся с вами.";f.reset();}catch(err){st.textContent="Не удалось отправить. Позвоните нам: "+PHONE_TEXT;}finally{btn.disabled=false;btn.textContent="Отправить заявку";}});
+$("lead-form").addEventListener("submit",async e=>{e.preventDefault();const f=e.currentTarget,st=$("lead-status"),btn=$("lead-send");if(!LEAD_URL){st.textContent="Не удалось отправить. Позвоните нам: "+PHONE_TEXT;return;}btn.disabled=true;btn.textContent="Отправляем…";st.textContent="";const d=Object.fromEntries(new FormData(f));d.topic="Заявка по объекту: "+(current?.title||"Недвижимость");d.message=(d.message||"Интересует объект")+`\nЦена: ${fmt(current?.price)} ₽\nАдрес: ${current?.location||current?.city||"не указан"}`;d.page=location.href;try{const r=await fetch(LEAD_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});if(!r.ok)throw 0;st.textContent="Заявка отправлена. Мы свяжемся с вами.";f.reset();if(current)track("lead",current.id);}catch(err){st.textContent="Не удалось отправить. Позвоните нам: "+PHONE_TEXT;}finally{btn.disabled=false;btn.textContent="Отправить заявку";}});
 load();
 </script>
 </body>
