@@ -205,7 +205,7 @@ const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>new Intl.NumberFormat("ru-RU").format(Number(n)||0);
 try{localStorage.setItem("city_owner","1")}catch(e){}
-let TOKEN="",LIST=[],editing=null,photos=[],STATS={};
+let TOKEN="",LIST=[],editing=null,photos=[],STATS=null,STATERR="";
 
 /* ---------- хранение ключа ---------- */
 const store={get(){try{return localStorage.getItem("city_admin_token")||""}catch(e){return ""}},set(v){try{localStorage.setItem("city_admin_token",v)}catch(e){}},del(){try{localStorage.removeItem("city_admin_token")}catch(e){}}};
@@ -268,9 +268,9 @@ $("logout").addEventListener("click",()=>{store.del();TOKEN="";$("token").value=
 
 /* ---------- список ---------- */
 let dirty=false;
-function statLine(i){const s=STATS[i.id];if(!s)return"";const p=[["Просмотры",s.v],["за 7 дн.",s.w7],["звонки",s.c],["WhatsApp",s.w],["заявки",s.l]];return'<div class="stat">'+p.map(x=>x[0]+": <b>"+x[1]+"</b>").join(" · ")+'</div>'}
+function statLine(i){if(STATS===null)return"";const s=STATS[i.id]||{v:0,w7:0,c:0,w:0,l:0};const p=[["Просмотры",s.v],["за 7 дн.",s.w7],["звонки",s.c],["WhatsApp",s.w],["заявки",s.l]];return'<div class="stat">'+p.map(x=>x[0]+": <b>"+x[1]+"</b>").join(" · ")+'</div>'}
 async function loadStats(){
-  try{const r=await fetch("/api/stat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"get",token:TOKEN,ids:LIST.map(x=>String(x.id))})});const j=await r.json();if(r.ok&&j.ok){STATS=j.stats||{};renderList()}}catch(e){}
+  try{const r=await fetch("/api/stat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"get",token:TOKEN,ids:LIST.map(x=>String(x.id))})});const j=await r.json();if(r.ok&&j.ok){STATS=j.stats||{};STATERR=""}else STATERR=r.status===404?"Статистика пока недоступна: сайт ещё обновляется, обновите страницу через пару минут.":r.status===503?"Статистика не подключена: проверьте привязку PUSH в Cloudflare.":"Статистика не загрузилась.";renderList()}catch(e){STATERR="Статистика не загрузилась.";renderList()}
 }
 async function loadList(){LIST=(await readList()).list;dirty=false;renderList();loadStats()}
 /* Скрытые объекты всегда внизу списка */
@@ -293,7 +293,7 @@ function renderList(){
   const rows=LIST.filter(i=>!q||(i.title+" "+(i.location||"")).toLowerCase().includes(q));
   const canMove=!q;$("ordbar").hidden=!dirty;
   const demo=LIST.filter(i=>i.demo).length;
-  $("list-sub").textContent="Всего: "+LIST.length+(demo?" (из них примеров: "+demo+")":"");
+  $("list-sub").textContent="Всего: "+LIST.length+(demo?" (из них примеров: "+demo+")":"")+(STATERR?" · "+STATERR:"");
   $("del-demo").hidden=!demo;
   $("items").innerHTML=rows.length?rows.map(i=>{
     const cover=(i.images&&i.images[0])||i.image;
