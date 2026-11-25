@@ -569,7 +569,7 @@ const statsOf=it=>{
   return r.slice(0,3);
 };
 async function drawCover(it){
-  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=800,NAVY="#101D36",GOLD="#E8C476",M=56;ctx.imageSmoothingQuality="high";
+  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=820,NAVY="#101D36",GOLD="#E8C476",M=56;ctx.imageSmoothingQuality="high";
   const SANS='"Manrope","Segoe UI",Arial,sans-serif',SERIF='"Playfair Display",Georgia,serif';
   ctx.textAlign="left";
   /* фон панели: глубокий синий с мягким свечением */
@@ -614,18 +614,21 @@ async function drawCover(it){
   ctx.fillStyle="#fff";ctx.font="700 42px "+SANS;
   const tl=wrap(ctx,it.title,W-2*M,2);tl.forEach((l,i)=>ctx.fillText(l,M,y+66+i*54));
   y+=66+(tl.length-1)*54;
-  /* показатели: крупное значение и подпись, колонки через золотые линии */
+  /* показатели одной строкой: значение жирно, единица мельче, между ними золотые точки */
   const st=statsOf(it);
   if(st.length){
-    const top=y+44,cw=(W-2*M)/st.length;
-    st.forEach(([v,l],i)=>{
-      const x0=M+i*cw+(i?30:0),maxw=cw-(i?30:0)-24;
-      let f=56;ctx.font="600 "+f+"px "+SERIF;while(ctx.measureText(v).width>maxw&&f>30){f-=2;ctx.font="600 "+f+"px "+SERIF}
-      ctx.fillStyle="#fff";ctx.textBaseline="alphabetic";ctx.fillText(v,x0,top+46);
-      ctx.font="500 24px "+SANS;ctx.fillStyle="#9FB0C8";ctx.fillText(l,x0,top+82);
-      if(i){ctx.fillStyle="rgba(232,196,118,.35)";ctx.fillRect(M+i*cw,top+4,2,84)}
+    const top=y+30,short={"комната":"комн.","комнаты":"комн.","соток":"сот.","назначение":""};
+    const items=st.map(([v,l])=>[v,short[l]??l]);
+    let f=46,gap=34;const meas=()=>{let t=0;for(const [a2,u] of items){ctx.font="800 "+f+"px "+SANS;t+=ctx.measureText(a2).width;ctx.font="600 "+Math.round(f*.7)+"px "+SANS;t+=(u?ctx.measureText(" "+u).width:0)}return t+gap*(items.length-1)};
+    while(meas()>W-2*M&&f>28){f-=2;gap=Math.max(20,gap-2)}
+    let x=M;const by=top+44;ctx.textBaseline="alphabetic";
+    items.forEach(([a2,u],i)=>{
+      if(i){ctx.fillStyle=GOLD;ctx.beginPath();ctx.arc(x-gap/2,by-f*.36,5,0,Math.PI*2);ctx.fill()}
+      ctx.font="800 "+f+"px "+SANS;ctx.fillStyle="#fff";ctx.fillText(a2,x,by);x+=ctx.measureText(a2).width;
+      if(u){ctx.font="600 "+Math.round(f*.7)+"px "+SANS;ctx.fillStyle="#B4C2D6";ctx.fillText(" "+u,x,by);x+=ctx.measureText(" "+u).width}
+      x+=gap;
     });
-    y=top+88;
+    y=by+10;
   }
   /* адрес с иконкой-меткой */
   ctx.font="600 30px "+SANS;
