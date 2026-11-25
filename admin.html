@@ -557,43 +557,92 @@ function wrap(ctx,text,maxW,maxLines){
   if(lines.length>maxLines){lines.length=maxLines;let l=lines[maxLines-1];while(ctx.measureText(l+"…").width>maxW&&l.length)l=l.slice(0,-1);lines[maxLines-1]=l.replace(/\s+$/,"")+"…"}
   return lines;
 }
+/* Крупные показатели для обложки: [значение, подпись] */
+const statsOf=it=>{
+  const r=[];
+  if(it.category==="uchastki"){if(it.area)r.push([String(it.area),"соток"]);const t=it.landType||it.purpose;if(t)r.push([t,"назначение"])}
+  else{
+    if(it.rooms&&(it.category==="kvartiry"||it.category==="doma"))r.push([String(it.rooms),+it.rooms===1?"комната":"комнаты"]);
+    if(it.area)r.push([String(it.area),"м²"]);
+    if(it.floor)r.push([it.floor+(it.floors?" / "+it.floors:""),"этаж"]);else if(it.floors&&it.category==="doma")r.push([String(it.floors),"этажей"]);
+  }
+  return r.slice(0,3);
+};
 async function drawCover(it){
-  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=930;ctx.imageSmoothingQuality="high";
-  ctx.fillStyle="#101D36";ctx.fillRect(0,0,W,H);
+  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=800,NAVY="#101D36",GOLD="#E8C476",M=56;ctx.imageSmoothingQuality="high";
+  const SANS='"Manrope","Segoe UI",Arial,sans-serif',SERIF='"Playfair Display",Georgia,serif';
+  ctx.textAlign="left";
+  /* фон панели: глубокий синий с мягким свечением */
+  let g=ctx.createLinearGradient(0,PH,0,H);g.addColorStop(0,"#13233F");g.addColorStop(1,"#0B1428");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   const src=photosOf(it)[0];
   if(src){
     try{
       const im=await loadImg(src);
       /* Логотип на фото стоит справа внизу (ширина 22%, отступ справа 5%). Берём левую часть кадра, где его нет. */
       let sw=im.width*.71,sh=sw*PH/W;if(sh>im.height){sh=im.height;sw=sh*W/PH}
-      ctx.drawImage(im,0,(im.height-sh)*.4,sw,sh,0,0,W,PH);
+      ctx.save();try{ctx.filter="saturate(1.1) contrast(1.05) brightness(1.02)"}catch(e){}
+      ctx.drawImage(im,0,(im.height-sh)*.4,sw,sh,0,0,W,PH);ctx.restore();
     }catch(e){}
   }
-  const SANS='"Manrope","Segoe UI",Arial,sans-serif',SERIF='"Playfair Display",Georgia,serif';
-  ctx.fillStyle="#E8C476";ctx.fillRect(0,PH,W,5);
-  // метка сделки на фото
-  const deal=(DEALLBL[it.deal]||"").toUpperCase();ctx.font="800 30px "+SANS;
-  const bw=ctx.measureText(deal).width+52;
-  ctx.fillStyle="#E8C476";ctx.beginPath();ctx.roundRect(40,40,bw,64,32);ctx.fill();
-  ctx.fillStyle="#101D36";ctx.textBaseline="middle";ctx.fillText(deal,66,73);
-  // цена
-  ctx.textBaseline="alphabetic";ctx.fillStyle="#E8C476";ctx.font="700 78px "+SERIF;
-  const price=fmt(it.price)+perOf(it);
-  let fs=78;while(ctx.measureText(price).width>W-100&&fs>40){fs-=4;ctx.font="700 "+fs+"px "+SERIF}
-  ctx.fillText(price,50,PH+105);
-  // название
-  ctx.fillStyle="#fff";ctx.font="700 40px "+SANS;
-  const tl=wrap(ctx,it.title,W-100,2);tl.forEach((l,i)=>ctx.fillText(l,50,PH+165+i*50));
-  let y=PH+165+tl.length*50+6;
-  // характеристики и адрес
-  ctx.fillStyle="#C9D4E3";ctx.font="600 30px "+SANS;
-  const sp=specsOf(it).join("  ·  ");if(sp){ctx.fillText(wrap(ctx,sp,W-100,1)[0],50,y+30);y+=46}
+  /* затемнение сверху (читаемость меток) и плавный переход фото в панель */
+  g=ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,"rgba(11,20,40,.55)");g.addColorStop(1,"rgba(11,20,40,0)");ctx.fillStyle=g;ctx.fillRect(0,0,W,220);
+  g=ctx.createLinearGradient(0,PH-300,0,PH+1);g.addColorStop(0,"rgba(19,35,63,0)");g.addColorStop(.6,"rgba(19,35,63,.7)");g.addColorStop(1,"#13233F");ctx.fillStyle=g;ctx.fillRect(0,PH-300,W,301);
+  /* тонкая золотая рамка по периметру */
+  ctx.strokeStyle="rgba(232,196,118,.55)";ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(16,16,W-32,H-32,26);ctx.stroke();
+  /* метка сделки */
+  const deal=(DEALLBL[it.deal]||"").toUpperCase();ctx.font="800 29px "+SANS;ctx.textBaseline="middle";
+  const bw=ctx.measureText(deal).width+56;
+  ctx.fillStyle=GOLD;ctx.beginPath();ctx.roundRect(M,56,bw,64,32);ctx.fill();
+  ctx.fillStyle=NAVY;ctx.fillText(deal,M+28,89);
+  /* «Проверено» справа */
+  if(it.verified){
+    ctx.font="700 26px "+SANS;const t="Проверено CITY",tw=ctx.measureText(t).width,pw=tw+86;
+    ctx.fillStyle="rgba(11,20,40,.82)";ctx.beginPath();ctx.roundRect(W-M-pw,56,pw,64,32);ctx.fill();
+    ctx.strokeStyle="rgba(232,196,118,.7)";ctx.lineWidth=2;ctx.stroke();
+    const cx=W-M-pw+38,cy=88;ctx.strokeStyle=GOLD;ctx.lineWidth=5;ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(cx-9,cy+1);ctx.lineTo(cx-2,cy+8);ctx.lineTo(cx+10,cy-8);ctx.stroke();
+    ctx.fillStyle="#fff";ctx.fillText(t,W-M-pw+64,89);
+  }
+  /* цена: число крупно, единица мельче */
+  ctx.textBaseline="alphabetic";
+  const num=fmt(it.price),unit=perOf(it).trim();let fs=104;ctx.font="700 "+fs+"px "+SERIF;
+  const uf=()=>Math.round(fs*.42);
+  const pwid=()=>{ctx.font="700 "+fs+"px "+SERIF;const a=ctx.measureText(num).width;ctx.font="600 "+uf()+"px "+SANS;return a+16+ctx.measureText(unit).width};
+  while(pwid()>W-2*M&&fs>56)fs-=4;
+  let y=PH+92;ctx.fillStyle=GOLD;ctx.font="700 "+fs+"px "+SERIF;ctx.fillText(num,M,y);
+  const nw=ctx.measureText(num).width;ctx.font="600 "+uf()+"px "+SANS;ctx.fillStyle="rgba(232,196,118,.85)";ctx.fillText(unit,M+nw+16,y);
+  /* название */
+  ctx.fillStyle="#fff";ctx.font="700 42px "+SANS;
+  const tl=wrap(ctx,it.title,W-2*M,2);tl.forEach((l,i)=>ctx.fillText(l,M,y+66+i*54));
+  y+=66+(tl.length-1)*54;
+  /* показатели: крупное значение и подпись, колонки через золотые линии */
+  const st=statsOf(it);
+  if(st.length){
+    const top=y+44,cw=(W-2*M)/st.length;
+    st.forEach(([v,l],i)=>{
+      const x0=M+i*cw+(i?30:0),maxw=cw-(i?30:0)-24;
+      let f=56;ctx.font="600 "+f+"px "+SERIF;while(ctx.measureText(v).width>maxw&&f>30){f-=2;ctx.font="600 "+f+"px "+SERIF}
+      ctx.fillStyle="#fff";ctx.textBaseline="alphabetic";ctx.fillText(v,x0,top+46);
+      ctx.font="500 24px "+SANS;ctx.fillStyle="#9FB0C8";ctx.fillText(l,x0,top+82);
+      if(i){ctx.fillStyle="rgba(232,196,118,.35)";ctx.fillRect(M+i*cw,top+4,2,84)}
+    });
+    y=top+88;
+  }
+  /* адрес с иконкой-меткой */
+  ctx.font="600 30px "+SANS;
   const ad=(it.city||"Буйнакск")+(addrOf(it)?", "+addrOf(it):"");
-  ctx.fillText(wrap(ctx,"📍 "+ad,W-100,1)[0],50,y+30);
-  // подвал: телефон и логотип
-  ctx.fillStyle="#E8C476";ctx.font="800 34px "+SANS;ctx.textAlign="right";ctx.fillText(PHONE_TXT,W-50,H-34);ctx.textAlign="left";
-  try{const lg=await loadImg("assets/city-logo-mark.png"),lh=56,lw=lg.width/lg.height*lh;ctx.drawImage(lg,50,H-34-lh+8,lw,lh);
-    ctx.fillStyle="#fff";ctx.font="700 34px "+SERIF;ctx.fillText("CITY",50+lw+12,H-34)}catch(e){ctx.fillStyle="#fff";ctx.font="700 34px "+SERIF;ctx.fillText("CITY",50,H-34)}
+  const ay=y+62;
+  ctx.fillStyle=GOLD;ctx.beginPath();ctx.arc(M+14,ay-14,11,Math.PI,0);ctx.lineTo(M+14,ay+8);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#13233F";ctx.beginPath();ctx.arc(M+14,ay-14,4.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#D3DCE9";ctx.fillText(wrap(ctx,ad,W-2*M-42,1)[0],M+42,ay);
+  /* подвал: линия, логотип, телефон кнопкой */
+  const fy=H-76;
+  ctx.fillStyle="rgba(232,196,118,.3)";ctx.fillRect(M,H-152,W-2*M,2);
+  ctx.font="800 34px "+SANS;const pw2=ctx.measureText(PHONE_TXT).width+64;
+  ctx.fillStyle=GOLD;ctx.beginPath();ctx.roundRect(W-M-pw2,fy-38,pw2,76,38);ctx.fill();
+  ctx.fillStyle=NAVY;ctx.textBaseline="middle";ctx.fillText(PHONE_TXT,W-M-pw2+32,fy+2);
+  ctx.textBaseline="alphabetic";
+  const wm=(x)=>{ctx.fillStyle="#fff";ctx.font="700 38px "+SERIF;ctx.fillText("CITY",x,fy+4);ctx.fillStyle="#9FB0C8";ctx.font="500 20px "+SANS;ctx.fillText("агентство недвижимости",x,fy+30)};
+  try{const lg=await loadImg("assets/city-logo-mark.png"),lh=66,lw=lg.width/lg.height*lh;ctx.drawImage(lg,M,fy-lh/2-2,lw,lh);wm(M+lw+14)}catch(e){wm(M)}
 }
 async function openShare(it){
   SH=it;$("share-t").textContent="Для соцсетей: "+it.title;$("sh-tg-note").textContent=it.tgPosted?"Уже опубликовано в Telegram: "+new Date(it.tgPosted+"T12:00:00").toLocaleDateString("ru-RU"):"";$("share-back").hidden=false;
