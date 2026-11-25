@@ -569,11 +569,11 @@ const statsOf=it=>{
   return r.slice(0,3);
 };
 async function drawCover(it){
-  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=820,NAVY="#101D36",GOLD="#E8C476",M=56;ctx.imageSmoothingQuality="high";
+  const cv=$("share-cv"),ctx=cv.getContext("2d"),W=1080,H=1350,PH=962,NAVY="#101D36",GOLD="#E8C476",M=56;ctx.imageSmoothingQuality="high";
   const SANS='"Manrope","Segoe UI",Arial,sans-serif',SERIF='"Playfair Display",Georgia,serif';
   ctx.textAlign="left";
   /* фон панели: глубокий синий с мягким свечением */
-  let g=ctx.createLinearGradient(0,PH,0,H);g.addColorStop(0,"#13233F");g.addColorStop(1,"#0B1428");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  let g;ctx.fillStyle="#101D36";ctx.fillRect(0,0,W,H);
   const src=photosOf(it)[0];
   if(src){
     try{
@@ -585,8 +585,9 @@ async function drawCover(it){
     }catch(e){}
   }
   /* затемнение сверху (читаемость меток) и плавный переход фото в панель */
-  g=ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,"rgba(11,20,40,.55)");g.addColorStop(1,"rgba(11,20,40,0)");ctx.fillStyle=g;ctx.fillRect(0,0,W,220);
-  g=ctx.createLinearGradient(0,PH-300,0,PH+1);g.addColorStop(0,"rgba(19,35,63,0)");g.addColorStop(.6,"rgba(19,35,63,.7)");g.addColorStop(1,"#13233F");ctx.fillStyle=g;ctx.fillRect(0,PH-300,W,301);
+  g=ctx.createLinearGradient(0,0,0,150);g.addColorStop(0,"rgba(11,20,40,.4)");g.addColorStop(1,"rgba(11,20,40,0)");ctx.fillStyle=g;ctx.fillRect(0,0,W,150);
+  /* чёткая граница фото и панели с тонкой золотой линией */
+  ctx.fillStyle=GOLD;ctx.fillRect(0,PH,W,3);
   /* тонкая золотая рамка по периметру */
   ctx.strokeStyle="rgba(232,196,118,.55)";ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(16,16,W-32,H-32,26);ctx.stroke();
   /* метка сделки */
@@ -604,42 +605,41 @@ async function drawCover(it){
   }
   /* цена: число крупно, единица мельче */
   ctx.textBaseline="alphabetic";
-  const num=fmt(it.price),unit=perOf(it).trim();let fs=104;ctx.font="700 "+fs+"px "+SERIF;
+  const num=fmt(it.price),unit=perOf(it).trim();let fs=88;ctx.font="700 "+fs+"px "+SERIF;
   const uf=()=>Math.round(fs*.42);
   const pwid=()=>{ctx.font="700 "+fs+"px "+SERIF;const a=ctx.measureText(num).width;ctx.font="600 "+uf()+"px "+SANS;return a+16+ctx.measureText(unit).width};
   while(pwid()>W-2*M&&fs>56)fs-=4;
-  let y=PH+92;ctx.fillStyle=GOLD;ctx.font="700 "+fs+"px "+SERIF;ctx.fillText(num,M,y);
+  let y=PH+88;ctx.fillStyle=GOLD;ctx.font="700 "+fs+"px "+SERIF;ctx.fillText(num,M,y);
   const nw=ctx.measureText(num).width;ctx.font="600 "+uf()+"px "+SANS;ctx.fillStyle="rgba(232,196,118,.85)";ctx.fillText(unit,M+nw+16,y);
   /* название */
-  ctx.fillStyle="#fff";ctx.font="700 42px "+SANS;
-  const tl=wrap(ctx,it.title,W-2*M,2);tl.forEach((l,i)=>ctx.fillText(l,M,y+66+i*54));
-  y+=66+(tl.length-1)*54;
+  ctx.fillStyle="#fff";ctx.font="700 38px "+SANS;
+  const tl=wrap(ctx,it.title,W-2*M,1);tl.forEach((l,i)=>ctx.fillText(l,M,y+54+i*50));
+  y+=54+(tl.length-1)*50;
   /* показатели одной строкой: значение жирно, единица мельче, между ними золотые точки */
   const st=statsOf(it);
   if(st.length){
-    const top=y+30,short={"комната":"комн.","комнаты":"комн.","соток":"сот.","назначение":""};
+    const top=y+16,short={"комната":"комн.","комнаты":"комн.","соток":"сот.","назначение":""};
     const items=st.map(([v,l])=>[v,short[l]??l]);
-    let f=46,gap=34;const meas=()=>{let t=0;for(const [a2,u] of items){ctx.font="800 "+f+"px "+SANS;t+=ctx.measureText(a2).width;ctx.font="600 "+Math.round(f*.7)+"px "+SANS;t+=(u?ctx.measureText(" "+u).width:0)}return t+gap*(items.length-1)};
+    let f=40,gap=30;const meas=()=>{let t=0;for(const [a2,u] of items){ctx.font="800 "+f+"px "+SANS;t+=ctx.measureText(a2).width;ctx.font="600 "+Math.round(f*.7)+"px "+SANS;t+=(u?ctx.measureText(" "+u).width:0)}return t+gap*(items.length-1)};
     while(meas()>W-2*M&&f>28){f-=2;gap=Math.max(20,gap-2)}
-    let x=M;const by=top+44;ctx.textBaseline="alphabetic";
+    let x=M;const by=top+40;ctx.textBaseline="alphabetic";
     items.forEach(([a2,u],i)=>{
       if(i){ctx.fillStyle=GOLD;ctx.beginPath();ctx.arc(x-gap/2,by-f*.36,5,0,Math.PI*2);ctx.fill()}
       ctx.font="800 "+f+"px "+SANS;ctx.fillStyle="#fff";ctx.fillText(a2,x,by);x+=ctx.measureText(a2).width;
       if(u){ctx.font="600 "+Math.round(f*.7)+"px "+SANS;ctx.fillStyle="#B4C2D6";ctx.fillText(" "+u,x,by);x+=ctx.measureText(" "+u).width}
       x+=gap;
     });
-    y=by+10;
+    y=by+6;
   }
   /* адрес с иконкой-меткой */
-  ctx.font="600 30px "+SANS;
+  ctx.font="600 27px "+SANS;
   const ad=(it.city||"Буйнакск")+(addrOf(it)?", "+addrOf(it):"");
-  const ay=y+62;
+  const ay=y+52;
   ctx.fillStyle=GOLD;ctx.beginPath();ctx.arc(M+14,ay-14,11,Math.PI,0);ctx.lineTo(M+14,ay+8);ctx.closePath();ctx.fill();
-  ctx.fillStyle="#13233F";ctx.beginPath();ctx.arc(M+14,ay-14,4.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#101D36";ctx.beginPath();ctx.arc(M+14,ay-14,4.5,0,Math.PI*2);ctx.fill();
   ctx.fillStyle="#D3DCE9";ctx.fillText(wrap(ctx,ad,W-2*M-42,1)[0],M+42,ay);
   /* подвал: линия, логотип, телефон кнопкой */
-  const fy=H-76;
-  ctx.fillStyle="rgba(232,196,118,.3)";ctx.fillRect(M,H-152,W-2*M,2);
+  const fy=H-66;
   ctx.font="800 34px "+SANS;const pw2=ctx.measureText(PHONE_TXT).width+64;
   ctx.fillStyle=GOLD;ctx.beginPath();ctx.roundRect(W-M-pw2,fy-38,pw2,76,38);ctx.fill();
   ctx.fillStyle=NAVY;ctx.textBaseline="middle";ctx.fillText(PHONE_TXT,W-M-pw2+32,fy+2);
