@@ -14,6 +14,7 @@ const GLYPH = {
 };
 const ICON_CHAT = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
 const fmt = (n) => new Intl.NumberFormat('ru-RU').format(n);
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 const PAGE = 12;
 
 function card(i) {
@@ -29,7 +30,7 @@ function card(i) {
     ? '<button type="button" class="photo-open" data-photo="' + esc(photos[0]) + '" data-photo-alt="' + esc(i.title) + '" aria-label="Увеличить фотографию: ' + esc(i.title) + '"><img src="' + esc(photos[0]) + '" alt="' + esc(i.title) + '" loading="lazy"></button>'
       + (photos.length > 1 ? '<button type="button" class="gallery-arrow prev" data-gallery-prev="' + i.id + '" aria-label="Предыдущее фото">‹</button><button type="button" class="gallery-arrow next" data-gallery-next="' + i.id + '" aria-label="Следующее фото">›</button><span class="gallery-count" data-gallery-count="' + i.id + '">1 / ' + photos.length + '</span>' : '')
     : '<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true">' + (GLYPH[i.category] || GLYPH.doma) + '</svg>';
-  return '<article class="card' + (i.image ? ' photo-card' : '') + '"><div class="visual">' + vis + '<div class="chips"><span class="chip">' + DEALLBL[i.deal] + '</span>' + (i.demo ? '<span class="chip o">пример</span>' : '') + '</div></div>'
+  return '<article class="card' + (i.image ? ' photo-card' : '') + '"><div class="visual">' + vis + '<div class="chips"><span class="chip">' + DEALLBL[i.deal] + '</span>' + (i.demo ? '<span class="chip o">пример</span>' : '') + '</div><button type="button" class="fav-btn card-fav" data-fav="' + esc(i.id) + '" aria-pressed="false" aria-label="В избранное">' + HEART + '</button></div>'
     + '<div class="cbody"><div class="price">' + fmt(i.price) + ' ₽' + (per ? '<small>' + per + '</small>' : '') + '</div><h3>' + esc(i.title) + '</h3><div class="loc"><strong>Город:</strong> ' + esc(city) + '</div><ul class="specs">' + specs + '</ul><div class="loc">' + esc(i.location || 'Район не указан') + '</div>'
     + '<div class="acts"><a class="ask" href="/o/' + encodeURIComponent(i.id) + '">Подробнее</a><a class="btn acc sm wa" href="' + wa + '" target="_blank" rel="noopener">' + ICON_CHAT + 'WhatsApp</a></div></div></article>';
 }

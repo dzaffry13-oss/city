@@ -3,7 +3,7 @@
 import { isOwner } from '../_auth.js';
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
-const EVENTS = { view: 'v', call: 'c', wa: 'w', lead: 'l' };
+const EVENTS = { view: 'v', call: 'c', wa: 'w', lead: 'l', fav: 'f', share: 's' };
 const BOT = /bot|spider|crawl|slurp|headless|preview|facebookexternalhit|monitor|lighthouse|python|curl|wget|go-http|java\//i;
 const ID = /^[A-Za-z0-9_-]{1,40}$/;
 const DAYS = 30;
@@ -30,7 +30,7 @@ export async function onRequestPost({ request, env }) {
       let s; try { s = JSON.parse((await env.PUSH.get('st:' + id)) || 'null'); } catch {}
       if (!s) return;
       const w7 = Object.entries(s.d || {}).filter(([k]) => k >= cut).reduce((a, [, n]) => a + n, 0);
-      out[id] = { v: s.v || 0, c: s.c || 0, w: s.w || 0, l: s.l || 0, w7 };
+      out[id] = { v: s.v || 0, c: s.c || 0, w: s.w || 0, l: s.l || 0, f: s.f || 0, s: s.s || 0, w7 };
     }));
     return json(200, { ok: true, stats: out });
   }
@@ -51,7 +51,7 @@ export async function onRequestPost({ request, env }) {
       const list = await r.json();
       if (!list.some((x) => String(x.id) === id)) return json(200, { ok: true, skipped: 'unknown' });
     } catch { return json(200, { ok: true, skipped: 'nolist' }); }
-    s = { v: 0, c: 0, w: 0, l: 0, d: {} };
+    s = { v: 0, c: 0, w: 0, l: 0, f: 0, s: 0, d: {} };
   }
   s[key] = (s[key] || 0) + 1;
   if (key === 'v') {

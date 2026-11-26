@@ -269,7 +269,7 @@ $("logout").addEventListener("click",()=>{store.del();TOKEN="";$("token").value=
 
 /* ---------- список ---------- */
 let dirty=false;
-function statLine(i){if(STATS===null)return"";const s=STATS[i.id]||{v:0,w7:0,c:0,w:0,l:0};const p=[["Просмотры",s.v],["за 7 дн.",s.w7],["звонки",s.c],["WhatsApp",s.w],["заявки",s.l]];return'<div class="stat">'+p.map(x=>x[0]+": <b>"+x[1]+"</b>").join(" · ")+'</div>'}
+function statLine(i){if(STATS===null)return"";const s=STATS[i.id]||{v:0,w7:0,c:0,w:0,l:0,f:0,s:0};const p=[["Просмотры",s.v],["за 7 дн.",s.w7],["звонки",s.c],["WhatsApp",s.w],["заявки",s.l],["в избранное",s.f||0],["поделились",s.s||0]];return'<div class="stat">'+p.map(x=>x[0]+": <b>"+x[1]+"</b>").join(" · ")+'</div>'}
 async function loadStats(){
   try{const r=await fetch("/api/stat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"get",token:TOKEN,ids:LIST.map(x=>String(x.id))})});const j=await r.json();if(r.ok&&j.ok){STATS=j.stats||{};STATERR=""}else STATERR=r.status===404?"Статистика пока недоступна: сайт ещё обновляется, обновите страницу через пару минут.":r.status===503?"Статистика не подключена: проверьте привязку PUSH в Cloudflare.":"Статистика не загрузилась.";renderList()}catch(e){STATERR="Статистика не загрузилась.";renderList()}
 }
