@@ -159,7 +159,8 @@ details .grid{padding-bottom:18px}
       <div id="w-rooms"><label for="f-rooms">Комнат</label><select id="f-rooms"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
       <div id="w-floor"><label for="f-floor">Этаж</label><input id="f-floor" type="text" inputmode="numeric" placeholder="1"></div>
       <div id="w-floors"><label for="f-floors">Этажей в доме</label><input id="f-floors" type="text" inputmode="numeric" placeholder="4"></div>
-      <div id="w-land"><label for="f-land">Категория земли</label><select id="f-land"><option value="">—</option><option>ИЖС</option><option>ЛПХ</option><option>Садоводство</option><option>Коммерческое</option><option>Сельскохозяйственное</option></select></div>
+      <div id="w-landcat"><label for="f-landcat">Категория земель</label><select id="f-landcat"><option value="">—</option><option>Земли населённых пунктов</option><option>Земли сельскохозяйственного назначения</option><option>Земли промышленности и иного специального назначения</option></select></div>
+      <div id="w-land"><label for="f-land">Вид разрешённого использования</label><select id="f-land"><option value="">—</option><option>ИЖС</option><option>ЛПХ</option><option>Садоводство</option><option>Коммерческое</option><option>Сельскохозяйственное</option></select></div>
     </div>
 
     <div class="sec">Фотографии</div>
@@ -391,7 +392,7 @@ function syncFields(){
   $("l-area").textContent=land?"Площадь, соток":"Площадь, м²";
   const rent=$("f-deal").value!=="prodazha";
   DETAILS.forEach(([k,,,m])=>{$("dw-"+k).hidden=(m==="s"&&rent)||(m==="r"&&!rent)});
-  $("w-rooms").hidden=land;$("w-floor").hidden=!flat;$("w-floors").hidden=!(flat||home);$("w-land").hidden=!land;
+  $("w-rooms").hidden=land;$("w-floor").hidden=!flat;$("w-floors").hidden=!(flat||home);$("w-land").hidden=!land;$("w-landcat").hidden=!land;
 }
 $("f-category").addEventListener("change",syncFields);$("f-deal").addEventListener("change",syncFields);
 $("f-price").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"");e.target.value=d?fmt(d):""});
@@ -402,7 +403,7 @@ function openForm(it){
   const v=(id,val)=>$(id).value=val??"";
   v("f-category",it?.category||"kvartiry");v("f-deal",it?.deal||"prodazha");v("f-title",it?.title);v("f-price",it?.price?fmt(it.price):"");v("f-area",it?.area);
   v("f-city",it?.city||"Буйнакск");v("f-location",it?.location);v("f-rooms",it?.rooms);v("f-floor",it?.floor);v("f-floors",it?.floors);
-  v("f-land",it?.landType||it?.purpose);v("f-desc",it?.description);v("f-extra",it?.extra);$("f-show").checked=!it?.hidden;$("f-verified").checked=!!it?.verified;
+  v("f-land",it?.landType||it?.purpose);v("f-landcat",it?.landCategory);v("f-desc",it?.description);v("f-extra",it?.extra);$("f-show").checked=!it?.hidden;$("f-verified").checked=!!it?.verified;
   DETAILS.forEach(([k])=>{v("d-"+k,it?.details?.[k]);syncChips(k)});
   document.querySelector("details").open=!!it?.details&&Object.values(it.details).some(Boolean);
   photos=(it?(it.images&&it.images.length?it.images:(it.image?[it.image]:[])):[]).map(p=>({path:p,url:p}));
@@ -463,6 +464,7 @@ function collect(id){
   const fl=num($("f-floor").value),fls=num($("f-floors").value);
   if(flat&&fl)o.floor=fl;if((flat||home)&&fls)o.floors=fls;
   if(land&&$("f-land").value)o.landType=$("f-land").value;
+  if(land&&$("f-landcat").value)o.landCategory=$("f-landcat").value;
   let extra=$("f-extra").value.trim();
   if(!extra){if(flat&&fl)extra="Этаж "+fl+(fls?" из "+fls:"");else if(land&&$("f-land").value)extra=$("f-land").value}
   if(extra)o.extra=extra;
@@ -497,7 +499,7 @@ $("form").addEventListener("submit",async e=>{
     await commitList(l=>{
       const cur=l.find(x=>x.id===id);
       const merged=cur?{...cur,...o}:o;
-      ["image","images","hidden","verified","extra","description","details","rooms","floor","floors","landType"].forEach(k=>{if(!(k in o))delete merged[k]});
+      ["image","images","hidden","verified","extra","description","details","rooms","floor","floors","landType","landCategory"].forEach(k=>{if(!(k in o))delete merged[k]});
       if(cur&&cur.demo===false||!cur)merged.demo=false;
       const out=cur?l.map(x=>x.id===id?merged:x):[merged,...l];
       return merged.hidden&&!(cur&&cur.hidden)?toEnd(out,id):out;
