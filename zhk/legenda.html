@@ -76,6 +76,19 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
 .stat{font-size:14px;color:var(--mut)}
 .demo-flag{display:inline-block;margin:0 0 14px;padding:6px 12px;border-radius:8px;background:#f6e7c3;color:#6b4e10;font-size:13px;font-weight:600}
 @media(max-width:860px){.cs-wrap{grid-template-columns:1fr}.panel{position:static}.chess{padding:10px}.row{grid-template-columns:20px repeat(10,1fr);gap:3px}.cell{min-height:36px;font-size:10px}.cell small{display:none}}
+
+.calc{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}
+.calc h3{margin:0 0 16px;font:400 28px/1.1 var(--display)}
+.fld{margin:0 0 20px}
+.fld label{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--mut);margin-bottom:8px}
+.fld label b{color:var(--ink);font-size:15px}
+.fld input[type=range]{width:100%;accent-color:var(--gold-h);height:28px}
+.res{background:var(--stone);border-radius:14px;padding:20px;align-self:start}
+.res .big{font:400 40px/1.1 var(--display);margin:2px 0 4px}
+.res .rw{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
+.res .rw span{color:var(--mut)}.res .rw b{text-align:right}
+.res .btn{display:flex;justify-content:center;margin-top:16px;color:var(--ink);background:var(--gold);border-color:var(--gold)}
+@media(max-width:860px){.calc{grid-template-columns:1fr;gap:20px;padding:18px}.res .big{font-size:34px}}
 @media(max-width:760px){
  section{padding:40px 0}
  .demo{grid-template-columns:1fr;gap:26px}
@@ -151,6 +164,16 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
       </div>
       <aside class="panel" id="panel"><p class="empty">Выберите квартиру на схеме.</p></aside>
     </div>
+    <div class="calc" id="calc">
+      <div>
+        <h3>Калькулятор рассрочки</h3>
+        <div class="fld"><label>Площадь квартиры</label><div class="chips" id="c-area" role="group" aria-label="Площадь квартиры"></div></div>
+        <div class="fld"><label for="c-first">Первый взнос <b id="c-first-v"></b></label><input type="range" id="c-first" min="0" max="70" step="5" value="30"></div>
+        <div class="fld"><label for="c-term">Срок рассрочки <b id="c-term-v"></b></label><input type="range" id="c-term" min="1" max="36" step="1" value="36"></div>
+      </div>
+      <div class="res" id="c-res"></div>
+    </div>
+    <p class="note">Цена за м²: 110 000 ₽ при оплате наличными, 115 000 ₽ в рассрочку, до 36 месяцев. Расчёт предварительный и не является офертой.</p>
   </div>
 </section>
 
@@ -194,10 +217,29 @@ function draw(){
   g.appendChild(r)}
  $("stat").textContent="Свободно в блоке: "+free+" из 100";
  var p=$("panel");
+ if(SEL&&CA!==SEL.a){CA=SEL.a;calc()}
  if(!SEL){p.innerHTML='<p class="empty">Выберите квартиру на схеме.</p>';return}
  var msg="Здравствуйте! Интересует ЖК «Легенда», блок "+SEL.b+", этаж "+SEL.f+", квартира №"+SEL.n+" ("+SEL.a+" м²).";
- p.innerHTML='<h3>Квартира №'+SEL.n+'</h3><div class="stat">'+ST[SEL.s]+'</div><dl><dt>Блок</dt><dd>'+SEL.b+'</dd><dt>Этаж</dt><dd>'+SEL.f+' из 10</dd><dt>Площадь</dt><dd>'+SEL.a+' м²</dd></dl><a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg)+'" rel="noopener">Узнать цену в WhatsApp</a>';
+ p.innerHTML='<h3>Квартира №'+SEL.n+'</h3><div class="stat">'+ST[SEL.s]+'</div><dl><dt>Блок</dt><dd>'+SEL.b+'</dd><dt>Этаж</dt><dd>'+SEL.f+' из 10</dd><dt>Площадь</dt><dd>'+SEL.a+' м²</dd><dt>Наличными</dt><dd>'+rub(CASH*SEL.a)+'</dd><dt>В рассрочку</dt><dd>'+rub(INST*SEL.a)+'</dd></dl><a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg)+'" rel="noopener">Уточнить в WhatsApp</a>';
 }
+
+var CASH=110000,INST=115000,CA=48;
+function rub(n){return Math.round(n).toLocaleString("ru-RU")+"\u00a0₽"}
+function calc(){
+ var ca=$("c-area");ca.innerHTML="";
+ [48,74,90].forEach(function(a){chip(ca,a+" м²",a===CA,function(){CA=a;calc()})});
+ var fp=+$("c-first").value,m=+$("c-term").value,tot=INST*CA,first=tot*fp/100,rest=tot-first;
+ $("c-first-v").textContent=fp+"% · "+rub(first);
+ $("c-term-v").textContent=m+" мес.";
+ var cash=CASH*CA;
+ $("c-res").innerHTML='<div class="stat">Платёж в месяц</div><div class="big">'+rub(rest/m)+'</div>'+
+ '<div class="rw"><span>Стоимость в рассрочку</span><b>'+rub(tot)+'</b></div>'+
+ '<div class="rw"><span>Первый взнос</span><b>'+rub(first)+'</b></div>'+
+ '<div class="rw"><span>Остаток на '+m+' мес.</span><b>'+rub(rest)+'</b></div>'+
+ '<div class="rw"><span>При оплате наличными</span><b>'+rub(cash)+'</b></div>'+
+ '<a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Здравствуйте! ЖК «Легенда», квартира "+CA+" м². Рассрочка: взнос "+fp+"%, "+m+" мес. Хочу уточнить условия.")+'" rel="noopener">Обсудить в WhatsApp</a>';
+}
+$("c-first").oninput=calc;$("c-term").oninput=calc;calc();
 $("onlyfree").onclick=function(){F=!F;draw()};
 fetch("/zhk/legenda/chess.json").then(function(r){return r.json()}).then(function(j){D=j.apts;draw()}).catch(function(){$("chess-grid").textContent="Не удалось загрузить схему."});
 })();
