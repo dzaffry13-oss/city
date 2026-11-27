@@ -92,6 +92,10 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
 .res .rw span{color:var(--mut)}.res .rw b{text-align:right}
 .res .btn{display:flex;justify-content:center;margin-top:16px;color:var(--ink);background:var(--gold);border-color:var(--gold)}
 @media(max-width:860px){.calc{grid-template-columns:1fr;gap:20px;padding:18px}.res .big{font-size:34px}}
+.plan{margin:28px 0 0}.plan img{display:block;width:100%;border-radius:14px;border:1px solid var(--line);background:#fff}.plan figcaption{margin-top:10px;font-size:13px;color:var(--mut);max-width:760px}
+.sel{width:100%;min-height:46px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:600 16px var(--text);color:var(--ink);background:#fff}
+.row{grid-template-columns:28px repeat(11,1fr)!important}
+@media(max-width:860px){.row{grid-template-columns:20px repeat(11,1fr)!important}.cell{font-size:9px!important;padding:4px 0!important}}
 @media(max-width:760px){
  section{padding:40px 0}
  .demo{grid-template-columns:1fr;gap:26px}
@@ -153,11 +157,11 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
 <section id="chess">
   <div class="wrap">
     <h2>Выбор квартиры</h2>
-    <p class="lead">Выберите блок и нажмите на квартиру, чтобы увидеть этаж, площадь и статус.</p>
-    <div class="demo-flag">Демонстрационные данные: расположение и статусы условные</div>
+    <p class="lead">Выберите блок и нажмите на квартиру, чтобы увидеть этаж, площадь, цену и статус.</p>
+    <div class="demo-flag">Планировки по данным застройщика. Этажность, блоки и статусы квартир условные</div>
     <div class="cs-bar">
       <div class="chips" id="blocks" role="group" aria-label="Блок"></div>
-      <div class="chips" id="areas" role="group" aria-label="Площадь"></div>
+      <div class="chips" id="areas" role="group" aria-label="Тип квартиры"></div>
       <div class="chips"><button class="chip" id="onlyfree" aria-pressed="false">Только свободные</button></div>
     </div>
     <div class="cs-wrap">
@@ -167,10 +171,12 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
       </div>
       <aside class="panel" id="panel"><p class="empty">Выберите квартиру на схеме.</p></aside>
     </div>
+    <figure class="plan"><a href="/zhk/legenda/floor-plan.jpg" target="_blank" rel="noopener"><img src="/zhk/legenda/floor-plan.jpg" alt="Планировка типового этажа: 11 квартир" loading="lazy"></a>
+      <figcaption>Типовой этаж: 11 квартир. 1К — однокомнатная, 2Е — двухкомнатная с кухней-гостиной, 2К — двухкомнатная. Первая цифра у каждой квартиры — площадь, вторая — балкон.</figcaption></figure>
     <div class="calc" id="calc">
       <div>
         <h3>Калькулятор рассрочки</h3>
-        <div class="fld"><label>Площадь квартиры</label><div class="chips" id="c-area" role="group" aria-label="Площадь квартиры"></div></div>
+        <div class="fld"><label for="c-area">Квартира</label><select id="c-area" class="sel"></select></div>
         <div class="fld"><label for="c-first">Первый взнос <b id="c-first-v"></b></label><input type="range" id="c-first" min="0" max="70" step="5" value="30"><div class="man"><input type="text" inputmode="numeric" id="c-first-n" aria-label="Первый взнос, рублей" autocomplete="off"><span>₽ — ввести вручную</span></div></div>
         <div class="fld"><label for="c-term">Срок рассрочки <b id="c-term-v"></b></label><input type="range" id="c-term" min="1" max="36" step="1" value="36"><div class="man"><input type="text" inputmode="numeric" id="c-term-n" aria-label="Срок, месяцев" autocomplete="off"><span>мес. — ввести вручную (1–36)</span></div></div>
       </div>
@@ -195,49 +201,52 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
 <script>
 (function(){
 var PHONE="79094833939",ST={free:"Свободна",booked:"Забронирована",sold:"Продана"};
-var D=[],B=1,A=0,F=false,SEL=null;
+var TN={"1К":"1-комнатная","2Е":"2-комнатная, кухня-гостиная","2К":"2-комнатная"};
+var D=[],PL={},UA=[],B=1,T="",F=false,SEL=null;
 function $(i){return document.getElementById(i)}
+function ar(x){return x.toFixed(2).replace(".",",")}
+function rub(n){return Math.round(n).toLocaleString("ru-RU")+" ₽"}
 function chip(box,label,on,fn){var b=document.createElement("button");b.className="chip";b.textContent=label;b.setAttribute("aria-pressed",on);b.onclick=fn;box.appendChild(b)}
 function draw(){
- var bl=$("blocks"),ar=$("areas");bl.innerHTML="";ar.innerHTML="";
+ var bl=$("blocks"),tp=$("areas");bl.innerHTML="";tp.innerHTML="";
  for(var i=1;i<=5;i++)(function(i){chip(bl,"Блок "+i,i===B,function(){B=i;SEL=null;draw()})})(i);
- [0,48,74,90].forEach(function(a){chip(ar,a?a+" м²":"Все площади",a===A,function(){A=a;draw()})});
+ [["","Все"],["1К","1-комн."],["2Е","2-комн. (евро)"],["2К","2-комн."]].forEach(function(t){chip(tp,t[1],t[0]===T,function(){T=t[0];draw()})});
  $("onlyfree").setAttribute("aria-pressed",F);
  var g=$("chess-grid");g.innerHTML="";
  var list=D.filter(function(x){return x.b===B}),free=0;
- for(var f=10;f>=1;f--){
+ for(var f=10;f>=2;f--){
   var r=document.createElement("div");r.className="row";
   r.innerHTML='<div class="fl">'+f+'</div>';
   list.filter(function(x){return x.f===f}).forEach(function(x){
-   var c=document.createElement("button");c.type="button";
-   var dim=(A&&x.a!==A)||(F&&x.s!=="free");
+   var q=PL[x.p],c=document.createElement("button");c.type="button";
+   var dim=(T&&q.t!==T)||(F&&x.s!=="free");
    c.className="cell "+x.s+(dim?" dim":"")+(SEL&&SEL.n===x.n?" sel":"");
-   c.innerHTML=x.n+"<small>"+x.a+" м²</small>";
-   c.setAttribute("aria-label","Квартира "+x.n+", "+x.a+" м², "+ST[x.s]);
+   c.innerHTML=x.n+"<small>"+ar(q.a)+"</small>";
+   c.setAttribute("aria-label","Квартира "+x.n+", "+q.t+", "+ar(q.a)+" м², "+ST[x.s]);
    if(x.s!=="sold")c.onclick=function(){SEL=x;draw();if(innerWidth<=860)$("panel").scrollIntoView({block:"nearest",behavior:"smooth"})};
    if(x.s==="free")free++;
    r.appendChild(c)});
   g.appendChild(r)}
- $("stat").textContent="Свободно в блоке: "+free+" из 100";
+ $("stat").textContent="Свободно в блоке: "+free+" из 99";
  var p=$("panel");
- if(SEL&&CA!==SEL.a){CA=SEL.a;calc()}
- if(!SEL){p.innerHTML='<p class="empty">Выберите квартиру на схеме.</p>';return}
- var msg="Здравствуйте! Интересует ЖК «Легенда», блок "+SEL.b+", этаж "+SEL.f+", квартира №"+SEL.n+" ("+SEL.a+" м²).";
- p.innerHTML='<h3>Квартира №'+SEL.n+'</h3><div class="stat">'+ST[SEL.s]+'</div><dl><dt>Блок</dt><dd>'+SEL.b+'</dd><dt>Этаж</dt><dd>'+SEL.f+' из 10</dd><dt>Площадь</dt><dd>'+SEL.a+' м²</dd><dt>Наличными</dt><dd>'+rub(CASH*SEL.a)+'</dd><dt>В рассрочку</dt><dd>'+rub(INST*SEL.a)+'</dd></dl><a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg)+'" rel="noopener">Уточнить в WhatsApp</a>';
+ if(!SEL){p.innerHTML='<p class="empty">Выберите квартиру на схеме. Цифра в клетке — общая площадь с балконом, м².</p>';return}
+ var q=PL[SEL.p];
+ if(CA!==q.a){CA=q.a;calc()}
+ var msg="Здравствуйте! Интересует ЖК «Легенда», блок "+SEL.b+", этаж "+SEL.f+", квартира №"+SEL.n+" ("+ar(q.a)+" м², "+q.t+").";
+ p.innerHTML='<h3>Квартира №'+SEL.n+'</h3><div class="stat">'+ST[SEL.s]+' · '+TN[q.t]+'</div><dl><dt>Блок</dt><dd>'+SEL.b+'</dd><dt>Этаж</dt><dd>'+SEL.f+'</dd><dt>Общая площадь</dt><dd>'+ar(q.a)+' м²</dd><dt>Жилая часть</dt><dd>'+ar(q.l)+' м²</dd><dt>Балкон</dt><dd>'+ar(q.bal)+' м²</dd><dt>Наличными</dt><dd>'+rub(CASH*q.a)+'</dd><dt>В рассрочку</dt><dd>'+rub(INST*q.a)+'</dd></dl><a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg)+'" rel="noopener">Уточнить в WhatsApp</a>';
 }
-
-var CASH=110000,INST=115000,CA=48;
-function rub(n){return Math.round(n).toLocaleString("ru-RU")+"\u00a0₽"}
+var CASH=110000,INST=115000,CA=47.75;
 var PCT=30,M=36;
 function calc(src){
- var ca=$("c-area");ca.innerHTML="";
- [48,74,90].forEach(function(a){chip(ca,a+" м²",a===CA,function(){CA=a;calc()})});
+ var sel=$("c-area");
+ if(!sel.options.length){UA.forEach(function(u){var o=document.createElement("option");o.value=u.a;o.textContent=u.t+" · "+ar(u.a)+" м²";sel.appendChild(o)})}
+ sel.value=CA;
  var tot=INST*CA,first=Math.min(tot,Math.round(tot*PCT/100)),fp=PCT,rest=tot-first,m=M;
  $("c-first-v").textContent=(Math.round(fp*10)/10)+"% · "+rub(first);
  $("c-term-v").textContent=m+" мес.";
  $("c-first").value=Math.min(70,Math.round(fp/5)*5);
  $("c-term").value=m;
- if(src!=="fn")$("c-first-n").value=first.toLocaleString("ru-RU");
+ if(src!=="fn")$("c-first-n").value=Math.round(first).toLocaleString("ru-RU");
  if(src!=="tn")$("c-term-n").value=m;
  var cash=CASH*CA;
  $("c-res").innerHTML='<div class="stat">Платёж в месяц</div><div class="big">'+rub(rest/m)+'</div>'+
@@ -245,16 +254,19 @@ function calc(src){
  '<div class="rw"><span>Первый взнос</span><b>'+rub(first)+'</b></div>'+
  '<div class="rw"><span>Остаток на '+m+' мес.</span><b>'+rub(rest)+'</b></div>'+
  '<div class="rw"><span>При оплате наличными</span><b>'+rub(cash)+'</b></div>'+
- '<a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Здравствуйте! ЖК «Легенда», квартира "+CA+" м². Рассрочка: взнос "+Math.round(fp)+"%, "+m+" мес. Хочу уточнить условия.")+'" rel="noopener">Обсудить в WhatsApp</a>';
+ '<a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Здравствуйте! ЖК «Легенда», квартира "+ar(CA)+" м². Рассрочка: взнос "+Math.round(fp)+"%, "+m+" мес. Хочу уточнить условия.")+'" rel="noopener">Обсудить в WhatsApp</a>';
 }
+$("c-area").onchange=function(){CA=+this.value;calc()};
 $("c-first").oninput=function(){PCT=+this.value;calc()};
 $("c-term").oninput=function(){M=+this.value;calc()};
 $("c-first-n").oninput=function(){var v=parseInt(this.value.replace(/\D/g,""),10)||0,t=INST*CA;if(v>t)v=t;this.value=v?v.toLocaleString("ru-RU"):"";PCT=v/t*100;calc("fn")};
 $("c-term-n").oninput=function(){var v=parseInt(this.value.replace(/\D/g,""),10);if(!v)return;if(v>36)v=36;this.value=v;M=v;calc("tn")};
 $("c-term-n").onblur=function(){this.value=M};
-calc();
 $("onlyfree").onclick=function(){F=!F;draw()};
-fetch("/zhk/legenda/chess.json").then(function(r){return r.json()}).then(function(j){D=j.apts;draw()}).catch(function(){$("chess-grid").textContent="Не удалось загрузить схему."});
+fetch("/zhk/legenda/chess.json").then(function(r){return r.json()}).then(function(j){
+ D=j.apts;j.plan.forEach(function(q){PL[q.p]=q});
+ var seen={};j.plan.slice().sort(function(a,b){return a.a-b.a}).forEach(function(q){if(!seen[q.a]){seen[q.a]=1;UA.push({a:q.a,t:q.t})}});
+ calc();draw()}).catch(function(){$("chess-grid").textContent="Не удалось загрузить схему."});
 })();
 </script>
 </body>
