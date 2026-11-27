@@ -83,6 +83,9 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
 .fld label{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--mut);margin-bottom:8px}
 .fld label b{color:var(--ink);font-size:15px}
 .fld input[type=range]{width:100%;accent-color:var(--gold-h);height:28px}
+.man{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:13px;color:var(--mut)}
+.man input{width:130px;min-height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:600 16px var(--text);color:var(--ink);background:#fff}
+.man input:focus{outline:2px solid var(--gold);border-color:var(--gold)}
 .res{background:var(--stone);border-radius:14px;padding:20px;align-self:start}
 .res .big{font:400 40px/1.1 var(--display);margin:2px 0 4px}
 .res .rw{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
@@ -168,8 +171,8 @@ footer{padding:26px 0;font-size:13px;color:var(--mut)}
       <div>
         <h3>Калькулятор рассрочки</h3>
         <div class="fld"><label>Площадь квартиры</label><div class="chips" id="c-area" role="group" aria-label="Площадь квартиры"></div></div>
-        <div class="fld"><label for="c-first">Первый взнос <b id="c-first-v"></b></label><input type="range" id="c-first" min="0" max="70" step="5" value="30"></div>
-        <div class="fld"><label for="c-term">Срок рассрочки <b id="c-term-v"></b></label><input type="range" id="c-term" min="1" max="36" step="1" value="36"></div>
+        <div class="fld"><label for="c-first">Первый взнос <b id="c-first-v"></b></label><input type="range" id="c-first" min="0" max="70" step="5" value="30"><div class="man"><input type="text" inputmode="numeric" id="c-first-n" aria-label="Первый взнос, рублей" autocomplete="off"><span>₽ — ввести вручную</span></div></div>
+        <div class="fld"><label for="c-term">Срок рассрочки <b id="c-term-v"></b></label><input type="range" id="c-term" min="1" max="36" step="1" value="36"><div class="man"><input type="text" inputmode="numeric" id="c-term-n" aria-label="Срок, месяцев" autocomplete="off"><span>мес. — ввести вручную (1–36)</span></div></div>
       </div>
       <div class="res" id="c-res"></div>
     </div>
@@ -225,21 +228,31 @@ function draw(){
 
 var CASH=110000,INST=115000,CA=48;
 function rub(n){return Math.round(n).toLocaleString("ru-RU")+"\u00a0₽"}
-function calc(){
+var PCT=30,M=36;
+function calc(src){
  var ca=$("c-area");ca.innerHTML="";
  [48,74,90].forEach(function(a){chip(ca,a+" м²",a===CA,function(){CA=a;calc()})});
- var fp=+$("c-first").value,m=+$("c-term").value,tot=INST*CA,first=tot*fp/100,rest=tot-first;
- $("c-first-v").textContent=fp+"% · "+rub(first);
+ var tot=INST*CA,first=Math.min(tot,Math.round(tot*PCT/100)),fp=PCT,rest=tot-first,m=M;
+ $("c-first-v").textContent=(Math.round(fp*10)/10)+"% · "+rub(first);
  $("c-term-v").textContent=m+" мес.";
+ $("c-first").value=Math.min(70,Math.round(fp/5)*5);
+ $("c-term").value=m;
+ if(src!=="fn")$("c-first-n").value=first.toLocaleString("ru-RU");
+ if(src!=="tn")$("c-term-n").value=m;
  var cash=CASH*CA;
  $("c-res").innerHTML='<div class="stat">Платёж в месяц</div><div class="big">'+rub(rest/m)+'</div>'+
  '<div class="rw"><span>Стоимость в рассрочку</span><b>'+rub(tot)+'</b></div>'+
  '<div class="rw"><span>Первый взнос</span><b>'+rub(first)+'</b></div>'+
  '<div class="rw"><span>Остаток на '+m+' мес.</span><b>'+rub(rest)+'</b></div>'+
  '<div class="rw"><span>При оплате наличными</span><b>'+rub(cash)+'</b></div>'+
- '<a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Здравствуйте! ЖК «Легенда», квартира "+CA+" м². Рассрочка: взнос "+fp+"%, "+m+" мес. Хочу уточнить условия.")+'" rel="noopener">Обсудить в WhatsApp</a>';
+ '<a class="btn" href="https://wa.me/'+PHONE+'?text='+encodeURIComponent("Здравствуйте! ЖК «Легенда», квартира "+CA+" м². Рассрочка: взнос "+Math.round(fp)+"%, "+m+" мес. Хочу уточнить условия.")+'" rel="noopener">Обсудить в WhatsApp</a>';
 }
-$("c-first").oninput=calc;$("c-term").oninput=calc;calc();
+$("c-first").oninput=function(){PCT=+this.value;calc()};
+$("c-term").oninput=function(){M=+this.value;calc()};
+$("c-first-n").oninput=function(){var v=parseInt(this.value.replace(/\D/g,""),10)||0,t=INST*CA;if(v>t)v=t;this.value=v?v.toLocaleString("ru-RU"):"";PCT=v/t*100;calc("fn")};
+$("c-term-n").oninput=function(){var v=parseInt(this.value.replace(/\D/g,""),10);if(!v)return;if(v>36)v=36;this.value=v;M=v;calc("tn")};
+$("c-term-n").onblur=function(){this.value=M};
+calc();
 $("onlyfree").onclick=function(){F=!F;draw()};
 fetch("/zhk/legenda/chess.json").then(function(r){return r.json()}).then(function(j){D=j.apts;draw()}).catch(function(){$("chess-grid").textContent="Не удалось загрузить схему."});
 })();
