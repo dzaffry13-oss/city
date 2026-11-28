@@ -141,6 +141,7 @@ h1{font-size:clamp(30px,2.15vw,38px);line-height:1.16;letter-spacing:-.025em;max
 .consent{display:flex!important;align-items:flex-start;gap:10px}
 .consent input[type=checkbox]{flex:none;width:20px!important;height:20px!important;min-height:0!important;padding:0!important;margin:1px 0 0!important;border-radius:4px}
 .consent span{flex:1;min-width:0;text-align:left}
+@media(max-width:800px){.content,.content.few{grid-template-columns:minmax(0,1fr);grid-template-areas:"side" "specs" "description"}.content.few .side{align-self:stretch}}
 </style>
 </head>
 <body>
